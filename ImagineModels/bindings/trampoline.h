@@ -1,5 +1,7 @@
 #include "../src/jf12.cc"
 
+// These classes are necessary to override virtual functions
+
 class PyMagneticField : public MagneticField {
 public:
     using MagneticField::MagneticField; // Inherit constructors
