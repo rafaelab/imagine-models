@@ -3,8 +3,7 @@ project(ImagineModels)
 
 add_subdirectory(extern/pybind11)
 
-
-pybind11_add_module(ImagineModels ImagineModels/bindings/imagine_models.cc)
+pybind11_add_module(ImagineModels ImagineModels/python/imagine_models.cc)
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.

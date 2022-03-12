@@ -1,6 +1,6 @@
-#include "../src/jf12.cc"
+#include "../c/headers/MagneticField.h"
 
-// These classes are necessary to override virtual functions
+// These classes are necessary to override virtual functions when binding
 
 class PyMagneticField : public MagneticField {
 public:

@@ -2,40 +2,7 @@
 #include "../headers/hamunits.h"
 #include "../headers/MagneticField.h"
 
-class JF12MagneticField : public RegularMagneticField {
-public:
-  JF12MagneticField() = default;
-//  JF12MagneticField(const JF12MagneticField &) = delete;
- // JF12MagneticField(JF12MagneticField &&) = delete;
-//  JF12MagneticField &operator=(const JF12MagneticField &) = delete;
-//  JF12MagneticField &operator=(JF12MagneticField &&) = delete;
-  virtual ~JF12MagneticField() = default;
-
-  double b_arm_1 = 0.1;
-  double b_arm_2 = 3.0;
-  double b_arm_3 = -0.9;
-  double b_arm_4 = -0.8;
-  double b_arm_5 = -2.0;
-  double b_arm_6 = -4.2;
-  double b_arm_7 = 0.0;
-  double b_ring = 0.1;
-  double h_disk = 0.40;
-  double w_disk = 0.27;
-
-                      // toroidal halo parameters
-  double Bn = 1.4;
-  double Bs = -1.1;
-  double rn = 9.22;
-  double rs = 16.7;
-  double wh = 0.20;
-  double z0 = 5.3;
-  // X-field parameters
-  double B0_X = 4.6;
-  double Xtheta_const = 49;
-  double rpc_X = 4.8;
-  double r0_X= 2.9;
-
-  std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override {
+std::vector<double>  JF12MagneticField::evaluate_at_pos(const std::vector<double> &pos) const {
   // define fixed parameters
       const double Rmax = 20 * cgs::kpc;   // outer boundary of GMF
       const double rho_GC = 1. * cgs::kpc; // interior boundary of GMF
@@ -56,11 +23,11 @@ public:
           11.4, 12.7, 15.5}; // the radii where the spiral arm boundaries cross the
                              // negative x-axis
 
-      const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])};
+      const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])* cgs::kpc};
       const double rho{
-          sqrt(pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2])};
+          sqrt(pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2])* cgs::kpc};
       const double phi{atan2(pos[1], pos[0])};
-      const double z{pos[2]};
+      const double z{pos[2]* cgs::kpc};
 
       // define boundaries for where magnetic field is zero (outside of galaxy)
       if (r > Rmax || rho < rho_GC) {
@@ -185,5 +152,4 @@ public:
       B_cart[2] = B_cyl[2];
 
       return std::vector<double>{{B_cart[0], B_cart[1], B_cart[2]}};
-  }
-};
+  };
