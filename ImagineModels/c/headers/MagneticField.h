@@ -5,10 +5,6 @@
 class MagneticField {
 public:
   MagneticField() = default;
-//  MagneticField(const MagneticField &) = delete;
-//  MagneticField(MagneticField &&) = delete;
-//  MagneticField &operator=(const MagneticField &) = delete;
-//  MagneticField &operator=(MagneticField &&) = delete;
   virtual ~MagneticField() = default;
 };
 
@@ -16,10 +12,6 @@ public:
 class RegularMagneticField : public MagneticField {
 public:
   RegularMagneticField() = default;
-//  RegularMagneticField(const RegularMagneticField &) = delete;
-//  RegularMagneticField(RegularMagneticField &&) = delete;
-//  RegularMagneticField &operator=(const RegularMagneticField &) = delete;
-//  RegularMagneticField &operator=(RegularMagneticField &&) = delete;
   virtual ~RegularMagneticField() = default;
 
   virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const {std::vector<double> _b(3); return _b;}
@@ -32,10 +24,6 @@ public:
  class JF12MagneticField : public RegularMagneticField {
     public:
       JF12MagneticField() = default;
-      JF12MagneticField(const JF12MagneticField &) = delete;
-      JF12MagneticField(JF12MagneticField &&) = delete;
-      JF12MagneticField &operator=(const JF12MagneticField &) = delete;
-      JF12MagneticField &operator=(JF12MagneticField &&) = delete;
       virtual ~JF12MagneticField() = default;
 
       double b_arm_1 = 0.1;

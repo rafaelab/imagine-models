@@ -1,16 +1,20 @@
 #include <cmath>
+#include <iostream>
 #include "../headers/hamunits.h"
 #include "../headers/MagneticField.h"
 
  std::vector<std::vector<std::vector<std::vector<double>>>> RegularMagneticField::evaluate_grid(
     const std::vector<double> grid_x, const std::vector<double> grid_y, const std::vector<double> grid_z) const {
-    int size = sizeof(grid_x)/sizeof(grid_x[0]);
-    if (size != sizeof(grid_y)/sizeof(grid_y[0])) {
-        throw std::length_error("size of grid y is not equal to size of grid x ");}
-    if (size != sizeof(grid_z)/sizeof(grid_z[0])) {
-        throw std::length_error("size of grid z is not equal to size of grid x ");}
+    int size = grid_x.size();
+    if (size != grid_y.size()) {
+        throw std::length_error(std::string("size of grid y (" + std::to_string(grid_y.size())) +
+        std::string(") is not equal to size of grid x (" + std::to_string(size) + std::string(")")));}
+    if (size != grid_z.size()) {
+        throw std::length_error(std::string("size of grid z (" + std::to_string(grid_z.size())) +
+        std::string(") is not equal to size of grid x (" + std::to_string(size) + std::string(")")));}
+    std::cout<< "(evaluate grid) size: " << size  <<std::endl;
     std::vector<std::vector<std::vector<std::vector<double>>>> b(size , std::vector<std::vector<std::vector<double>>> (size, std::vector<std::vector<double>> (size, std::vector<double> (3))));
-    for (int i = 0; i < size; i++) {
+    for (int i=0; i < size; i++) {
         for (int j=0; j < size; j++) {
             for (int k=0; k < size; k++) {
                 std::vector<double> grid_at_pos = {{grid_x[i], grid_y[j], grid_z[k]}};
