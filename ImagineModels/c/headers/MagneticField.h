@@ -1,5 +1,6 @@
 #include <vector>
 #include <stdexcept>
+#include <functional>
 
 // magnetic field base class
 class MagneticField {
@@ -14,11 +15,12 @@ public:
   RegularMagneticField() = default;
   virtual ~RegularMagneticField() = default;
 
-  virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const {std::vector<double> _b(3); return _b;}
+  // virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const {std::vector<double> _b(3); return _b;}
 
-  std::vector<std::vector<std::vector<std::vector<double>>>> evaluate_grid(const std::vector<double> grid_x,
+  std::vector<std::vector<std::vector<std::vector<double>>>> _evaluate_grid(const std::vector<double> grid_x,
                                        const std::vector<double> grid_y,
-                                       const std::vector<double> grid_z) const;
+                                       const std::vector<double> grid_z,
+                                       std::function<std::vector<double>(std::vector<double> )> &ev_at_pos) const;
  };
 
  class JF12MagneticField : public RegularMagneticField {

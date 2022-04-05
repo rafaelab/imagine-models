@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
+#include <pybind11/functional.h>
 
 #include "trampoline.h"
 
@@ -18,8 +19,7 @@ PYBIND11_MODULE(ImagineModels, m) {
 
     py::class_<RegularMagneticField, MagneticField, PyRegularMagneticField>(m, "RegularMagneticField")
         .def(py::init<>())
-        .def("evaluate_at_pos", &RegularMagneticField::evaluate_at_pos, "pos"_a)
-        .def("evaluate_grid", &RegularMagneticField::evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
+        .def("_evaluate_grid", &RegularMagneticField::_evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a, "ev_at_pos"_a);
 
    py::class_<JF12MagneticField, RegularMagneticField, PyJF12MagneticField>(m, "JF12MagneticField")
         .def(py::init<>())
