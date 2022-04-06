@@ -1,4 +1,4 @@
-#include "../c/headers/MagneticField.h"
+#include "../c_library/headers/MagneticField.h"
 
 // These classes are necessary to override virtual functions when binding
 

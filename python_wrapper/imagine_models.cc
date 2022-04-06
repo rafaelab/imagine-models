@@ -11,10 +11,10 @@ using namespace pybind11::literals;
 // Trampoline classes via templates
 
 
-PYBIND11_MODULE(ImagineModels, m) {
+PYBIND11_MODULE(_ImagineModels, m) {
     m.doc() = "IMAGINE Magnetic Field Model Library";
 
-    py::class_<MagneticField, PyMagneticField>(m, "Magnetic_Field")
+    py::class_<MagneticField, PyMagneticField>(m, "MagneticField")
         .def(py::init<>());
 
     py::class_<RegularMagneticField, MagneticField, PyRegularMagneticField>(m, "RegularMagneticField")

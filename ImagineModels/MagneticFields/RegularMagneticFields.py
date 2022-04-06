@@ -1,10 +1,9 @@
-import ImagineModels as im
 import numpy as np
 
-from ..HelperFunctions.CoordinateConversions import cyl2cart
+from ImagineModels import RegularMagneticField, cyl2cart
 
 
-class AxiSymmetricSpiral(im.RegularMagneticField):
+class AxiSymmetricSpiral(RegularMagneticField):
     """
             FUNCTION
                 ===  ASS : AxiSymmetric Spiral Galactic magnetic field model ===

@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.4...3.18)
-project(ImagineModels)
+project(_ImagineModels)
 
 add_subdirectory(extern/pybind11)
 
-pybind11_add_module(ImagineModels ImagineModels/python_wrapper/imagine_models.cc)
-target_link_libraries(ImagineModels PUBLIC "${CMAKE_SOURCE_DIR}/ImagineModels/c/source/jf12.cc"
-                                           "${CMAKE_SOURCE_DIR}/ImagineModels/c/source/regular.cc")
+pybind11_add_module(_ImagineModels python_wrapper/imagine_models.cc)
+target_link_libraries(_ImagineModels PUBLIC "${CMAKE_SOURCE_DIR}/c_library/source/jf12.cc"
+                                           "${CMAKE_SOURCE_DIR}/c_library/source/regular.cc")
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 # define (VERSION_INFO) here.
-target_compile_definitions(ImagineModels
+target_compile_definitions(_ImagineModels
                            PRIVATE VERSION_INFO=${EXAMPLE_VERSION_INFO})
