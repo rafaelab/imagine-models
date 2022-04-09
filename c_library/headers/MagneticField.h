@@ -55,3 +55,17 @@ public:
       std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const;
  };
 
+
+ class HelixMagneticField : public RegularMagneticField {
+    public:
+      HelixMagneticField() = default;
+      virtual ~HelixMagneticField() = default;
+
+      double bx = 0.;
+      double by = 0.;
+      double bz = 0.;
+      double rmax = 3.;
+      double rmin = 0.;
+
+      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const;
+ };

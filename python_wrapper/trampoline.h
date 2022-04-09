@@ -17,3 +17,8 @@ public:
     using JF12MagneticField::JF12MagneticField; // Inherit constructors
     // std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, evaluate_at_pos, pos); }
 };
+
+class HelixMagneticField : public HelixMagneticField {
+public:
+    using HelixMagneticField::HelixMagneticField; // Inherit constructors
+};
