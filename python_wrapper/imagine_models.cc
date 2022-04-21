@@ -19,7 +19,8 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
     py::class_<RegularMagneticField, MagneticField, PyRegularMagneticField>(m, "RegularMagneticField")
         .def(py::init<>())
-        .def("_evaluate_grid", &RegularMagneticField::_evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a, "ev_at_pos"_a);
+        .def("_evaluate_grid", &RegularMagneticField::_evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a, "ev_at_pos"_a)
+        .def("evaluate_grid", &RegularMagneticField::evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
 
 
     py::class_<JF12MagneticField, RegularMagneticField, PyJF12MagneticField>(m, "JF12MagneticField")

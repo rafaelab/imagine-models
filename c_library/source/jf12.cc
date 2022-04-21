@@ -117,7 +117,7 @@ std::vector<double>  JF12MagneticField::evaluate_at_pos(const std::vector<double
         r_sign = -1.;
       }
 
-      // dividing line between region with constat elevation angle, and the
+      // dividing line between region with constant elevation angle, and the
       // interior:
       double rc_X = rpc_X + std::fabs(z) / tan(Xtheta_const);
 

@@ -4,8 +4,8 @@
 #include "../headers/MagneticField.h"
 
  std::vector<std::vector<std::vector<std::vector<double>>>> RegularMagneticField::_evaluate_grid(
-    const std::vector<double> grid_x, const std::vector<double> grid_y, const std::vector<double> grid_z,
-    std::function<std::vector<double>(std::vector<double> )> &ev_at_pos ) const {
+    std::vector<double> grid_x, const std::vector<double> grid_y, const std::vector<double> grid_z,
+    std::function<std::vector<double>(std::vector<double> )> ev_at_pos ) const {
     int size = grid_x.size();
     if (size != grid_y.size()) {
         throw std::length_error(std::string("size of grid y (" + std::to_string(grid_y.size())) +
