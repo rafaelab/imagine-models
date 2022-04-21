@@ -1,4 +1,4 @@
-#include "../../ImagineModels/c/headers/MagneticField.h"
+#include "../../c_library/headers/MagneticField.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -20,22 +20,11 @@ int main() {
   JF12MagneticField jf12;
   std::vector<double> test_pos{{6., 2., 0.}};
   std::vector<double> b_val = {1.e-12, 1.e-12, 1.e-12};
-  std::cout << "b_arm_1: " << jf12.b_arm_1 << std::endl;
-  print_ev_pos(jf12, test_pos);
-  jf12.b_arm_1 = 40.;
-  jf12.b_arm_2 = 40.;
-  jf12.b_arm_3 = 40.;
-  jf12.b_arm_4 = 40.;
-  jf12.b_arm_5 = 40.;
-  jf12.b_arm_6 = 40.;
-  jf12.b_arm_7 = 40.;
-  std::cout << "b_arm_1: " << jf12.b_arm_1 << std::endl;
-  print_ev_pos(jf12, test_pos);
-  const std::vector<double> grid_x {{2.,4.,6.,8.}};
-  const std::vector<double> grid_y {{4.,6.,8.,2.}};
-  const std::vector<double> grid_z {{-.2,-.4, .6, 0}};
+  const std::vector<double> grid_x {{2.,4.,6.,8., 0., 0., 0., 0.}};
+  const std::vector<double> grid_y {{4.,6.,8.,2., 0., 0., 0., 0.}};
+  const std::vector<double> grid_z {{-.2,-.4, .6, 0, -.1, .8, .2, 0}};
   std::vector<std::vector<std::vector<std::vector<double>>>>  b_grid = jf12.evaluate_grid(grid_x, grid_y, grid_z);
-  std::cout<< "\n b_grid: "  <<std::endl;
+  std::cout<< "b_grid: "  <<std::endl;
   for (int i = 0; i < b_grid.size(); i++) {
         std::cout<< "b_grid x size: " << b_grid.size() <<std::endl;
         for (int j = 0; j < b_grid[i].size(); j++) {
@@ -50,5 +39,16 @@ int main() {
                 }
             }
         }
+  std::cout << "\n b_arm_1: " << jf12.b_arm_1 << std::endl;
+  print_ev_pos(jf12, test_pos);
+  jf12.b_arm_1 = 40.;
+  jf12.b_arm_2 = 40.;
+  jf12.b_arm_3 = 40.;
+  jf12.b_arm_4 = 40.;
+  jf12.b_arm_5 = 40.;
+  jf12.b_arm_6 = 40.;
+  jf12.b_arm_7 = 40.;
+  std::cout << "b_arm_1: " << jf12.b_arm_1 << std::endl;
+  print_ev_pos(jf12, test_pos);
   return 0;
 }

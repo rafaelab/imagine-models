@@ -15,12 +15,20 @@ public:
   RegularMagneticField() = default;
   virtual ~RegularMagneticField() = default;
 
-  // virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const {std::vector<double> _b(3); return _b;}
+  virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const {};
 
   std::vector<std::vector<std::vector<std::vector<double>>>> _evaluate_grid(const std::vector<double> grid_x,
                                        const std::vector<double> grid_y,
                                        const std::vector<double> grid_z,
-                                       std::function<std::vector<double>(std::vector<double> )> &ev_at_pos) const;
+                                       std::function<std::vector<double>(std::vector<double> )> ev_at_pos) const;
+
+  std::vector<std::vector<std::vector<std::vector<double>>>> evaluate_grid(const std::vector<double> grid_x,
+                                    const std::vector<double> grid_y,
+                                    const std::vector<double> grid_z) const {
+                                    return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p) {return evaluate_at_pos(p);});
+                                    };
+
+
  };
 
  class JF12MagneticField : public RegularMagneticField {
@@ -52,6 +60,5 @@ public:
       double rpc_X = 4.8;
       double r0_X= 2.9;
 
-      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const;
+      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
  };
-
