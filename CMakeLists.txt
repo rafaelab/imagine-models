@@ -5,6 +5,7 @@ add_subdirectory(extern/pybind11)
 
 pybind11_add_module(_ImagineModels python_wrapper/imagine_models.cc)
 target_link_libraries(_ImagineModels PUBLIC "${CMAKE_SOURCE_DIR}/c_library/source/jf12.cc"
+                                            "${CMAKE_SOURCE_DIR}/c_library/source/helix.cc"
                                            "${CMAKE_SOURCE_DIR}/c_library/source/regular.cc")
 
 # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a

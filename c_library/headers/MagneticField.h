@@ -15,7 +15,7 @@ public:
   RegularMagneticField() = default;
   virtual ~RegularMagneticField() = default;
 
-  virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const {};
+  virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const = 0;
 
   std::vector<std::vector<std::vector<std::vector<double>>>> _evaluate_grid(const std::vector<double> grid_x,
                                        const std::vector<double> grid_y,
@@ -75,5 +75,29 @@ public:
       double rmax = 3.;
       double rmin = 0.;
 
-      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const;
+      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
+
+      std::vector<double> _dbx_at_pos(const std::vector<double> &pos) const;
+      std::vector<double> _dby_at_pos(const std::vector<double> &pos) const;
+      std::vector<double> _dbz_at_pos(const std::vector<double> &pos) const;
+
+      std::vector<std::vector<std::vector<std::vector<double>>>> dbx_grid(const std::vector<double> grid_x,
+                                        const std::vector<double> grid_y,
+                                        const std::vector<double> grid_z) const {
+                                        return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
+                                        {return _dbx_at_pos(p);});
+                                        };
+      std::vector<std::vector<std::vector<std::vector<double>>>> dby_grid(const std::vector<double> grid_x,
+                                        const std::vector<double> grid_y,
+                                        const std::vector<double> grid_z) const {
+                                        return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
+                                        {return _dby_at_pos(p);});
+                                      };
+      std::vector<std::vector<std::vector<std::vector<double>>>> dbz_grid(const std::vector<double> grid_x,
+                                        const std::vector<double> grid_y,
+                                        const std::vector<double> grid_z) const {
+                                        return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
+                                        {return _dbz_at_pos(p);});
+                                                                        };
+
  };

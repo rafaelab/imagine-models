@@ -46,13 +46,16 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("Xtheta_const", &JF12MagneticField::Xtheta_const)
         .def_readwrite("rpc_X", &JF12MagneticField::rpc_X)
         .def_readwrite("r0_X", &JF12MagneticField::r0_X);
-    }
-    py::class_<HelixMagneticField, RegularMagneticField, HelixMagneticField>(m, "HelixMagneticField")
+
+    py::class_<HelixMagneticField, RegularMagneticField, PyHelixMagneticField>(m, "HelixMagneticField")
         .def(py::init<>())
         .def("evaluate_at_pos", &HelixMagneticField::evaluate_at_pos, "pos"_a)
+        .def("dbx_grid", &HelixMagneticField::dbx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+        .def("dby_grid", &HelixMagneticField::dby_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+        .def("dbz_grid", &HelixMagneticField::dbz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
         .def_readwrite("bx", &HelixMagneticField::bx)
         .def_readwrite("by", &HelixMagneticField::by)
         .def_readwrite("bz", &HelixMagneticField::bz)
         .def_readwrite("rmin", &HelixMagneticField::rmin)
-        .def_readwrite("rmax", &HelixMagneticField::rmax)
+        .def_readwrite("rmax", &HelixMagneticField::rmax);
     }
