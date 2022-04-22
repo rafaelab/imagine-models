@@ -1,5 +1,4 @@
 #include <cmath>
-#include <iostream>
 #include "../headers/hamunits.h"
 #include "../headers/MagneticField.h"
 
