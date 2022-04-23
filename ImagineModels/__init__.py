@@ -1,4 +1,4 @@
-from _ImagineModels import MagneticField, RegularMagneticField, JF12MagneticField, HelixMagneticField
+from _ImagineModels import MagneticField, RegularMagneticField, JF12MagneticField, JaffeMagneticField
 
 from .HelperFunctions.CoordinateConversions import cyl2cart
 

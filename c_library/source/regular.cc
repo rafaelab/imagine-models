@@ -13,7 +13,6 @@
     if (size != grid_z.size()) {
         throw std::length_error(std::string("size of grid z (" + std::to_string(grid_z.size())) +
         std::string(") is not equal to size of grid x (" + std::to_string(size) + std::string(")")));}
-    std::cout<< "(evaluate grid) size: " << size  <<std::endl;
     std::vector<std::vector<std::vector<std::vector<double>>>> b(size , std::vector<std::vector<std::vector<double>>> (size, std::vector<std::vector<double>> (size, std::vector<double> (3))));
     for (int i=0; i < size; i++) {
         for (int j=0; j < size; j++) {

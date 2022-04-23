@@ -31,7 +31,7 @@ std::vector<double>  JF12MagneticField::evaluate_at_pos(const std::vector<double
 
       // define boundaries for where magnetic field is zero (outside of galaxy)
       if (r > Rmax || rho < rho_GC) {
-        return std::vector<double>{1.e-12, 1.e-12, 1.e-12};
+        return std::vector<double>{0., 0., 0.};
       }
 
       //------------------------------------------------------------------------------

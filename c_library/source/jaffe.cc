@@ -1,159 +1,261 @@
 #include <cmath>
+#include <vector>
 #include "../headers/hamunits.h"
 #include "../headers/MagneticField.h"
 
-std::vector<double>  HelixMagneticField::evaluate_at_pos(const std::vector<double> &pos) const {
+std::vector<double> JaffeMagneticField::evaluate_at_pos(const std::vector<double> &pos) const {
+    double inner_b{0};
+    if (ring) {
+      inner_b = ring_amp;}
+    else if (bar) {
+      inner_b = bar_amp;}
 
-
-  //---------------------------------------------
-
-  // define fixed parameters
-  const double Rmax = 20 * cgs::kpc;   // outer boundary of GMF
-  const double rho_GC = 1. * cgs::kpc; // interior boundary of GMF
-
-  // fixed disk parameters
-  const double inc = 11.5; // inclination, in degrees
-  const double rmin =
-      5. * cgs::kpc; // outer boundary of the molecular ring region
-  const double rcent =
-      3. * cgs::kpc; // inner boundary of the molecular ring region (field is
-                     // zero within this region)
-  const double f[8] = {
-      0.130, 0.165, 0.094, 0.122,
-      0.13,  0.118, 0.084, 0.156}; // fractions of circumference spanned by each
-                                   // spiral, sums to unity
-  const double rc_B[8] = {
-      5.1,  6.3,  7.1, 8.3, 9.8,
-      11.4, 12.7, 15.5}; // the radii where the spiral arm boundaries cross the
-                         // negative x-axis
-
-  const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])};
-  const double rho{
-      sqrt(pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2])};
-  const double phi{atan2(pos[1], pos[0])};
-  const double z{pos[2]};
-
-  // define boundaries for where magnetic field is zero (outside of galaxy)
-  if (r > Rmax || rho < rho_GC) {
-    return std::vector<double>{1.e-12, 1.e-12, 1.e-12};
-  }
-
-  //------------------------------------------------------------------------------
-  // DISK COMPONENT (8 spiral regions, 7 free parameters with 8th set to
-  // conserve flux)
-  // B0 set to 1 at r=5kpc
-  const double B0 = (rmin / r); //
-  // the logistic equation, to be multiplied to the toroidal halo field and
-  // (1-zprofile) multiplied to the disk:
-  const double zprofile{1. /
-                           (1 + exp(-2. / w_disk * (std::fabs(z) - h_disk)))};
-
-  // printf("%g, %g \n", z, zprofile);
-  double B_cyl_disk[3] = {0, 0,
-                             0}; // the disk field in cylindrical coordinates
-
-  if ((r > rcent)) // disk field zero elsewhere
-  {
-    if (r < rmin) { // circular field in molecular ring
-      B_cyl_disk[1] = B0 * b_ring * (1 - zprofile);
-    } else {
-      // use flux conservation to calculate the field strength in the 8th spiral
-      // arm
-      double bv_B[8] = {b_arm_1, b_arm_2, b_arm_3, b_arm_4,
-                           b_arm_5, b_arm_6, b_arm_7, 0.};
-      double b8 = 0.;
-
-      for (int i = 0; i < 7; i++) {
-        b8 -= f[i] * bv_B[i] / f[7];
-      }
-      bv_B[7] = b8;
-
-      // iteratively figure out which spiral arm the current coordinates (r.phi)
-      // correspond to
-      double b_disk = 0.;
-      double r_negx =
-          r * exp(-1 / tan(M_PI / 180. * (90 - inc)) * (phi - M_PI));
-
-      if (r_negx > rc_B[7] * cgs::kpc) {
-        r_negx = r * exp(-1 / tan(M_PI / 180. * (90 - inc)) * (phi + M_PI));
-      }
-      if (r_negx > rc_B[7] * cgs::kpc) {
-        r_negx = r * exp(-1 / tan(M_PI / 180. * (90 - inc)) * (phi + 3 * M_PI));
-      }
-      for (int i = 7; i >= 0; i--) {
-        if (r_negx < rc_B[i] * cgs::kpc) {
-          b_disk = bv_B[i];
-        }
-      } // "region 8,7,6,..,2"
-
-      B_cyl_disk[0] = b_disk * B0 * sin(M_PI / 180. * inc) * (1 - zprofile);
-      B_cyl_disk[1] = b_disk * B0 * cos(M_PI / 180. * inc) * (1 - zprofile);
+    std::vector<double> bhat;
+    bhat = orientation(pos);
+    std::vector<double> btot{0., 0., 0.};
+    double scaling = radial_scaling(pos) *
+           (disk_amp * disk_scaling(pos) +
+            halo_amp * halo_scaling(pos));
+    for(int i=0;i<bhat.size();++i) {
+        	btot[i] = bhat[i] * scaling;}
+    // compress factor for each arm or for ring/bar
+    std::vector<double> arm;
+    arm = arm_compress(pos);
+    // only inner region
+    if (arm.size() == 1) {
+      for(int i=0;i<bhat.size();++i) {
+        btot[i] += bhat[i] * arm[0] * inner_b;}
     }
+    // spiral arm region
+    else {
+      std::vector<double> arm_amp{arm_amp1, arm_amp2, arm_amp3, arm_amp4};
+      for (decltype(arm.size()) i = 0; i < arm.size(); ++i) {
+        for(int j=0;j<bhat.size();++j) {
+          btot[j] += bhat[j] * arm[i] * arm_amp[i];}
+      }
+      
+    }
+    return btot;
   }
 
-  //-------------------------------------------------------------------------
-  ////TOROIDAL HALO COMPONENT
-
-  double b1, rh;
-  double B_h = 0.;
-
-  if (z >= 0) { // North
-    b1 = Bn;
-    rh = rn; // transition radius between inner-outer region
-  } else {   // South
-    b1 = Bs;
-    rh = rs;
+  std::vector<double> JaffeMagneticField::orientation(const std::vector<double> &pos) const {
+    const double r{
+        sqrt(pos[0] * pos[0] + pos[1] * pos[1])}; // cylindrical frame
+    const double r_lim = ring_r;
+    const double bar_lim{bar_a + 0.5 * comp_d};
+    const double cos_p = std::cos(arm_pitch);
+    const double sin_p = std::sin(arm_pitch); // pitch angle
+    std::vector<double> tmp{0., 0., 0.};
+    double quadruple{1};
+    if (r < 0.5 * cgs::kpc) // forbiden region
+      return tmp;
+    if (pos[2] > disk_z0)
+      quadruple = (1 - 2 * quadruple);
+    // molecular ring
+    if (ring) {
+      // inside spiral arm
+      if (r > r_lim) {
+        tmp[0] =
+            (cos_p * (pos[1] / r) - sin_p * (pos[0] / r)) * quadruple; // sin(t-p)
+        tmp[1] = (-cos_p * (pos[0] / r) - sin_p * (pos[1] / r)) *
+                 quadruple; //-cos(t-p)
+      }
+      // inside molecular ring
+      else {
+        tmp[0] = (1 - 2 * bss) * pos[1] / r; // sin(phi)
+        tmp[1] = (2 * bss - 1) * pos[0] / r; //-cos(phi)
+      }
+    }
+    // elliptical bar (replace molecular ring)
+    else if (bar) {
+      const double cos_phi = std::cos(bar_phi0);
+      const double sin_phi = std::sin(bar_phi0);
+      const double x = cos_phi * pos[0] - sin_phi * pos[1];
+      const double y = sin_phi * pos[0] + cos_phi * pos[1];
+      // inside spiral arm
+      if (r > bar_lim) {
+        tmp[0] =
+            (cos_p * (pos[1] / r) - sin_p * (pos[0] / r)) * quadruple; // sin(t-p)
+        tmp[1] = (-cos_p * (pos[0] / r) - sin_p * (pos[1] / r)) *
+                 quadruple; //-cos(t-p)
+      }
+      // inside elliptical bar
+      else {
+        if (y != 0) {
+          const double new_x = copysign(1, y);
+          const double new_y = copysign(1, y) * (x / y) *
+                                bar_b * bar_b /
+                                (bar_a * bar_a);
+          tmp[0] =
+              (cos_phi * new_x + sin_phi * new_y) * (1 - 2 * bss);
+          tmp[1] = (-sin_phi * new_x + cos_phi * new_y) *
+                   (1 - 2 * bss);
+          // versor
+          double tmp_length = std::sqrt(tmp[0]* tmp[0] + tmp[1]* tmp[1] + tmp[2]* tmp[2]);
+          if (tmp_length != 0.) {
+            for(int i=0;i<tmp.size();++i) {
+              tmp[i] = tmp[i]/tmp_length;}
+            }
+        } else {
+          tmp[0] = (2 * bss - 1) * copysign(1, x) * sin_phi;
+          tmp[1] = (2 * bss - 1) * copysign(1, x) * cos_phi;
+        }
+      }
+    }
+    return tmp;
   }
 
-  B_h = b1 * (1. - 1. / (1. + exp(-2. / wh * (r - rh)))) *
-        exp(-(std::fabs(z)) / (z0)); // vertical exponential fall-off
-  const double B_cyl_h[3] = {0., B_h * zprofile, 0.};
-
-  //------------------------------------------------------------------------
-  // X- FIELD
-
-  double Xtheta = 0.;
-  double rp_X =
-      0.; // the mid-plane radius for the field line that pass through r
-  double B_X = 0.;
-  double r_sign = 1.; // +1 for north, -1 for south
-  if (z < 0) {
-    r_sign = -1.;
+  double JaffeMagneticField::radial_scaling(const std::vector<double> &pos) const {
+    const double r2 = pos[0] * pos[0] + pos[1] * pos[1];
+    // separate into 3 parts for better view
+    const double s1{
+        1. - std::exp(-r2 / (r_inner * r_inner))};
+    const double s2{
+        std::exp(-r2 / (r_scale * r_scale))};
+    const double s3{
+        std::exp(-r2 * r2 /
+                 (r_peak * r_peak *
+                  r_peak * r_peak))};
+    return s1 * (s2 + s3);
   }
 
-  // dividing line between region with constat elevation angle, and the
-  // interior:
-  double rc_X = rpc_X + std::fabs(z) / tan(Xtheta_const);
-
-  if (r < rc_X) { // interior region, with varying elevation angle
-    rp_X = r * rpc_X / rc_X;
-    B_X = B0_X * pow(rpc_X / rc_X, 2.) * exp(-rp_X / r0_X);
-    Xtheta = atan(std::abs(z) /
-                  (r - rp_X)); // modified elevation angle in interior region
-    // printf("Xtheta %g at z %g , r %g , rc_X %g \n",Xtheta, z,r,rc_X);
-    if (z == 0.) {
-      Xtheta = M_PI / 2.;
-    }      // to avoid some NaN
-  } else { // exterior region with constant elevation angle
-    Xtheta = Xtheta_const;
-    rp_X = r - std::abs(z) / tan(Xtheta);
-    B_X = B0_X * rp_X / r * exp(-rp_X / r0_X);
+  std::vector<double> JaffeMagneticField::arm_compress(const std::vector<double> &pos) const {
+    const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1]) /
+                      comp_r};
+    const double c0{1. / comp_c - 1.};
+    std::vector<double> a0 = dist2arm(pos);
+    const double r_scaling{radial_scaling(pos)};
+    const double z_scaling{arm_scaling(pos)};
+    // for saving computing time
+    const double d0_inv{(r_scaling * z_scaling) / comp_d};
+    double factor{c0 * r_scaling * z_scaling};
+    if (r > 1) {
+      double cdrop{std::pow(r, -comp_p)};
+      for (decltype(a0.size()) i = 0; i < a0.size(); ++i) {
+        a0[i] = factor * cdrop *
+                std::exp(-a0[i] * a0[i] * cdrop * cdrop * d0_inv * d0_inv);
+      }
+    } else {
+      for (decltype(a0.size()) i = 0; i < a0.size(); ++i) {
+        a0[i] = factor * std::exp(-a0[i] * a0[i] * d0_inv * d0_inv);
+      }
+    }
+    return a0;
   }
 
-  // X-field in cylindrical coordinates
-  double B_cyl_X[3] = {B_X * cos(Xtheta) * r_sign, 0., B_X * sin(Xtheta)};
+  std::vector<double> JaffeMagneticField::arm_compress_dust(const std::vector<double> &pos) const {
+    const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1]) /
+                      comp_r};
+    const double c0{1. / comp_c - 1.};
+    std::vector<double> a0 = dist2arm(pos);
+    const double r_scaling{radial_scaling(pos)};
+    const double z_scaling{arm_scaling(pos)};
+    // only difference from normal arm_compress
+    const double d0_inv{(r_scaling) / comp_d};
+    double factor{c0 * r_scaling * z_scaling};
+    if (r > 1) {
+      double cdrop{std::pow(r, -comp_p)};
+      for (decltype(a0.size()) i = 0; i < a0.size(); ++i) {
+        a0[i] = factor * cdrop *
+                std::exp(-a0[i] * a0[i] * cdrop * cdrop * d0_inv * d0_inv);
+      }
+    } else {
+      for (decltype(a0.size()) i = 0; i < a0.size(); ++i) {
+        a0[i] = factor * std::exp(-a0[i] * a0[i] * d0_inv * d0_inv);
+      }
+    }
+    return a0;
+  }
 
-  // add fields together
-  double B_cyl[3] = {0.0, 0.0, 0.0};
-  B_cyl[0] = B_cyl_disk[0] + B_cyl_h[0] + B_cyl_X[0];
-  B_cyl[1] = B_cyl_disk[1] + B_cyl_h[1] + B_cyl_X[1];
-  B_cyl[2] = B_cyl_disk[2] + B_cyl_h[2] + B_cyl_X[2];
+  std::vector<double> JaffeMagneticField::dist2arm(const std::vector<double> &pos) const {
+    std::vector<double> d;
+    const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])};
+    const double r_lim{ring_r};
+    const double bar_lim{bar_a + 0.5 * comp_d};
+    const double cos_p{std::cos(arm_pitch)};
+    const double sin_p{std::sin(arm_pitch)}; // pitch angle
+    const double beta_inv{-sin_p / cos_p};
+    double theta{atan2(pos[1], pos[0])};
+    if (theta < 0)
+      theta += 2 * cgs::pi;
+    // if molecular ring
+    if (ring) {
+      // in molecular ring, return single element vector
+      if (r < r_lim) {
+        d.push_back(std::fabs(ring_r - r));
+      }
+      // in spiral arm, return vector with arm_num elements
+      else {
+        // loop through arms
+        std::vector<double> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
+        for (int i = 0; i < arm_num; ++i) {
+          double d_ang{arm_phi[i] - theta};
+          double d_rad{
+              std::fabs(arm_r0 * std::exp(d_ang * beta_inv) - r)};
+          double d_rad_p{
+              std::fabs(arm_r0 *
+                            std::exp((d_ang + 2 * cgs::pi) * beta_inv) -
+                        r)};
+          double d_rad_m{
+              std::fabs(arm_r0 *
+                            std::exp((d_ang - 2 * cgs::pi) * beta_inv) -
+                        r)};
+          d.push_back(std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p);
+        }
+      }
+    }
+    // if elliptical bar
+    else if (bar) {
+      const double cos_tmp{std::cos(bar_phi0) * pos[0] / r -
+                              std::sin(bar_phi0) * pos[1] /
+                                  r}; // cos(phi)cos(phi0) - sin(phi)sin(phi0)
+      const double sin_tmp{std::cos(bar_phi0) * pos[1] / r +
+                              std::sin(bar_phi0) * pos[0] /
+                                  r}; // sin(phi)cos(phi0) + cos(phi)sin(phi0)
+      // in bar, return single element vector
+      if (r < bar_lim) {
+        d.push_back(
+            std::fabs(bar_a * bar_b /
+                          sqrt(bar_a * bar_a *
+                                   sin_tmp * sin_tmp +
+                               bar_b * bar_b *
+                                   cos_tmp * cos_tmp) -
+                      r));
+      }
+      // in spiral arm, return vector with arm_num elements
+      else {
+        // loop through arms
+        std::vector<double> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
+        for (int i = 0; i < arm_num; ++i) {
+          double d_ang{arm_phi[i] - theta};
+          double d_rad{
+              std::fabs(arm_r0 * std::exp(d_ang * beta_inv) - r)};
+          double d_rad_p{
+              std::fabs(arm_r0 *
+                            std::exp((d_ang + 2 * cgs::pi) * beta_inv) -
+                        r)};
+          double d_rad_m{
+              std::fabs(arm_r0 *
+                            std::exp((d_ang - 2 * cgs::pi) * beta_inv) -
+                        r)};
+          d.push_back(std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p);
+        }
+      }
+    }
+    return d;
+  }
 
-  // convert field to cartesian coordinates
-  double B_cart[3] = {0.0, 0.0, 0.0};
-  B_cart[0] = B_cyl[0] * cos(phi) - B_cyl[1] * sin(phi);
-  B_cart[1] = B_cyl[0] * sin(phi) + B_cyl[1] * cos(phi);
-  B_cart[2] = B_cyl[2];
+  double JaffeMagneticField::arm_scaling(const std::vector<double> &pos) const {
+    return 1. / (std::cosh(pos[2] / arm_z0) *
+                 std::cosh(pos[2] / arm_z0));
+  }
 
-  return std::vector<double>{B_cart[0], B_cart[1], B_cart[2]};
-}
+  double JaffeMagneticField::disk_scaling(const std::vector<double> &pos) const {
+    return 1. / (std::cosh(pos[2] / disk_z0) *
+                 std::cosh(pos[2] / disk_z0));
+  }
+
+  double JaffeMagneticField::halo_scaling(const std::vector<double> &pos) const {
+    return 1. / (std::cosh(pos[2] / halo_z0) *
+                 std::cosh(pos[2] / halo_z0));
+  }
