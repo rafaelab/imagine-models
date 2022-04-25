@@ -119,7 +119,7 @@ public:
       double r_peak = 0.; // R peak, kpc
 
       bool ring = false; // molecular ring
-      bool bar = false; // elliptical bar
+      bool bar = true; // elliptical bar
        // either ring or bar!
       double ring_amp = 0.023; // ring field amplitude, microG
       double ring_r = 5.0; // ring radius, kpc

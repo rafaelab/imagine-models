@@ -1,5 +1,6 @@
 #include <cmath>
 #include <vector>
+#include <iostream>
 #include "../headers/hamunits.h"
 #include "../headers/MagneticField.h"
 
@@ -9,9 +10,7 @@ std::vector<double> JaffeMagneticField::evaluate_at_pos(const std::vector<double
       inner_b = ring_amp;}
     else if (bar) {
       inner_b = bar_amp;}
-
-    std::vector<double> bhat;
-    bhat = orientation(pos);
+    std::vector<double> bhat = orientation(pos);
     std::vector<double> btot{0., 0., 0.};
     double scaling = radial_scaling(pos) *
            (disk_amp * disk_scaling(pos) +
@@ -26,6 +25,7 @@ std::vector<double> JaffeMagneticField::evaluate_at_pos(const std::vector<double
       for(int i=0;i<bhat.size();++i) {
         btot[i] += bhat[i] * arm[0] * inner_b;}
     }
+
     // spiral arm region
     else {
       std::vector<double> arm_amp{arm_amp1, arm_amp2, arm_amp3, arm_amp4};
@@ -33,7 +33,7 @@ std::vector<double> JaffeMagneticField::evaluate_at_pos(const std::vector<double
         for(int j=0;j<bhat.size();++j) {
           btot[j] += bhat[j] * arm[i] * arm_amp[i];}
       }
-      
+
     }
     return btot;
   }
@@ -47,7 +47,7 @@ std::vector<double> JaffeMagneticField::evaluate_at_pos(const std::vector<double
     const double sin_p = std::sin(arm_pitch); // pitch angle
     std::vector<double> tmp{0., 0., 0.};
     double quadruple{1};
-    if (r < 0.5 * cgs::kpc) // forbiden region
+    if (r < 0.5) // forbiden region
       return tmp;
     if (pos[2] > disk_z0)
       quadruple = (1 - 2 * quadruple);
