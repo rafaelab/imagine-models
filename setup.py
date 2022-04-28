@@ -3,7 +3,7 @@ import re
 import subprocess
 import sys
 
-from setuptools import Extension, setup, find_packages, find_namespace_packages
+from setuptools import Extension, setup, find_packages
 from setuptools.command.build_ext import build_ext
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
@@ -116,6 +116,7 @@ class CMakeBuild(build_ext):
             ["cmake", "--build", "."] + build_args, cwd=self.build_temp
         )
 
+
 setup(
     name="ImagineModels",
     version="0.0.1",
@@ -125,8 +126,7 @@ setup(
     long_description="",
     ext_modules=[CMakeExtension("_ImagineModels")],
     cmdclass={"build_ext": CMakeBuild},
-    packages=find_packages(where="ImagineModels"),
-    package_dir={"": "ImagineModels"},
+    packages=find_packages(),
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.6",

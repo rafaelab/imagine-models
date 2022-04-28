@@ -50,12 +50,12 @@ PYBIND11_MODULE(_ImagineModels, m) {
     py::class_<HelixMagneticField, RegularMagneticField, PyHelixMagneticField>(m, "HelixMagneticField")
         .def(py::init<>())
         .def("evaluate_at_pos", &HelixMagneticField::evaluate_at_pos, "pos"_a)
-        .def("dbx_grid", &HelixMagneticField::dbx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-        .def("dby_grid", &HelixMagneticField::dby_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-        .def("dbz_grid", &HelixMagneticField::dbz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-        .def_readwrite("bx", &HelixMagneticField::bx)
-        .def_readwrite("by", &HelixMagneticField::by)
-        .def_readwrite("bz", &HelixMagneticField::bz)
+        .def("dampx_grid", &HelixMagneticField::dampx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+        .def("dampy_grid", &HelixMagneticField::dampy_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+        .def("dampz_grid", &HelixMagneticField::dampz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+        .def_readwrite("ampx", &HelixMagneticField::ampx)
+        .def_readwrite("ampy", &HelixMagneticField::ampy)
+        .def_readwrite("ampz", &HelixMagneticField::ampz)
         .def_readwrite("rmin", &HelixMagneticField::rmin)
         .def_readwrite("rmax", &HelixMagneticField::rmax);
 

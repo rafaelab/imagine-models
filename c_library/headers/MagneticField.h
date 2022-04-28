@@ -69,35 +69,35 @@ public:
       HelixMagneticField() = default;
       virtual ~HelixMagneticField() = default;
 
-      double bx = 0.;
-      double by = 0.;
-      double bz = 0.;
+      double ampx = 0.;
+      double ampy = 0.;
+      double ampz = 0.;
       double rmax = 3.;
       double rmin = 0.;
 
       std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
 
-      std::vector<double> _dbx_at_pos(const std::vector<double> &pos) const;
-      std::vector<double> _dby_at_pos(const std::vector<double> &pos) const;
-      std::vector<double> _dbz_at_pos(const std::vector<double> &pos) const;
+      std::vector<double> _dampx_at_pos(const std::vector<double> &pos) const;
+      std::vector<double> _dampy_at_pos(const std::vector<double> &pos) const;
+      std::vector<double> _dampz_at_pos(const std::vector<double> &pos) const;
 
-      std::vector<std::vector<std::vector<std::vector<double>>>> dbx_grid(const std::vector<double> grid_x,
+      std::vector<std::vector<std::vector<std::vector<double>>>> dampx_grid(const std::vector<double> grid_x,
                                         const std::vector<double> grid_y,
                                         const std::vector<double> grid_z) const {
                                         return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
-                                        {return _dbx_at_pos(p);});
+                                        {return _dampx_at_pos(p);});
                                         };
-      std::vector<std::vector<std::vector<std::vector<double>>>> dby_grid(const std::vector<double> grid_x,
+      std::vector<std::vector<std::vector<std::vector<double>>>> dampy_grid(const std::vector<double> grid_x,
                                         const std::vector<double> grid_y,
                                         const std::vector<double> grid_z) const {
                                         return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
-                                        {return _dby_at_pos(p);});
+                                        {return _dampy_at_pos(p);});
                                       };
-      std::vector<std::vector<std::vector<std::vector<double>>>> dbz_grid(const std::vector<double> grid_x,
+      std::vector<std::vector<std::vector<std::vector<double>>>> dampz_grid(const std::vector<double> grid_x,
                                         const std::vector<double> grid_y,
                                         const std::vector<double> grid_z) const {
                                         return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
-                                        {return _dbz_at_pos(p);});
+                                        {return _dampz_at_pos(p);});
                                                                         };
 
  };
