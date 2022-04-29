@@ -3,20 +3,27 @@ A model library usable for Galactic inference engines.
 The library is (mostly) written C++, but can be accessed via python.
 Some (non-essential) elements are written in pure python, which presently cannot be accessed in the c-library.
 
-## Installation
-
-### Python
+## Installation (Python)
 
 #### Requirements
 
 Requires:
 
-    [Python 3](https://www.python.org/) (>3.6)
+- [Python 3](https://www.python.org/) (>=3.6)
+- [C++](https://www.python.org/) (>=11)
+
+Python Libraries:
+
+- [NumPy](https://numpy.org/) (>=1.22)
+
+Optional (Developers):
+
+- [pybind11](https://pybind11.readthedocs.io/en/stable/installing.html)
+
+Note that pybind is included in the current repository, so in the current state you should not need to install it.
+This may change in the future.  
 
 
-    [NumPy](https://numpy.org/) (>1.22)
-
-Optional:
 
 
 
@@ -42,6 +49,10 @@ The package can then be installed with
     pip3 install folder/where/setup/py/is/
 
 
-### C++
+## Installation (C++)
+
+TBD
+
+## Examples
 
 TBD
