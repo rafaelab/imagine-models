@@ -30,7 +30,7 @@ b_grid = np.asarray(b_grid)
 
 # change a parameter
 
-jf12.b_arm_2 = -24
+jf12.disk_amp = 24
 
 # evaluate model at position with updated parameter
 b_at_pos = jf12.evaluate_pos(pos)
