@@ -17,7 +17,7 @@ double TEreg_ymw16::write_field(const std::vector<double> &pos) const {
     gc_pos[2] -= par t0_gamma_w *
                  (r_cyl - r_warp) * std::cos(theta_warp);
   }
-  if (gc_pos.length() > 25 * cgs::kpc) {
+  if (gc_pos.length() > 25 ) {
     return 0.;
   } else {
     double ne{0.};
@@ -37,7 +37,7 @@ double TEreg_ymw16::write_field(const std::vector<double> &pos) const {
     ne_comp[4] = galcen(gc_pos[0], gc_pos[1], gc_pos[2], par);
     ne_comp[5] = gum(gc_pos[0], gc_pos[1], gc_pos[2], par);
     // localbubble boundary
-    const double localbubble_boundary{110. * cgs::pc};
+    const double localbubble_boundary{110. * 0.001};
     ne_comp[6] = localbubble(gc_pos[0], gc_pos[1], gc_pos[2], ec_l,
                              localbubble_boundary, par);
     ne_comp[7] = nps(gc_pos[0], gc_pos[1], gc_pos[2], par);
@@ -45,7 +45,7 @@ double TEreg_ymw16::write_field(const std::vector<double> &pos) const {
     ne_comp[0] = ne_comp[1] + std::max(ne_comp[2], ne_comp[3]);
     // distance to local bubble
     const double rlb{std::sqrt(
-        std::pow(((gc_pos[1] - 8.34 * cgs::kpc) * 0.94 - 0.34 * gc_pos[2]), 2) +
+        std::pow(((gc_pos[1] - 8.34 ) * 0.94 - 0.34 * gc_pos[2]), 2) +
         gc_pos[0] * gc_pos[0])};
     if (rlb < localbubble_boundary) { // inside local bubble
       ne_comp[0] = lb * ne_comp[1] +
@@ -94,7 +94,7 @@ double TEreg_ymw16::thick(const double &zz, const double &rr) const {
 double TEreg_ymw16::thin(const double &zz, const double &rr) const {
   // z scaling, K_2*h0 in ref
   double h0{t2_k2 *
-               (32 * cgs::pc + 1.6e-3 * rr + (4.e-7 / cgs::pc) * rr * rr)};
+               (32 * 0.001 + 1.6e-3 * rr + (4.e-7 / 0.001) * rr * rr)};
   if (zz > 10. * h0)
     return 0.; // timesaving
   double gd{1.};
@@ -123,8 +123,8 @@ double TEreg_ymw16::spiral(const double &xx, const double &yy,
         2);
   }
   // z scaling, K_a*h0 in ref
-  const double h0{t3_ka * (32 * cgs::pc + 1.6e-3 * rr +
-                                               (4.e-7 / cgs::pc) * pow(rr, 2))};
+  const double h0{t3_ka * (32 * 0.001 + 1.6e-3 * rr +
+                                               (4.e-7 / 0.001) * pow(rr, 2))};
   if (zz > 10. * h0)
     return 0.; // timesaving
   scaling *= std::pow(1. / std::cosh(zz / h0), 2);
@@ -172,7 +172,7 @@ double TEreg_ymw16::spiral(const double &xx, const double &yy,
     if (i != 2) {
       ne3s += t3_narm[i] * scaling *
               std::pow(1. / std::cosh(smin / t3_warm[i]), 2);
-    } else if (rr > 6 * cgs::kpc and
+    } else if (rr > 6  and
                theta * cgs::rad > t3_thetacn) { // correction for Carina-Sagittarius
       const double ga =
           (1. - (t3_nsg) *
@@ -206,9 +206,9 @@ double TEreg_ymw16::spiral(const double &xx, const double &yy,
 double TEreg_ymw16::galcen(const double &xx, const double &yy,
                               const double &zz) const {
   // pos of center
-  const double Xgc{50. * cgs::pc};
+  const double Xgc{50. * 0.001};
   const double Ygc{0.};
-  const double Zgc{-7. * cgs::pc};
+  const double Zgc{-7. * 0.001};
   const double R2gc{(xx - Xgc) * (xx - Xgc) + (yy - Ygc) * (yy - Ygc)};
   if (R2gc > 10. * t4_agc * t4_agc)
     return 0.; // timesaving
@@ -229,7 +229,7 @@ double TEreg_ymw16::gum(const double &xx, const double &yy,
   // center of Gum Nebula
   const double lc{264. * cgs::rad};
   const double bc{-4. * cgs::rad};
-  const double dc{450. * cgs::pc};
+  const double dc{450. * 0.001};
   const double xc{dc * std::cos(bc) * std::sin(lc)};
   const double yc{r0 - dc * std::cos(bc) * std::cos(lc)};
   const double zc{dc * std::sin(bc)};
@@ -271,7 +271,7 @@ double TEreg_ymw16::localbubble(const double &xx, const double &yy,
   double nel{0.};
   // r_LB in ref
   const double rLB{
-      std::sqrt(std::pow(((yy - 8.34 * cgs::kpc) * 0.94 - 0.34 * zz), 2) +
+      std::sqrt(std::pow(((yy - 8.34 ) * 0.94 - 0.34 * zz), 2) +
                 std::pow(xx, 2))};
   // l-l_LB1 in ref
   const double dl1{
@@ -304,9 +304,9 @@ double TEreg_ymw16::nps(const double &xx, const double &yy,
   if (yy < 0)
     return 0.; // timesaving
   const double theta_LI{(t7_thetali) * cgs::rad};
-  const double x_c{-10.156 * cgs::pc};
-  const double y_c{8106.207 * cgs::pc};
-  const double z_c{10.467 * cgs::pc};
+  const double x_c{-10.156 * 0.001};
+  const double y_c{8106.207 * 0.001};
+  const double z_c{10.467 * 0.001};
   // r_LI in ref
   const double rLI{std::sqrt((xx - x_c) * (xx - x_c) +
                                 (yy - y_c) * (yy - y_c) +
