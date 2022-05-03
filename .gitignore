@@ -4,7 +4,7 @@ _generate/
 venv_imagine
 Playground/
 test/cpp/test
-example/cpp/example
+examples/cpp/example
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -10,13 +10,13 @@ void print_ev_pos(std::vector<double> mval, std::vector<double> tp) {
                         std::cout << tp[l] << " kpc, ";
                         }
       std::cout << ":\n";
-      for (int l = 0; l < jf12_val.size(); l++) {
-                        std::cout << jf12_val[l]<< ", ";
+      for (int l = 0; l < mval.size(); l++) {
+                        std::cout << mval[l]<< ", ";
                         }
       std::cout << "\n";
       }
 
-void print_ev_grid(std::vector<std::vector<std::vector<std::vector<double>>>>  bgrid,
+void print_ev_grid(std::vector<std::vector<std::vector<std::vector<double>>>>  b_grid,
   std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) {
 
   std::cout<< "b_grid: "  <<std::endl;
@@ -44,7 +44,7 @@ int main() {
   std::vector<double> test_pos{{1., 2., 0.}};
 
   // evaluate the position
-  std::vector<double> jf12_val = jf12.evaluate_at_pos(tp);
+  std::vector<double> jf12_val = jf12.evaluate_at_pos(test_pos);
   print_ev_pos(jf12_val, test_pos);
 
   // Define grid axes in Galactic cartesian coordinates (again, units are kpc)
@@ -67,7 +67,7 @@ int main() {
   std::cout << "\n updated b_arm_1: " << jf12.b_arm_1 << std::endl;
 
   // Evaluate moel again
-  std::vector<double> jf12_val = jf12.evaluate_at_pos(tp);
-  print_ev_pos(jf12_val, test_pos);
+  std::vector<double> jf12_val2 = jf12.evaluate_at_pos(test_pos);
+  print_ev_pos(jf12_val2, test_pos);
   return 0;
 }
