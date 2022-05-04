@@ -1,4 +1,5 @@
 #include "../../c_library/headers/MagneticField.h"
+#include "../../c_library/headers/ThermalElectronField.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -48,9 +49,9 @@ int main() {
   print_ev_pos(jf12_val, test_pos);
 
   // Define grid axes in Galactic cartesian coordinates (again, units are kpc)
-  const std::vector<double> grid_x {{2., 4., 0., 1.}};
-  const std::vector<double> grid_y {{4., 6., 0.1, 0.}};
-  const std::vector<double> grid_z {{-0.2, 0.8, 0.2, 0.}};
+  const std::vector<double> grid_x{2., 4., 0., 1.};
+  const std::vector<double> grid_y{4., 6., 0.1, 0.};
+  const std::vector<double> grid_z{-0.2, 0.8, 0.2, 0.};
 
   // evaluate the grid
   std::vector<std::vector<std::vector<std::vector<double>>>>  jf12_grid = jf12.evaluate_grid(grid_x, grid_y, grid_z);

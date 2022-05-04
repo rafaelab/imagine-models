@@ -1,3 +1,4 @@
+#include <cmath>
 #include <vector>
 #include <stdexcept>
 #include <functional>
@@ -7,6 +8,14 @@ class ThermalElectronField {
 public:
   ThermalElectronField() = default;
   virtual ~ThermalElectronField() = default;
+
+  double vec_length(std::vector<double> vec) const {
+    double sz = 0;
+    for(int i=0;i<vec.size();++i) {
+      sz = sz + vec[i] * vec[i];
+      }
+    return std::sqrt(sz);
+  }
 };
 
 // regular thermal electrons
@@ -28,6 +37,8 @@ public:
                                     return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p) {return evaluate_at_pos(p);});
                                     };
 
+ };
+
 
  //
  class YMW16Component : public ThermalElectronField {
@@ -44,11 +55,12 @@ public:
    double t1_ad = 2500.;
    double t1_bd = 15000.;
 
-   double gd(const double rr) const;
+   double gd(const double &rr) const;
 
-   double dgd_dad(const double rr) const;
-   double dgd_dbd(const double rr) const;
+   double dgd_dad(const double &rr) const;
+   double dgd_dbd(const double &rr) const;
 
+};
 
 class YMW16ThickDisc : public YMW16Component {
 public:
@@ -67,6 +79,8 @@ public:
  double dThick_dbd(const std::vector<double> &pos) const;
  double dThick_dh1(const std::vector<double> &pos) const;
  double dThick_dn1(const std::vector<double> &pos) const;
+
+};
 
 class YMW16ThinDisc : public YMW16Component {
 public:
@@ -89,6 +103,8 @@ public:
  double dThin_dn2(const std::vector<double> &pos) const;
  double dThin_da2(const std::vector<double> &pos) const;
  double dThin_db2(const std::vector<double> &pos) const;
+
+};
 
 // ymw16 thermal electrons
 class YMW16ThermalElectronField : public ThermalElectronField {
@@ -124,12 +140,12 @@ public:
  double t3_nsg = 0.626;
  double t3_wsg = 20;
  double t3_thetasg = 78.8;
- double t3_rmin{3.35, 3.707, 3.56, 3.670, 8.21};
- double t3_phimin{44.4, 120.0, 218.6, 330.3, 55.1};
- double t3_tpitch{11.43, 9.84, 10.38, 10.54, 2.77};
- double t3_cpitch{11.43, 9.84, 10.38, 10.54, 2.77};
- double t3_narm{0.135, 0.129, 0.103, 0.116, 0.0057};
- double t3_warm{300., 500., 300., 500., 300.};
+ double t3_rmin[5] = {3.35, 3.707, 3.56, 3.670, 8.21};
+ double t3_phimin[5] = {44.4, 120.0, 218.6, 330.3, 55.1};
+ double t3_tpitch[5] = {11.43, 9.84, 10.38, 10.54, 2.77};
+ double t3_cpitch[5] = {11.43, 9.84, 10.38, 10.54, 2.77};
+ double t3_narm[5] = {0.135, 0.129, 0.103, 0.116, 0.0057};
+ double t3_warm[5] = {300., 500., 300., 500., 300.};
 
 // Galactic Center
  double t4_ngc = 6.2;
@@ -161,3 +177,19 @@ public:
  double t7_wli = 15.;
  double t7_detthetali = 30.0;
  double t7_thetali = 40.0;
+
+
+
+double evaluate_at_pos(const std::vector<double> &pos) const;
+
+double thick(const double &zz, const double &rr) const;
+double thin(const double &zz, const double &rr) const;
+double spiral(const double &xx, const double &yy, const double &zz,
+              const double &rr) const;
+double galcen(const double &xx, const double &yy, const double &zz) const;
+double gum(const double &xx, const double &yy, const double &zz) const;
+double localbubble(const double &xx, const double &yy,
+                   const double &zz, const double &ll,
+                   const double &Rlb) const;
+double nps(const double &xx, const double &yy, const double &zz) const;
+};
