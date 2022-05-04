@@ -109,7 +109,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
     py::class_<ThermalElectronField, PyThermalElectronField>(m, "ThermalElectronField")
         .def(py::init<>());
-    }
 
     py::class_<RegularThermalElectronField, ThermalElectronField, PyRegularThermalElectronField>(m, "RegularThermalElectronField")
         .def(py::init<>())
@@ -132,6 +131,8 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("t1_ad",  &YMW16ThinDisc::t1_ad)
         .def_readwrite("t1_bd",  &YMW16ThinDisc::t1_bd)
         .def_readwrite("t2_n2",  &YMW16ThinDisc::t2_n2)
-        .def_readwrite("t2_k2",  &YMW16ThinDisc::t2_h2);
+        .def_readwrite("t2_k2",  &YMW16ThinDisc::t2_k2)
         .def_readwrite("t2_a2",  &YMW16ThinDisc::t2_a2)
         .def_readwrite("t2_b2",  &YMW16ThinDisc::t2_b2);
+
+        }

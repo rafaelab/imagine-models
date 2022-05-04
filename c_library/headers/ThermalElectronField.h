@@ -46,6 +46,8 @@ public:
    YMW16Component() = default;
    virtual ~YMW16Component() = default;
 
+   virtual double evaluate_at_pos(const std::vector<double> &pos) const = 0;
+
    // warp (yet not implemented)
    double r_warp = 8.4;
    double r0 = 8.3;
