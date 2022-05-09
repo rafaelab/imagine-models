@@ -6,6 +6,7 @@ Playground/
 test/cpp/test
 examples/cpp/example
 c_library/build
+python_wrapper/playground*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
