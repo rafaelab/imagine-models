@@ -33,6 +33,9 @@ public:
 
  class JF12MagneticField : public RegularMagneticField {
     public:
+
+      bool DEBUG = false;
+      
       JF12MagneticField() {};
       virtual ~JF12MagneticField() {};
 
