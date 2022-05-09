@@ -5,6 +5,7 @@ venv_imagine
 Playground/
 test/cpp/test
 example/cpp/example
+python_wrapper/playground*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
