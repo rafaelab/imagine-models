@@ -122,7 +122,7 @@ setup(
     version="0.0.1",
     author="Sebastian Hutschenreuter & ??",
     author_email="hutsch@astro.ru.nl",
-    description="IMAGINE Magnetic Field Model Library",
+    description="IMAGINE Model Library",
     long_description="",
     ext_modules=[CMakeExtension("_ImagineModels")],
     cmdclass={"build_ext": CMakeBuild},
