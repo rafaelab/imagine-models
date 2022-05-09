@@ -47,14 +47,27 @@ int main() {
   std::vector<double> pos_on_x_axis{{.123, 0., 0.}};
   std::vector<double> pos_on_y_axis{{0., .432, 0.}};
   std::vector<double> pos_on_z_axis{{0., 0., 1.2}};
-  std::vector<double> pos_on_xy_axis{{.123, -.213, 0.}};
-  std::vector<double> pos_on_yz_axis{{0., -.232, -.3}};
-  std::vector<double> pos_on_xz_axis{{-.24, 0., 1.2}};
+  std::vector<double> pos_on_xy_plane{{.123, -.213, 0.}};
+  std::vector<double> pos_on_yz_plane{{0., -.232, -.3}};
+  std::vector<double> pos_on_xz_plane{{-.24, 0., 1.2}};
 
 
-  std::vector<double> jf12_val = jf12.evaluate_at_pos(test_pos);
-  print_ev_pos(jf12_val, test_pos, "test_pos");
-
+  std::vector<double> jf12_test_pos = jf12.evaluate_at_pos(test_pos);
+  print_ev_pos(jf12_test_pos, test_pos, "test_pos");
+  std::vector<double> jf12_origin = jf12.evaluate_at_pos(origin);
+  print_ev_pos(jf12_origin , origin , "origin");
+  std::vector<double> jf12_pos_on_x_axis = jf12.evaluate_at_pos(pos_on_x_axis);
+  print_ev_pos(jf12_pos_on_x_axis, pos_on_x_axis , "pos_on_x_axis");
+  std::vector<double> jf12_pos_on_y_axis = jf12.evaluate_at_pos(pos_on_y_axis);
+  print_ev_pos(jf12_pos_on_y_axis, pos_on_y_axis , "pos_on_y_axis");
+  std::vector<double> jf12_pos_on_z_axis = jf12.evaluate_at_pos(pos_on_z_axis);
+  print_ev_pos(jf12_pos_on_z_axis, pos_on_z_axis , "pos_on_z_axis");
+  std::vector<double> jf12_pos_on_xy_plane = jf12.evaluate_at_pos(pos_on_xy_plane);
+  print_ev_pos(jf12_pos_on_xy_plane, pos_on_xy_plane , "pos_on_xy_plane");
+  std::vector<double> jf12_pos_on_yz_plane = jf12.evaluate_at_pos(pos_on_yz_plane);
+  print_ev_pos(jf12_pos_on_yz_plane, pos_on_yz_plane , "pos_on_yz_plane");
+  std::vector<double> jf12_pos_on_xz_plane = jf12.evaluate_at_pos(pos_on_xz_plane);
+  print_ev_pos(jf12_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
 
   const std::vector<double> grid_x {{2., 4., 0., 1.}};
   const std::vector<double> grid_y {{4., 6., 0.1, 0.}};
