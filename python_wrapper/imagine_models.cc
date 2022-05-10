@@ -115,12 +115,17 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def("_evaluate_grid", &RegularThermalElectronField::_evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a, "ev_at_pos"_a)
         .def("evaluate_grid", &RegularThermalElectronField::evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
 
+
+    py::class_<YMW16Component, RegularThermalElectronField, PyYMW16Component>(m, "YMW16Component")
+        .def(py::init<>())
+
+        .def_readwrite("t1_ad",  &YMW16Component::t1_ad)
+        .def_readwrite("t1_bd",  &YMW16Component::t1_bd);
+
     py::class_<YMW16ThickDisc, YMW16Component, PyYMW16ThickDisc>(m, "YMW16ThickDisc")
         .def(py::init<>())
         .def("evaluate_at_pos", &YMW16ThickDisc::evaluate_at_pos, "pos"_a)
 
-        .def_readwrite("t1_ad",  &YMW16ThickDisc::t1_ad)
-        .def_readwrite("t1_bd",  &YMW16ThickDisc::t1_bd)
         .def_readwrite("t1_n1",  &YMW16ThickDisc::t1_n1)
         .def_readwrite("t1_h1",  &YMW16ThickDisc::t1_h1);
 
@@ -128,8 +133,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<>())
         .def("evaluate_at_pos", &YMW16ThinDisc::evaluate_at_pos, "pos"_a)
 
-        .def_readwrite("t1_ad",  &YMW16ThinDisc::t1_ad)
-        .def_readwrite("t1_bd",  &YMW16ThinDisc::t1_bd)
         .def_readwrite("t2_n2",  &YMW16ThinDisc::t2_n2)
         .def_readwrite("t2_k2",  &YMW16ThinDisc::t2_k2)
         .def_readwrite("t2_a2",  &YMW16ThinDisc::t2_a2)
