@@ -5,15 +5,15 @@
 // magnetic field base class
 class MagneticField {
 public:
-  MagneticField() = default;
-  virtual ~MagneticField() = default;
+  MagneticField() {};
+  virtual ~MagneticField() {};
 };
 
 // regular magnetic field
 class RegularMagneticField : public MagneticField {
 public:
-  RegularMagneticField() = default;
-  virtual ~RegularMagneticField() = default;
+  RegularMagneticField() {};
+  virtual ~RegularMagneticField() {};
 
   virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const = 0;
 
@@ -33,8 +33,11 @@ public:
 
  class JF12MagneticField : public RegularMagneticField {
     public:
-      JF12MagneticField() = default;
-      virtual ~JF12MagneticField() = default;
+
+      bool DEBUG = false;
+      
+      JF12MagneticField() {};
+      virtual ~JF12MagneticField() {};
 
       double b_arm_1 = 0.1;
       double b_arm_2 = 3.0;
@@ -66,8 +69,8 @@ public:
 
  class HelixMagneticField : public RegularMagneticField {
     public:
-      HelixMagneticField() = default;
-      virtual ~HelixMagneticField() = default;
+      HelixMagneticField() {};
+      virtual ~HelixMagneticField() {};
 
       double ampx = 0.;
       double ampy = 0.;
@@ -104,8 +107,8 @@ public:
 
  class JaffeMagneticField : public RegularMagneticField {
     public:
-      JaffeMagneticField() = default;
-      virtual ~JaffeMagneticField() = default;
+      JaffeMagneticField() {};
+      virtual ~JaffeMagneticField() {};
 
       bool quadruple = false; // quadruple pattern in halo
       bool bss = false; // bi-symmetric

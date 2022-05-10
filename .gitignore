@@ -4,7 +4,8 @@ _generate/
 venv_imagine
 Playground/
 test/cpp/test
-example/cpp/example
+examples/cpp/example
+c_library/build
 python_wrapper/playground*
 
 # Byte-compiled / optimized / DLL files
