@@ -6,12 +6,12 @@
 // thermal electron base class
 class ThermalElectronField {
 public:
-  ThermalElectronField() = default;
-  virtual ~ThermalElectronField() = default;
+  ThermalElectronField() {};
+  virtual ~ThermalElectronField() {};
 
   double vec_length(std::vector<double> vec) const {
     double sz = 0;
-    for(int i=0;i<vec.size();++i) {
+    for(size_t i=0;i<vec.size();++i) {
       sz = sz + vec[i] * vec[i];
       }
     return std::sqrt(sz);
@@ -21,17 +21,17 @@ public:
 // regular thermal electrons
 class RegularThermalElectronField : public ThermalElectronField {
 public:
-  RegularThermalElectronField() = default;
-  virtual ~RegularThermalElectronField() = default;
+  RegularThermalElectronField() {};
+  virtual ~RegularThermalElectronField() {};
 
   virtual double evaluate_at_pos(const std::vector<double> &pos) const = 0;
 
-  std::vector<double> _evaluate_grid(const std::vector<double> grid_x,
+  std::vector<std::vector<std::vector<double>>> _evaluate_grid(const std::vector<double> grid_x,
                                      const std::vector<double> grid_y,
                                      const std::vector<double> grid_z,
                                      std::function<double(std::vector<double>)> ev_at_pos) const;
 
-  std::vector<double> evaluate_grid(const std::vector<double> grid_x,
+  std::vector<std::vector<std::vector<double>>> evaluate_grid(const std::vector<double> grid_x,
                                     const std::vector<double> grid_y,
                                     const std::vector<double> grid_z) const {
                                     return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p) {return evaluate_at_pos(p);});
@@ -41,10 +41,10 @@ public:
 
 
  //
- class YMW16Component : public ThermalElectronField {
+ class YMW16Component : public RegularThermalElectronField {
  public:
-   YMW16Component() = default;
-   virtual ~YMW16Component() = default;
+   YMW16Component() {};
+   virtual ~YMW16Component() {};
 
    virtual double evaluate_at_pos(const std::vector<double> &pos) const = 0;
 
@@ -66,8 +66,8 @@ public:
 
 class YMW16ThickDisc : public YMW16Component {
 public:
- YMW16ThickDisc () = default;
- virtual ~YMW16ThickDisc () = default;
+ YMW16ThickDisc () {};
+ virtual ~YMW16ThickDisc () {};
 
 
 // Thick disc
@@ -86,8 +86,8 @@ public:
 
 class YMW16ThinDisc : public YMW16Component {
 public:
- YMW16ThinDisc () = default;
- virtual ~YMW16ThinDisc () = default;
+ YMW16ThinDisc () {};
+ virtual ~YMW16ThinDisc () {};
 
 
  // Thin disc
@@ -109,10 +109,10 @@ public:
 };
 
 // ymw16 thermal electrons
-class YMW16ThermalElectronField : public ThermalElectronField {
+class YMW16ThermalElectronField : public RegularThermalElectronField {
 public:
- YMW16ThermalElectronField() = default;
- virtual ~YMW16ThermalElectronField() = default;
+ YMW16ThermalElectronField() {};
+ virtual ~YMW16ThermalElectronField() {};
 
 // warp
  double r_warp = 8.4;
