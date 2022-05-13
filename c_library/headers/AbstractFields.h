@@ -24,8 +24,11 @@ public:
     assert(size == grid_z.size());
     };
 
+};
 
-
+template<typename G>
+class RegularScalarField : Field {
+  // constructors
 
   // methods
 
@@ -43,7 +46,7 @@ public:
      }
 
 
-   std::vector<double> evaluate_grid(const G &grid_x, const G &grid_y, const G &grid_z) {
+   std::vector<double> evaluate_positions(const G &grid_x, const G &grid_y, const G &grid_z) {
      int siz = grid_x.size();
      assert(siz == grid_y.size());
      assert(siz == grid_z.size());
@@ -51,7 +54,7 @@ public:
      return b;
    }
 
-   std::vector<double> evaluate_grid() {
+   std::vector<double> evaluate_positions() {
      std::vector<double> b = grid_to_vector(gx, gy, gz, size);
      return b;
    }
