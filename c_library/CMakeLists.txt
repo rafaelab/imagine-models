@@ -5,13 +5,13 @@ project(ImagineModels VERSION 0.0.1 DESCRIPTION "A library for parametric Galact
 include(GNUInstallDirs)
 
 add_library(ImagineModels SHARED
-    source/component.cc
-    source/disc.cc
-    source/helix.cc
-    source/jaffe.cc
+#    source/component.cc
+#    source/disc.cc
+#    source/helix.cc
+#    source/jaffe.cc
     source/jf12.cc
-    source/ymw16.cc
-    source/regular.cc
+#    source/ymw16.cc
+#    source/regular.cc
 )
 set_target_properties(ImagineModels PROPERTIES
     VERSION ${PROJECT_VERSION}

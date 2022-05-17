@@ -1,5 +1,4 @@
 #include "../../c_library/headers/MagneticField.h"
-#include "../../c_library/headers/ThermalElectronField.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -16,7 +15,7 @@ void print_magnetic_pos(std::vector<double> mval, std::vector<double> tp, const 
                         }
       std::cout << "\n";
       }
-
+/*
 void print_thermal_pos(double tval, std::vector<double> tp, const char* title) {
 
       std::cout << "Theraml electron field at " << title << " (";
@@ -25,7 +24,7 @@ void print_thermal_pos(double tval, std::vector<double> tp, const char* title) {
                         }
       std::cout << "): " << tval << "\n";
       }
-
+*/
 void print_ev_grid(std::vector<std::vector<std::vector<std::vector<double>>>>  b_grid,
   std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) {
 
@@ -62,7 +61,7 @@ int main() {
   std::vector<double> pos_on_xz_plane{{-.24, 0., 1.2}};
 
 
-  std::vector<double> jf12_test_pos = jf12.evaluate_at_pos(test_pos);
+  double jf12_test_pos = *jf12.evaluate_model(test_pos);
   print_magnetic_pos(jf12_test_pos, test_pos, "test_pos");
   std::vector<double> jf12_origin = jf12.evaluate_at_pos(origin);
   print_magnetic_pos(jf12_origin , origin , "origin");
@@ -79,7 +78,7 @@ int main() {
   std::vector<double> jf12_pos_on_xz_plane = jf12.evaluate_at_pos(pos_on_xz_plane);
   print_magnetic_pos(jf12_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
 
-
+/*
   double ymw_test_pos = ymw16.evaluate_at_pos(test_pos);
   print_thermal_pos(ymw_test_pos, test_pos, "test_pos");
   double ymw_origin = ymw16.evaluate_at_pos(origin);
@@ -96,15 +95,15 @@ int main() {
   print_thermal_pos(ymw_pos_on_yz_plane, pos_on_yz_plane , "pos_on_yz_plane");
   double ymw_pos_on_xz_plane = ymw16.evaluate_at_pos(pos_on_xz_plane);
   print_thermal_pos(ymw_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
-
+*/
   const std::vector<double> grid_x {{2., 4., 0., 1., .4}};
   const std::vector<double> grid_y {{4., 6., 0.1, 0., .2}};
   const std::vector<double> grid_z {{-0.2, 0.8, 0.2, 0., 1.}};
 
 
-  std::vector<std::vector<std::vector<std::vector<double>>>> jf12_grid = jf12.evaluate_grid(grid_x, grid_y, grid_z);
+  std::vector<std::vector<std::vector<std::vector<double>>>> jf12_grid = jf12.evaluate_model_on_grid(grid_x, grid_y, grid_z);
 
-  std::vector<std::vector<std::vector<double>>> ymw_grid = ymw16.evaluate_grid(grid_x, grid_y, grid_z);
+  //std::vector<std::vector<std::vector<double>>> ymw_grid = ymw16.evaluate_grid(grid_x, grid_y, grid_z);
 
   print_ev_grid(jf12_grid, grid_x, grid_y, grid_z);
 

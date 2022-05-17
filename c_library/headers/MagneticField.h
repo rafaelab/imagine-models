@@ -2,113 +2,96 @@
 #include <stdexcept>
 #include <functional>
 
-// magnetic field base class
-class MagneticField {
-public:
-  MagneticField() {};
-  virtual ~MagneticField() {};
-};
+#include "AbstractFields.h"
 
-// regular magnetic field
-class RegularMagneticField : public MagneticField {
-public:
-  RegularMagneticField() {};
-  virtual ~RegularMagneticField() {};
+class JF12MagneticField : RegularField {
+  protected:
+    bool vector_valued = true;
+    bool regular = true;
+    bool DEBUG = false;
+  public:
 
-  virtual std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const = 0;
+  using JF12MagneticField  :: RegularField;
 
-  std::vector<std::vector<std::vector<std::vector<double>>>> _evaluate_grid(const std::vector<double> grid_x,
-                                       const std::vector<double> grid_y,
-                                       const std::vector<double> grid_z,
-                                       std::function<std::vector<double>(std::vector<double> )> ev_at_pos) const;
+  double b_arm_1 = 0.1;
+  double b_arm_2 = 3.0;
+  double b_arm_3 = -0.9;
+  double b_arm_4 = -0.8;
+  double b_arm_5 = -2.0;
+  double b_arm_6 = -4.2;
+  double b_arm_7 = 0.0;
+  double b_ring = 0.1;
+  double h_disk = 0.40;
+  double w_disk = 0.27;
+  // toroidal halo parameters
+  double Bn = 1.4;
+  double Bs = -1.1;
+  double rn = 9.22;
+  double rs = 16.7;
+  double wh = 0.20;
+  double z0 = 5.3;
+  // X-field parameters
+  double B0_X = 4.6;
+  double Xtheta_const = 49;
+  double rpc_X = 4.8;
+  double r0_X= 2.9;
 
-  std::vector<std::vector<std::vector<std::vector<double>>>> evaluate_grid(const std::vector<double> grid_x,
-                                    const std::vector<double> grid_y,
-                                    const std::vector<double> grid_z) const {
-                                    return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p) {return evaluate_at_pos(p);});
-                                    };
+//  double *evaluate_model(const std::vector<double> &pos) const override;
 
-
+  double *evaluate_model(const double &x, const double &y, const double &z) const override;
  };
+/*
 
- class JF12MagneticField : public RegularMagneticField {
+class HelixMagneticField : public RegularField {
+    protected:
+        bool vector_valued = true;
+        bool regular = true;
+        bool DEBUG = false;
     public:
+        using HelixMagneticField  :: RegularField;
 
-      bool DEBUG = false;
-      
-      JF12MagneticField() {};
-      virtual ~JF12MagneticField() {};
+        double ampx = 0.;
+        double ampy = 0.;
+        double ampz = 0.;
+        double rmax = 3.;
+        double rmin = 0.;
+        double *evaluate_model(const std::vector<double> &pos) const override;
+        //std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
 
-      double b_arm_1 = 0.1;
-      double b_arm_2 = 3.0;
-      double b_arm_3 = -0.9;
-      double b_arm_4 = -0.8;
-      double b_arm_5 = -2.0;
-      double b_arm_6 = -4.2;
-      double b_arm_7 = 0.0;
-      double b_ring = 0.1;
-      double h_disk = 0.40;
-      double w_disk = 0.27;
+        std::vector<double> _dampx_at_pos(const std::vector<double> &pos) const;
+        std::vector<double> _dampy_at_pos(const std::vector<double> &pos) const;
+        std::vector<double> _dampz_at_pos(const std::vector<double> &pos) const;
 
-                          // toroidal halo parameters
-      double Bn = 1.4;
-      double Bs = -1.1;
-      double rn = 9.22;
-      double rs = 16.7;
-      double wh = 0.20;
-      double z0 = 5.3;
-      // X-field parameters
-      double B0_X = 4.6;
-      double Xtheta_const = 49;
-      double rpc_X = 4.8;
-      double r0_X= 2.9;
-
-      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
- };
-
-
- class HelixMagneticField : public RegularMagneticField {
-    public:
-      HelixMagneticField() {};
-      virtual ~HelixMagneticField() {};
-
-      double ampx = 0.;
-      double ampy = 0.;
-      double ampz = 0.;
-      double rmax = 3.;
-      double rmin = 0.;
-
-      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
-
-      std::vector<double> _dampx_at_pos(const std::vector<double> &pos) const;
-      std::vector<double> _dampy_at_pos(const std::vector<double> &pos) const;
-      std::vector<double> _dampz_at_pos(const std::vector<double> &pos) const;
-
-      std::vector<std::vector<std::vector<std::vector<double>>>> dampx_grid(const std::vector<double> grid_x,
-                                        const std::vector<double> grid_y,
-                                        const std::vector<double> grid_z) const {
-                                        return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
-                                        {return _dampx_at_pos(p);});
+        std::vector<std::vector<std::vector<std::vector<double>>>> dampx_grid(const std::vector<double> grid_x,
+                                          const std::vector<double> grid_y,
+                                          const std::vector<double> grid_z) const {
+                                          return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
+                                          {return _dampx_at_pos(p);});
+                                          };
+        std::vector<std::vector<std::vector<std::vector<double>>>> dampy_grid(const std::vector<double> grid_x,
+                                          const std::vector<double> grid_y,
+                                          const std::vector<double> grid_z) const {
+                                          return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
+                                          {return _dampy_at_pos(p);});
                                         };
-      std::vector<std::vector<std::vector<std::vector<double>>>> dampy_grid(const std::vector<double> grid_x,
-                                        const std::vector<double> grid_y,
-                                        const std::vector<double> grid_z) const {
-                                        return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
-                                        {return _dampy_at_pos(p);});
-                                      };
-      std::vector<std::vector<std::vector<std::vector<double>>>> dampz_grid(const std::vector<double> grid_x,
-                                        const std::vector<double> grid_y,
-                                        const std::vector<double> grid_z) const {
-                                        return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
-                                        {return _dampz_at_pos(p);});
-                                                                        };
+        std::vector<std::vector<std::vector<std::vector<double>>>> dampz_grid(const std::vector<double> grid_x,
+                                          const std::vector<double> grid_y,
+                                          const std::vector<double> grid_z) const {
+                                          return _evaluate_grid(grid_x, grid_y, grid_z, [this](std::vector<double> p)
+                                          {return _dampz_at_pos(p);});
+                                                                          };
 
  };
 
  class JaffeMagneticField : public RegularMagneticField {
     public:
-      JaffeMagneticField() {};
-      virtual ~JaffeMagneticField() {};
+    protected:
+      bool vector_valued = true;
+      bool regular = true;
+      bool DEBUG = false;
+    public:
+
+    using JaffeMagneticField :: RegularField;
 
       bool quadruple = false; // quadruple pattern in halo
       bool bss = false; // bi-symmetric
@@ -149,14 +132,15 @@ public:
       double comp_r = 12; // radial cutoff scale, kpc
       double comp_p = 3; //cutoff power
 
-      std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
+      double *evaluate_at_pos(const double &x, const double &y, const double &z) const override;
 
-      std::vector<double> orientation(const std::vector<double> &pos) const;
-      double radial_scaling(const std::vector<double> &pos) const;
-      double arm_scaling(const std::vector<double> &pos) const;
-      double disk_scaling(const std::vector<double> &pos) const;
-      double halo_scaling(const std::vector<double> &pos) const;
-      std::vector<double> arm_compress(const std::vector<double> &pos) const;
-      std::vector<double> arm_compress_dust(const std::vector<double> &pos) const;
-      std::vector<double> dist2arm(const std::vector<double> &pos) const;
+      std::vector<double> orientation(const double &x, const double &y,  const double &z) const;
+      double radial_scaling(const double &x, const double &y) const;
+      double arm_scaling(const double &z) const;
+      double disk_scaling(const double &z) const;
+      double halo_scaling(const double &z) const;
+      std::vector<double> arm_compress(const double &x, const double &y,  const double &z) const;
+      std::vector<double> arm_compress_dust(const double &x, const double &y,  const double &z) const;
+      std::vector<double> dist2arm(const double &x, const double &y) const;
 };
+*/

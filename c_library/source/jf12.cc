@@ -4,7 +4,7 @@
 #include "../headers/hamunits.h"
 #include "../headers/MagneticField.h"
 
-std::vector<double>  JF12MagneticField::evaluate_at_pos(const std::vector<double> &pos) const {
+double*  JF12MagneticField::*evaluate_model(const double &x, const double &y, const double &z) const {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
@@ -25,11 +25,11 @@ std::vector<double>  JF12MagneticField::evaluate_at_pos(const std::vector<double
           11.4, 12.7, 15.5}; // the radii where the spiral arm boundaries cross the
                              // negative x-axis
 
-      const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])};
+      const double r{sqrt(x * x + y * y)};
       const double rho{
-          sqrt(pos[0] * pos[0] + pos[1] * pos[1] + pos[2] * pos[2])};
-      const double phi{atan2(pos[1], pos[0])};
-      const double z{pos[2]};
+          sqrt(x * x + y * y + z * z)};
+      const double phi{atan2(y, x)};
+      const double z{z};
 
       // define boundaries for where magnetic field is zero (outside of galaxy)
       if (r > Rmax || rho < rho_GC) {
@@ -143,9 +143,9 @@ std::vector<double>  JF12MagneticField::evaluate_at_pos(const std::vector<double
 
       if (DEBUG) {
 
-        std::cout << "DEBUG JF12: x: " <<  pos[0] <<  std::endl;
-        std::cout << "DEBUG JF12: y: " <<  pos[1] <<  std::endl;
-        std::cout << "DEBUG JF12: z: " <<  pos[2] <<  "\n" << std::endl;
+        std::cout << "DEBUG JF12: x: " <<  x <<  std::endl;
+        std::cout << "DEBUG JF12: y: " <<  y <<  std::endl;
+        std::cout << "DEBUG JF12: z: " <<  z <<  "\n" << std::endl;
 
         std::cout << "DEBUG JF12: r: " <<  r <<  std::endl;
         std::cout << "DEBUG JF12: rho: " <<  rho << std::endl;
@@ -180,5 +180,5 @@ std::vector<double>  JF12MagneticField::evaluate_at_pos(const std::vector<double
 
 
 
-      return std::vector<double>{{B_cart[0], B_cart[1], B_cart[2]}};
+      return *B_cart;
   };
