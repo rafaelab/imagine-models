@@ -16,8 +16,9 @@ add_library(ImagineModels SHARED
 set_target_properties(ImagineModels PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
-  PUBLIC_HEADER "headers/MagneticField.h;headers/ThermalElectronField.h")
+  PUBLIC_HEADER "headers/MagneticField.h;")
 configure_file(ImagineModels.pc.in ImagineModels.pc @ONLY)
+target_compile_features(ImagineModels PRIVATE cxx_std_17)
 target_include_directories(ImagineModels PRIVATE .)
 install(TARGETS ImagineModels
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

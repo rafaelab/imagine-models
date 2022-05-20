@@ -1,17 +1,23 @@
-#include <vector>
-#include <stdexcept>
 #include <functional>
 
 #include "AbstractFields.h"
 
-class JF12MagneticField : RegularField {
+template<typename G=std::vector<double>>
+class JF12MagneticField : public VectorField<G> {
   protected:
-    bool vector_valued = true;
-    bool regular = true;
     bool DEBUG = false;
   public:
+  const bool regular = true;
+  using VectorField<G> :: VectorField;
 
-  using JF12MagneticField  :: RegularField;
+  JF12MagneticField() : VectorField<G>() {};
+  virtual ~JF12MagneticField() {};
+
+  SumVectorField<G> operator+(const VectorField<G>& f) {
+         SumVectorField<G> sum(*this, f);
+         return sum;
+       }
+
 
   double b_arm_1 = 0.1;
   double b_arm_2 = 3.0;
@@ -36,10 +42,9 @@ class JF12MagneticField : RegularField {
   double rpc_X = 4.8;
   double r0_X= 2.9;
 
-//  double *evaluate_model(const std::vector<double> &pos) const override;
-
-  double *evaluate_model(const double &x, const double &y, const double &z) const override;
+std::vector<double> evaluate_model(const double &x, const double &y, const double &z) const;
  };
+
 /*
 
 class HelixMagneticField : public RegularField {

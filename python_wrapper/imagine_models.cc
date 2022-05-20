@@ -9,6 +9,8 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+PYBIND11_MAKE_OPAQUE(std::vector<double>);
+
 
 PYBIND11_MODULE(_ImagineModels, m) {
     m.doc() = "IMAGINE Model Library";
@@ -16,10 +18,10 @@ PYBIND11_MODULE(_ImagineModels, m) {
 /////////////////////////////////Magnetic Field/////////////////////////////////
 
 // Base Class
-    py::class_<MagneticField, PyMagneticField>(m, "MagneticField")
+    py::class_<Field, PyField>(m, "MagneticField")
         .def(py::init<>());
 
-//Derived Base class for Regular field
+//Vector Base Class
 
     py::class_<RegularMagneticField, MagneticField, PyRegularMagneticField>(m, "RegularMagneticField")
         .def(py::init<>())
