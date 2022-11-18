@@ -18,7 +18,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
 /////////////////////////////////Magnetic Field/////////////////////////////////
 
 // Base Class
-    py::class_<Field, PyField>(m, "MagneticField")
+    py::class_<Field, PyField>(m, "Field")
         .def(py::init<>());
 
 //Vector Base Class
@@ -52,7 +52,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("Xtheta_const", &JF12MagneticField::Xtheta_const)
         .def_readwrite("rpc_X", &JF12MagneticField::rpc_X)
         .def_readwrite("r0_X", &JF12MagneticField::r0_X);
-
+/*
     py::class_<HelixMagneticField, RegularMagneticField, PyHelixMagneticField>(m, "HelixMagneticField")
         .def(py::init<>())
         .def("evaluate_at_pos", &HelixMagneticField::evaluate_at_pos, "pos"_a)
@@ -141,3 +141,4 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("t2_b2",  &YMW16ThinDisc::t2_b2);
 
         }
+*/

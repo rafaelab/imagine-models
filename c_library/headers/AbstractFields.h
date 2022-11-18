@@ -8,23 +8,19 @@
 
 
 template<typename G, typename T>
-class Field {
+class RegularField {
 protected:
     // Fields
     // constructors
-    Field() {};
+    RegularField() {};
 
-    Field(const Field<G, T>& f): regular(f.regular) {
-      };
+    RegularField(const RegularField<G, T>& f) {};
     // methods
-    void set_regular(bool reg) {
-      regular = reg;
-    }
 
 public:
 
   // Fields
-  bool regular;
+
   // methods
   virtual T evaluate_model(const double &x, const double &y, const double &z) const = 0;
 
@@ -34,6 +30,7 @@ public:
     return evm;
   }
 
+    // Evaluate scalar valued functions
   std::vector<double> evaluate_function_on_grid(const G &ggx, const G &ggy, const G &ggz, const int size,
   std::function<double(double, double, double)> eval) const{
      std::vector<double> b(size*size*size);
@@ -47,6 +44,7 @@ public:
      return b;
      }
 
+     // Evaluate vector valued functions
    std::vector<double> evaluate_function_on_grid(const G &ggx, const G &ggy, const G &ggz,
      const int size, std::function<std::vector<double>(double, double, double)> eval) {
       std::vector<double> b(size*size*size*3);
@@ -73,34 +71,31 @@ public:
 };
 
 
-template<typename G>
-class VectorField : public Field<G, std::vector<double>> {
-protected:
-  VectorField() : Field<G, std::vector<double>>() {};
+template<typename G, typename T>
+class SumRegularField : public RegularField<G, T>{
 public:
-  // constructors
-  using Field<G, std::vector<double>> :: Field;
-};
-
-
-template<typename G>
-class SumVectorField : public VectorField<G>{
-public:
-  SumVectorField(const VectorField<G>& summand1, const VectorField<G>& summand2) :
-  VectorField<G>(summand1),
+  SumRegularField(const RegularField<G, T>& summand1, const RegularField<G, T>& summand2) :
+  RegularField<G, T>(summand1),
     summand1(summand1), summand2(summand2)  {
-      // Consistency checks
-      if (summand1.regular && summand2.regular) {
-        VectorField<G>::set_regular(true);
-      } else {
-        VectorField<G>::set_regular(false);
-      }
       }
 
-  const VectorField<G> &summand1;
-  const VectorField<G> &summand2;
+  const RegularField<G, T> &summand1;
+  const RegularField<G, T> &summand2;
 
-  std::vector<double> evaluate_model(const double& x, const double& y,
+  T evaluate_model(const double& x, const double& y, const double& z) const {
+
+  T sum;
+  if constexpr (std::is_same<T, double>::value) {
+    sum = sum_scalar_models(x, y, z);
+    }
+  else
+    {
+    sum =  sum_vector_models(x, y, z);
+  }
+  return sum;
+}
+
+  std::vector<double> sum_vector_models(const double& x, const double& y,
     const double& z) const {
       std::vector<double> sum1 = summand1.evaluate_model(x, y, z);
       std::vector<double> sum2 = summand2.evaluate_model(x, y, z);
@@ -111,40 +106,8 @@ public:
       return sum;
       }
 
-};
-
-
-
-template<typename G>
-class ScalarField : public Field<G, double> {
-protected:
-public:
-    // constructors
-    using Field<G, double> :: Field;
-    ScalarField();
-    virtual ~ScalarField() {};
-
-};
-
-
-template<typename G>
-class SumScalarField : public ScalarField<G>{
-public:
-  SumScalarField(const ScalarField<G>& summand1, const ScalarField<G>& summand2) :
-  ScalarField<G>(summand1),
-    summand1(summand1), summand2(summand2)  {
-      // Consistency checks
-      if (summand1.regular && summand2.regular) {
-        ScalarField<G>::set_regular(true);
-      } else {
-        ScalarField<G>::set_regular(false);
-      }
-      }
-
-  const ScalarField<G> &summand1;
-  const ScalarField<G> &summand2;
-
-  double evaluate_model(const double& x, const double& y, const double& z) const {
+  double sum_scalar_models(const double& x, const double& y, const double& z) const {
       return summand1.evaluate_model(x, y, z) + summand2.evaluate_model(x, y, z);
     }
+
 };

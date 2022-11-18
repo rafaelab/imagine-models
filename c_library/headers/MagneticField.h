@@ -3,18 +3,17 @@
 #include "AbstractFields.h"
 
 template<typename G=std::vector<double>>
-class JF12MagneticField : public VectorField<G> {
+class JF12MagneticField : public RegularField<G, std::vector<double>> {
   protected:
     bool DEBUG = false;
   public:
-  const bool regular = true;
-  using VectorField<G> :: VectorField;
+  using RegularField<G, std::vector<double>> :: RegularField;
 
-  JF12MagneticField() : VectorField<G>() {};
+  JF12MagneticField() : RegularField<G, std::vector<double>>() {};
   virtual ~JF12MagneticField() {};
 
-  SumVectorField<G> operator+(const VectorField<G>& f) {
-         SumVectorField<G> sum(*this, f);
+  SumRegularField<G, std::vector<double>> operator+(const RegularField<G, std::vector<double>>& f) {
+         SumRegularField<G, std::vector<double>> sum(*this, f);
          return sum;
        }
 
