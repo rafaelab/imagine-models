@@ -41,7 +41,7 @@ class JF12MagneticField : public RegularField<G, std::vector<double>> {
   double rpc_X = 4.8;
   double r0_X= 2.9;
 
-std::vector<double> evaluate_model(const double &x, const double &y, const double &z) const;
+std::vector<double> at_position(const double &x, const double &y, const double &z) const;
  };
 
 /*

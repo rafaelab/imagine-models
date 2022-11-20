@@ -84,6 +84,24 @@ int main() {
   std::vector<double> jf12_pos_on_xz_plane = jf12_1.getField(pos_on_xz_plane);
   print_magnetic_pos(jf12_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
 
+  std::cout << "\n Now the summed field: " << std::endl;
+  std::vector<double> jf12_sum_test_pos = jf12_3.getField(test_pos);
+  print_magnetic_pos(jf12_sum_test_pos, test_pos, "test_pos_sum");
+  std::vector<double> jf12_sum_origin = jf12_3.getField(origin);
+  print_magnetic_pos(jf12_sum_origin , origin , "origin");
+  std::vector<double> jf12_sum_pos_on_x_axis = jf12_3.getField(pos_on_x_axis);
+  print_magnetic_pos(jf12_sum_pos_on_x_axis, pos_on_x_axis , "pos_on_x_axis");
+  std::vector<double> jf12_sum_pos_on_y_axis = jf12_3.getField(pos_on_y_axis);
+  print_magnetic_pos(jf12_sum_pos_on_y_axis, pos_on_y_axis , "pos_on_y_axis");
+  std::vector<double> jf12_sum_pos_on_z_axis = jf12_3.getField(pos_on_z_axis);
+  print_magnetic_pos(jf12_sum_pos_on_z_axis, pos_on_z_axis , "pos_on_z_axis");
+  std::vector<double> jf12_sum_pos_on_xy_plane = jf12_3.getField(pos_on_xy_plane);
+  print_magnetic_pos(jf12_sum_pos_on_xy_plane, pos_on_xy_plane , "pos_on_xy_plane");
+  std::vector<double> jf12_sum_pos_on_yz_plane = jf12_3.getField(pos_on_yz_plane);
+  print_magnetic_pos(jf12_sum_pos_on_yz_plane, pos_on_yz_plane , "pos_on_yz_plane");
+  std::vector<double> jf12_sum_pos_on_xz_plane = jf12_3.getField(pos_on_xz_plane);
+  print_magnetic_pos(jf12_sum_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
+
 /*
   double ymw_test_pos = ymw16.getField(test_pos);
   print_thermal_pos(ymw_test_pos, test_pos, "test_pos");

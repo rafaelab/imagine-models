@@ -7,7 +7,7 @@
 template class JF12MagneticField<std::vector<double>>;
 
 template <typename G>
-std::vector<double> JF12MagneticField<G>::evaluate_model(const double &x, const double &y, const double &z) const {
+std::vector<double> JF12MagneticField<G>::at_position(const double &x, const double &y, const double &z) const {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
