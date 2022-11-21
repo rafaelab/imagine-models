@@ -2,11 +2,14 @@ _build/
 _generate/
 
 venv_imagine
+env_imagine_develop
+runs
 Playground/
 test/cpp/test
 examples/cpp/example
 c_library/build
 python_wrapper/playground*
+*.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

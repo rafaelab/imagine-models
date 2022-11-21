@@ -4,7 +4,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "exceptions.h"
+// #include "exceptions.h"
 
 
 
@@ -71,7 +71,7 @@ protected:
     using Field<G, T> :: Field;
 
     RegularField() : Field<G, T>() {};
-    virtual ~RegularField() {};
+    //virtual ~RegularField() {};
 
     // methods
 
@@ -123,15 +123,9 @@ public:
     const double& z) const {
       std::vector<double> sum1 = summand1.at_position(x, y, z);
       std::vector<double> sum2 = summand2.at_position(x, y, z);
-      std::cout << "SumRegularField: sum1 " << sum1[0] << std::endl;
-      std::cout << "SumRegularField: sum2 " << sum2[0] << std::endl;
       std::vector<double> sum(3);
 
       std::transform(sum1.begin(), sum1.end(), sum2.begin(), sum.begin(), std::plus<double>());
-      //for (size_t i; i<3; i++) {
-      //  sum[i] = sum1[i] + sum2[i];
-      //}
-      std::cout << "SumRegularField: sum " << sum[0] << std::endl;
       return sum;
       }
 
@@ -149,7 +143,7 @@ protected:
     using Field<G, T> :: Field;
 
     RandomField() : Field<G, T>() {};
-    virtual ~RandomField() {};
+    //virtual ~RandomField() {};
 
     // methods
 
