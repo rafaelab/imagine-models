@@ -1,15 +1,19 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/numpy.h>
+//#include <pybind11/pybind11.h>
+//#include <pybind11/stl.h>
+//#include <pybind11/numpy.h>
 #include <pybind11/functional.h>
 
 #include "trampoline.h"
 // #include "thermal_trampoline.h"
 
+
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-// PYBIND11_MAKE_OPAQUE(std::vector<double>);
+// wrappers to numpy
+py::array_t<double> my_grid (RegularField<py::array_t<double>, double> &rf, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z) {
+    return py::array(rf.on_grid(grid_x, grid_y, grid_z).data());
+}
 
 
 PYBIND11_MODULE(_ImagineModels, m) {
@@ -18,8 +22,9 @@ PYBIND11_MODULE(_ImagineModels, m) {
 /////////////////////////////////Base classes/////////////////////////////////
 
 // Vector Base Class
-    py::class_<Field<std::vector<double>, std::vector<double>>, PyVectorField>(m, "VectorField")
+    py::class_<Field<py::array_t<double>, std::vector<double>>, PyVectorField>(m, "VectorField")
         .def(py::init<>());
+
 
 // Scalar Base Class
     py::class_<Field<std::vector<double>, double>, PyScalarField>(m, "ScalarField")
@@ -28,14 +33,16 @@ PYBIND11_MODULE(_ImagineModels, m) {
 /////////////////////////////////Regular Field Basc/////////////////////////////////
 
 // Regular Vector Base Class
-    py::class_<RegularField<std::vector<double>, std::vector<double>>, Field<std::vector<double>, std::vector<double>>, PyRegularVectorField>(m, "RegularVectorField")
+    py::class_<RegularField<py::array_t<double>, std::vector<double>>, Field<py::array_t<double>, std::vector<double>>, PyRegularVectorField>(m, "RegularVectorField")
         .def(py::init<>())
-        .def("on_grid", &RegularField<std::vector<double>, std::vector<double>>::on_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
+        // still produces a copy!
+        .def("on_grid", my_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
 
 // Regular Scalar Base Class
-    py::class_<RegularField<std::vector<double>, double>, Field<std::vector<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
+    py::class_<RegularField<py::array_t<double>, double>, Field<py::array_t<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
         .def(py::init<>())
-        .def("on_grid", &RegularField<std::vector<double>, double>::on_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
+        // still produces a copy!
+        .def("on_grid", my_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
 
 /////////////////////////////////Random Fields/////////////////////////////////
 
@@ -43,29 +50,29 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
 /////////////////////////////////Regular Fields/////////////////////////////////
 
-    py::class_<JF12MagneticField<std::vector<double>>, RegularField<std::vector<double>, std::vector<double>>, PyJF12MagneticField>(m, "JF12RegularField")
+    py::class_<JF12MagneticField<py::array_t<double>>, RegularField<py::array_t<double>, std::vector<double>>, PyJF12MagneticField>(m, "JF12RegularField")
         .def(py::init<>())
-        .def("at_position", &JF12MagneticField<std::vector<double>>::at_position, "x"_a, "y"_a, "z"_a)
-        .def_readwrite("b_arm_1", &JF12MagneticField<std::vector<double>>::b_arm_1)
-        .def_readwrite("b_arm_2", &JF12MagneticField<std::vector<double>>::b_arm_2)
-        .def_readwrite("b_arm_3", &JF12MagneticField<std::vector<double>>::b_arm_3)
-        .def_readwrite("b_arm_4", &JF12MagneticField<std::vector<double>>::b_arm_4)
-        .def_readwrite("b_arm_5", &JF12MagneticField<std::vector<double>>::b_arm_5)
-        .def_readwrite("b_arm_6", &JF12MagneticField<std::vector<double>>::b_arm_6)
-        .def_readwrite("b_arm_7", &JF12MagneticField<std::vector<double>>::b_arm_7)
-        .def_readwrite("b_ring", &JF12MagneticField<std::vector<double>>::b_ring)
-        .def_readwrite("h_disk", &JF12MagneticField<std::vector<double>>::h_disk)
-        .def_readwrite("w_disk", &JF12MagneticField<std::vector<double>>::w_disk)
-        .def_readwrite("Bn", &JF12MagneticField<std::vector<double>>::Bn)
-        .def_readwrite("Bs", &JF12MagneticField<std::vector<double>>::Bs)
-        .def_readwrite("rn", &JF12MagneticField<std::vector<double>>::rn)
-        .def_readwrite("rs", &JF12MagneticField<std::vector<double>>::rs)
-        .def_readwrite("wh", &JF12MagneticField<std::vector<double>>::wh)
-        .def_readwrite("z0", &JF12MagneticField<std::vector<double>>::z0)
-        .def_readwrite("B0_X", &JF12MagneticField<std::vector<double>>::B0_X)
-        .def_readwrite("Xtheta_const", &JF12MagneticField<std::vector<double>>::Xtheta_const)
-        .def_readwrite("rpc_X", &JF12MagneticField<std::vector<double>>::rpc_X)
-        .def_readwrite("r0_X", &JF12MagneticField<std::vector<double>>::r0_X);
+        .def("at_position", &JF12MagneticField<py::array_t<double>>::at_position, "x"_a, "y"_a, "z"_a)
+        .def_readwrite("b_arm_1", &JF12MagneticField<py::array_t<double>>::b_arm_1)
+        .def_readwrite("b_arm_2", &JF12MagneticField<py::array_t<double>>::b_arm_2)
+        .def_readwrite("b_arm_3", &JF12MagneticField<py::array_t<double>>::b_arm_3)
+        .def_readwrite("b_arm_4", &JF12MagneticField<py::array_t<double>>::b_arm_4)
+        .def_readwrite("b_arm_5", &JF12MagneticField<py::array_t<double>>::b_arm_5)
+        .def_readwrite("b_arm_6", &JF12MagneticField<py::array_t<double>>::b_arm_6)
+        .def_readwrite("b_arm_7", &JF12MagneticField<py::array_t<double>>::b_arm_7)
+        .def_readwrite("b_ring", &JF12MagneticField<py::array_t<double>>::b_ring)
+        .def_readwrite("h_disk", &JF12MagneticField<py::array_t<double>>::h_disk)
+        .def_readwrite("w_disk", &JF12MagneticField<py::array_t<double>>::w_disk)
+        .def_readwrite("Bn", &JF12MagneticField<py::array_t<double>>::Bn)
+        .def_readwrite("Bs", &JF12MagneticField<py::array_t<double>>::Bs)
+        .def_readwrite("rn", &JF12MagneticField<py::array_t<double>>::rn)
+        .def_readwrite("rs", &JF12MagneticField<py::array_t<double>>::rs)
+        .def_readwrite("wh", &JF12MagneticField<py::array_t<double>>::wh)
+        .def_readwrite("z0", &JF12MagneticField<py::array_t<double>>::z0)
+        .def_readwrite("B0_X", &JF12MagneticField<py::array_t<double>>::B0_X)
+        .def_readwrite("Xtheta_const", &JF12MagneticField<py::array_t<double>>::Xtheta_const)
+        .def_readwrite("rpc_X", &JF12MagneticField<py::array_t<double>>::rpc_X)
+        .def_readwrite("r0_X", &JF12MagneticField<py::array_t<double>>::r0_X);
 /*
     py::class_<HelixMagneticField, RegularMagneticField, PyHelixMagneticField>(m, "HelixMagneticField")
         .def(py::init<>())

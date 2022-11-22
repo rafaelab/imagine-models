@@ -1,34 +1,41 @@
 #include "../c_library/headers/MagneticField.h"
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
+// PYBIND11_MAKE_OPAQUE(std::vector<double>);
+
+namespace py = pybind11;
 
 // These classes are necessary to override virtual functions when binding
 
-class PyVectorField : public Field<std::vector<double>, std::vector<double>> {
+
+class PyVectorField: public Field<py::array_t<double>, std::vector<double>> {
 public:
-    using Field<std::vector<double>, std::vector<double>>::Field; // Inherit constructors
+    using Field<py::array_t<double>, std::vector<double>>::Field; // Inherit constructors
     std::vector<double> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(std::vector<double>, Field, at_position, x, y, z); }
-    std::vector<double> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z) const override {PYBIND11_OVERRIDE_PURE(std::vector<double>, Field, on_grid, grid_x, grid_y, grid_z); }
+//    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE_PURE(std::vector<double>, Field, on_grid, grid_x, grid_y, grid_z); }
 };
 
-class PyScalarField : public Field<std::vector<double>, double> {
+class PyScalarField : public Field<py::array_t<double>, double> {
 public:
-    using Field<std::vector<double>, double>::Field; // Inherit constructors
+    using Field<py::array_t<double>, double>::Field; // Inherit constructors
     double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, Field, at_position, x, y, z); }
-    std::vector<double> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z) const override {PYBIND11_OVERRIDE_PURE(std::vector<double>, Field, on_grid, grid_x, grid_y, grid_z); }
+//    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE_PURE(std::vector<double>, Field, on_grid, grid_x, grid_y, grid_z); }
 };
 
-
-class PyRegularVectorField : public RegularField<std::vector<double>, std::vector<double>> {
+class PyRegularVectorField : public RegularField<py::array_t<double>, std::vector<double>> {
 public:
-    using RegularField<std::vector<double>, std::vector<double>>::RegularField; // Inherit constructors
+    using RegularField<py::array_t<double>, std::vector<double>>::RegularField; // Inherit constructors
     std::vector<double> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(std::vector<double>, RegularField, at_position, x, y, z); }
-    std::vector<double> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, RegularField, on_grid,  grid_x, grid_y, grid_z); }
+//    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, RegularField, on_grid,  grid_x, grid_y, grid_z); }
 };
 
-class PyRegularScalarField : public RegularField<std::vector<double>, double> {
+class PyRegularScalarField : public RegularField<py::array_t<double>, double> {
 public:
-    using RegularField<std::vector<double>, double>::RegularField; // Inherit constructors
+    using RegularField<py::array_t<double>, double>::RegularField; // Inherit constructors
     double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, RegularField, at_position, x, y, z); }
-    std::vector<double> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, RegularField, on_grid,  grid_x, grid_y, grid_z); }
+  //  std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, RegularField, on_grid,  grid_x, grid_y, grid_z); }
 };
 
 //class PyRandomField : public RandomField {
@@ -38,10 +45,11 @@ public:
 //};
 
 
-class PyJF12MagneticField : public JF12MagneticField<std::vector<double>> {
+class PyJF12MagneticField : public JF12MagneticField<py::array_t<double>> {
 public:
-    using JF12MagneticField<std::vector<double>>::JF12MagneticField; // Inherit constructors
+    using JF12MagneticField<py::array_t<double>>::JF12MagneticField; // Inherit constructors
     std::vector<double> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, at_position, x, y, z); }
+    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, on_grid,  grid_x, grid_y, grid_z); }
 };
 
 /*

@@ -4,6 +4,7 @@
 #include "../headers/hamunits.h"
 #include "../headers/MagneticField.h"
 
+// This line is needed to avoid linker errors due to templates
 template class JF12MagneticField<std::vector<double>>;
 
 template <typename G>
