@@ -2,6 +2,7 @@
 //#include <pybind11/stl.h>
 //#include <pybind11/numpy.h>
 #include <pybind11/functional.h>
+#include <iostream>
 
 #include "trampoline.h"
 // #include "thermal_trampoline.h"
@@ -10,9 +11,21 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-// wrappers to numpy
-py::array_t<double> my_grid (RegularField<py::array_t<double>, double> &rf, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z) {
-    return py::array(rf.on_grid(grid_x, grid_y, grid_z).data());
+
+// helper function to avoid making a copy when returning a py::array_t
+// author: https://github.com/YannickJadoul
+// source: https://github.com/pybind/pybind11/issues/1042#issuecomment-642215028
+template <typename Sequence>
+inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
+  auto size = seq.size();
+  auto data = seq.data();
+  std::unique_ptr<Sequence> seq_ptr =
+      std::make_unique<Sequence>(std::move(seq));
+  auto capsule = py::capsule(seq_ptr.get(), [](void *p) {
+    std::unique_ptr<Sequence>(reinterpret_cast<Sequence *>(p));
+  });
+  seq_ptr.release();
+  return py::array(size, data, capsule);
 }
 
 
@@ -27,7 +40,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
 
 // Scalar Base Class
-    py::class_<Field<std::vector<double>, double>, PyScalarField>(m, "ScalarField")
+    py::class_<Field<py::array_t<double>, double>, PyScalarField>(m, "ScalarField")
         .def(py::init<>());
 
 /////////////////////////////////Regular Field Basc/////////////////////////////////
@@ -36,14 +49,20 @@ PYBIND11_MODULE(_ImagineModels, m) {
     py::class_<RegularField<py::array_t<double>, std::vector<double>>, Field<py::array_t<double>, std::vector<double>>, PyRegularVectorField>(m, "RegularVectorField")
         .def(py::init<>())
         // still produces a copy!
-        .def("on_grid", my_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
+        .def("on_grid", [](RegularField<py::array_t<double>, std::vector<double>> &self, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z)  {
+          std::vector<double> f = self.on_grid(grid_x, grid_y, grid_z);
+          std::cout << "on grid f size " << f.size() << std::endl;
+          return as_pyarray(std::move(f));
+        }, "grid_x"_a, "grid_y"_a, "grid_z"_a);
 
 // Regular Scalar Base Class
     py::class_<RegularField<py::array_t<double>, double>, Field<py::array_t<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
         .def(py::init<>())
         // still produces a copy!
-        .def("on_grid", my_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
-
+        .def("on_grid", [](RegularField<py::array_t<double>, std::vector<double>> &self, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z)  {
+          std::vector<double> f = self.on_grid(grid_x, grid_y, grid_z);
+          return as_pyarray(std::move(f));
+        }, "grid_x"_a, "grid_y"_a, "grid_z"_a);
 /////////////////////////////////Random Fields/////////////////////////////////
 
 //TODO
