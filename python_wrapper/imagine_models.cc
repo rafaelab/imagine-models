@@ -66,7 +66,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
 // Regular Scalar Base Class
     py::class_<RegularField<py::array_t<double>, double>, Field<py::array_t<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
         .def(py::init<>())
-        // still produces a copy!
         .def("on_grid", [](RegularField<py::array_t<double>, std::vector<double>> &self, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z)  {
           std::vector<double> f = self.on_grid(grid_x, grid_y, grid_z);
           int sx = grid_x.size();
@@ -105,22 +104,22 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("Xtheta_const", &JF12MagneticField<py::array_t<double>>::Xtheta_const)
         .def_readwrite("rpc_X", &JF12MagneticField<py::array_t<double>>::rpc_X)
         .def_readwrite("r0_X", &JF12MagneticField<py::array_t<double>>::r0_X);
-/*
-    py::class_<HelixMagneticField, RegularMagneticField, PyHelixMagneticField>(m, "HelixMagneticField")
+
+    py::class_<HelixMagneticField<py::array_t<double>>, RegularMagneticField<py::array_t<double>, std::vector<double>>, PyHelixMagneticField>(m, "HelixMagneticField")
         .def(py::init<>())
-        .def("evaluate_at_pos", &HelixMagneticField::evaluate_at_pos, "pos"_a)
-        .def("dampx_grid", &HelixMagneticField::dampx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-        .def("dampy_grid", &HelixMagneticField::dampy_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-        .def("dampz_grid", &HelixMagneticField::dampz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+        .def("at_position", &HelixMagneticField::evaluate_at_pos,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+  //      .def("dampx_grid", &HelixMagneticField::dampx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+  //      .def("dampy_grid", &HelixMagneticField::dampy_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+  //      .def("dampz_grid", &HelixMagneticField::dampz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
         .def_readwrite("ampx", &HelixMagneticField::ampx)
         .def_readwrite("ampy", &HelixMagneticField::ampy)
         .def_readwrite("ampz", &HelixMagneticField::ampz)
         .def_readwrite("rmin", &HelixMagneticField::rmin)
         .def_readwrite("rmax", &HelixMagneticField::rmax);
 
-    py::class_<JaffeMagneticField, RegularMagneticField, PyJaffeMagneticField>(m, "JaffeMagneticField")
+    py::class_<JaffeMagneticField<py::array_t<double>>, RegularMagneticField<py::array_t<double>, std::vector<double>>, PyJaffeMagneticField>(m, "JaffeMagneticField")
         .def(py::init<>())
-        .def("evaluate_at_pos", &JaffeMagneticField::evaluate_at_pos, "pos"_a)
+        .def("at_position", &JaffeMagneticField::evaluate_at_pos, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
         .def_readwrite("quadruple", &JaffeMagneticField::quadruple)
         .def_readwrite("bss", &JaffeMagneticField::bss)
 
@@ -162,35 +161,27 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
 /////////////////////////////Thermal Electron Field/////////////////////////////
 
-    py::class_<ThermalElectronField, PyThermalElectronField>(m, "ThermalElectronField")
-        .def(py::init<>());
-
-    py::class_<RegularThermalElectronField, ThermalElectronField, PyRegularThermalElectronField>(m, "RegularThermalElectronField")
+    py::class_<YMW16, RegularField<py::array_t<double>, double>, PyYMW16>(m, "YMW16Component")
         .def(py::init<>())
-        .def("_evaluate_grid", &RegularThermalElectronField::_evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a, "ev_at_pos"_a)
-        .def("evaluate_grid", &RegularThermalElectronField::evaluate_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a);
-
-
-    py::class_<YMW16Component, RegularThermalElectronField, PyYMW16Component>(m, "YMW16Component")
-        .def(py::init<>())
+        .def("at_position", &YMW16ThickDisc::evaluate_at_pos, "pos"_a)
 
         .def_readwrite("t1_ad",  &YMW16Component::t1_ad)
         .def_readwrite("t1_bd",  &YMW16Component::t1_bd);
 
     py::class_<YMW16ThickDisc, YMW16Component, PyYMW16ThickDisc>(m, "YMW16ThickDisc")
         .def(py::init<>())
-        .def("evaluate_at_pos", &YMW16ThickDisc::evaluate_at_pos, "pos"_a)
+
 
         .def_readwrite("t1_n1",  &YMW16ThickDisc::t1_n1)
         .def_readwrite("t1_h1",  &YMW16ThickDisc::t1_h1);
 
    py::class_<YMW16ThinDisc, YMW16Component, PyYMW16ThinDisc>(m, "YMW16ThinDisc")
         .def(py::init<>())
-        .def("evaluate_at_pos", &YMW16ThinDisc::evaluate_at_pos, "pos"_a)
+        .def("at_posiiton", &YMW16ThinDisc::evaluate_at_pos, "pos"_a)
 
         .def_readwrite("t2_n2",  &YMW16ThinDisc::t2_n2)
         .def_readwrite("t2_k2",  &YMW16ThinDisc::t2_k2)
         .def_readwrite("t2_a2",  &YMW16ThinDisc::t2_a2)
         .def_readwrite("t2_b2",  &YMW16ThinDisc::t2_b2);
-*/
+
         }

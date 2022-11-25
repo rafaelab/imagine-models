@@ -1,4 +1,7 @@
-#include "../c_library/headers/MagneticField.h"
+#include "../c_library/headers/RegularJF12.h"
+#include "../c_library/headers/Helix.h"
+#include "../c_library/headers/Jaffe.h"
+#include "../c_library/headers/ThermalElectronField.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -66,18 +69,18 @@ public:
     std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, on_grid,  grid_x, grid_y, grid_z); }
 };
 
-/*
-class PyHelixMagneticField : public HelixMagneticField {
+/
+class PyHelixMagneticField : public HelixMagneticField<py::array_t<double>> {
 public:
-    using HelixMagneticField::HelixMagneticField; // Inherit constructors
-    std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override {PYBIND11_OVERRIDE(std::vector<double>, HelixMagneticField, evaluate_at_pos, pos); }
-
+    using HelixMagneticField<py::array_t<double>>::HelixMagneticField; // Inherit constructors
+    std::vector<double> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE(std::vector<double>, HelixMagneticField, at_position, x, y, z); }
+    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, HelixMagneticField, on_grid,  grid_x, grid_y, grid_z); }
 };
 
-class PyJaffeMagneticField : public JaffeMagneticField {
+class PyJaffeMagneticField : public JaffeMagneticField<py::array_t<double>> {
 public:
-    using JaffeMagneticField::JaffeMagneticField; // Inherit constructors
-    std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override {PYBIND11_OVERRIDE(std::vector<double>, JaffeMagneticField, evaluate_at_pos, pos); }
+    using JaffeMagneticField<py::array_t<double>>::JaffeMagneticField; // Inherit constructors
+    std::vector<double> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE(std::vector<double>, JaffeMagneticField, at_position, x, y, z); }
+    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, JaffeMagneticField, on_grid,  grid_x, grid_y, grid_z); }
 
 };
-*/
