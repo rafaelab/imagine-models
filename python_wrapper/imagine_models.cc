@@ -29,6 +29,7 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
 }
 
 
+
 PYBIND11_MODULE(_ImagineModels, m) {
     m.doc() = "IMAGINE Model Library";
 
@@ -48,12 +49,19 @@ PYBIND11_MODULE(_ImagineModels, m) {
 // Regular Vector Base Class
     py::class_<RegularField<py::array_t<double>, std::vector<double>>, Field<py::array_t<double>, std::vector<double>>, PyRegularVectorField>(m, "RegularVectorField")
         .def(py::init<>())
-        // still produces a copy!
+
         .def("on_grid", [](RegularField<py::array_t<double>, std::vector<double>> &self, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z)  {
           std::vector<double> f = self.on_grid(grid_x, grid_y, grid_z);
           std::cout << "on grid f size " << f.size() << std::endl;
-          return as_pyarray(std::move(f));
-        }, "grid_x"_a, "grid_y"_a, "grid_z"_a);
+          int sx = grid_x.size();
+          int sy = grid_y.size();
+          int sz = grid_z.size();
+          int si = 3;
+          auto arr = as_pyarray(std::move(f));
+          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
+          arr.resize({sx, sy, sz, si});
+          return arr;},
+          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::move);
 
 // Regular Scalar Base Class
     py::class_<RegularField<py::array_t<double>, double>, Field<py::array_t<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
@@ -61,8 +69,13 @@ PYBIND11_MODULE(_ImagineModels, m) {
         // still produces a copy!
         .def("on_grid", [](RegularField<py::array_t<double>, std::vector<double>> &self, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z)  {
           std::vector<double> f = self.on_grid(grid_x, grid_y, grid_z);
-          return as_pyarray(std::move(f));
-        }, "grid_x"_a, "grid_y"_a, "grid_z"_a);
+          int sx = grid_x.size();
+          int sy = grid_y.size();
+          int sz = grid_z.size();
+          auto arr = as_pyarray(std::move(f));
+          arr.resize({sx, sy, sz});
+          return arr;},
+          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::move);
 /////////////////////////////////Random Fields/////////////////////////////////
 
 //TODO
@@ -71,7 +84,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
     py::class_<JF12MagneticField<py::array_t<double>>, RegularField<py::array_t<double>, std::vector<double>>, PyJF12MagneticField>(m, "JF12RegularField")
         .def(py::init<>())
-        .def("at_position", &JF12MagneticField<py::array_t<double>>::at_position, "x"_a, "y"_a, "z"_a)
+        .def("at_position", &JF12MagneticField<py::array_t<double>>::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
         .def_readwrite("b_arm_1", &JF12MagneticField<py::array_t<double>>::b_arm_1)
         .def_readwrite("b_arm_2", &JF12MagneticField<py::array_t<double>>::b_arm_2)
         .def_readwrite("b_arm_3", &JF12MagneticField<py::array_t<double>>::b_arm_3)

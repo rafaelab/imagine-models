@@ -9,8 +9,8 @@ class JF12MagneticField : public RegularField<G, std::vector<double>> {
   public:
   using RegularField<G, std::vector<double>> :: RegularField;
 
-  JF12MagneticField() : RegularField<G, std::vector<double>>() {};
-  virtual ~JF12MagneticField() {};
+  JF12MagneticField() : RegularField<G, std::vector<double>>() {std::cout << "Jf12 Constructor Used" << std::endl;};
+  ~JF12MagneticField() {std::cout << "Jf12 Destructor Used" << std::endl;};
 
   SumRegularField<G, std::vector<double>> operator+(const RegularField<G, std::vector<double>>& f) {
          SumRegularField<G, std::vector<double>> sum(*this, f);

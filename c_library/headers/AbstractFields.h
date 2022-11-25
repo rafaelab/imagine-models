@@ -12,14 +12,15 @@ template<typename G, typename T>
 class Field {
 protected:
     // Fields
+
     // Constructors
     Field() {};
-
-    Field(const Field<G, T>& f) {};
+    //Field(const Field<G, T>& f) {};
     // Methods
 
 public:
-
+  // Constructors
+  virtual ~Field() = default;
   // Fields
 
   // Methods
@@ -50,13 +51,13 @@ public:
    std::vector<double> evaluate_function_on_grid(const G &ggx, const G &ggy, const G &ggz,
      const int size_x, const int size_y, const int size_z,
      std::function<std::vector<double>(double, double, double)> eval) const {
-      std::vector<double> b(size_x*size_y*size_z*3);
+      std::vector<double> b;
       std::vector<double>::iterator bend = b.begin();
       for (int i=0; i < size_x; i++) {
           for (int j=0; j < size_y; j++) {
               for (int k=0; k < size_z; k++) {
                   std::vector<double> v = eval(ggx.at(i), ggy.at(j), ggz.at(k));
-                  bend = std::copy(v.begin(), v.end() + 3, bend);
+                  b.insert(b.end(), v.begin(), v.end());
           }   }   }
       return b;
     }
@@ -67,19 +68,18 @@ template<typename G, typename T>
 class RegularField : public Field<G, T>  {
 protected:
     // Fields
-    // constructors
+
+    // Constructors
     using Field<G, T> :: Field;
-
     RegularField() : Field<G, T>() {};
-    //virtual ~RegularField() {};
-
-    // methods
+    // Methods
 
 public:
-
+  // Constructors
+  virtual ~RegularField() = default;
   // Fields
 
-  // methods
+  // Methods
   virtual T at_position(const double &x, const double &y, const double &z) const = 0;
 
   std::vector<double> on_grid(const G &grid_x, const G &grid_y, const G &grid_z) const {
@@ -143,7 +143,7 @@ protected:
     using Field<G, T> :: Field;
 
     RandomField() : Field<G, T>() {};
-    //virtual ~RandomField() {};
+    ~RandomField() {};
 
     // methods
 

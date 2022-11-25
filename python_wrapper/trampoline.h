@@ -63,7 +63,7 @@ class PyJF12MagneticField : public JF12MagneticField<py::array_t<double>> {
 public:
     using JF12MagneticField<py::array_t<double>>::JF12MagneticField; // Inherit constructors
     std::vector<double> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, at_position, x, y, z); }
-  //  std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, on_grid,  grid_x, grid_y, grid_z); }
+    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, on_grid,  grid_x, grid_y, grid_z); }
 };
 
 /*
