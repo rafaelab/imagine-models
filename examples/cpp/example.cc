@@ -1,30 +1,45 @@
-#include "../../c_library/headers/MagneticField.h"
+
+#include "../../c_library/headers/hamunits.h"
+#include "../../c_library/headers/AbstractFields.h"
+#include "../../c_library/headers/RegularJF12.h"
+#include "../../c_library/headers/Jaffe.h"
+#include "../../c_library/headers/Helix.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <map>
+#include <memory>
 
-void print_magnetic_pos(std::vector<double> mval, std::vector<double> tp, const char* title) {
+void print_pos(std::map <std::string, std::vector<double>> pd,
+               std::map <std::string, std::shared_ptr<RegularField<std::vector<double>, std::vector<double>>>> md) {
 
-      std::cout << "Magnetic field at " << title << " (";
-      for (size_t l = 0; l < tp.size(); l++) {
-                        std::cout << tp[l] << " kpc, ";
-                        }
-      std::cout << "):\n";
-      for (size_t l = 0; l < mval.size(); l++) {
-                        std::cout << mval[l]<< ", ";
-                        }
-      std::cout << "\n";
+      auto model_iter = md.begin();
+
+
+      while (model_iter != md.end()) {
+        auto position_iter = pd.begin();
+        std::cout << "The nodel " << model_iter->first << " is evaluated \n\n";
+        while (position_iter != pd.end()) {
+          std::vector<double> mval = (*(model_iter->second)).getField(position_iter->second);
+
+          std::cout << "Position: ";
+          for (size_t l = 0; l < (position_iter->second).size(); l++) {
+                            std::cout << (position_iter->second)[l] << " kpc  ";
+                          }
+          std::cout << "\n";
+          std::cout << "Evaluation: ";
+          for (size_t l = 0; l < mval.size(); l++) {
+                            std::cout << mval[l] << "  ";
+                            }
+          std::cout << "\n\n";
+
+          ++position_iter;
+          }
+        std::cout << "\n";
+        ++model_iter;
       }
-/*
-void print_thermal_pos(double tval, std::vector<double> tp, const char* title) {
+    }
 
-      std::cout << "Theraml electron field at " << title << " (";
-      for (size_t l = 0; l < tp.size(); l++) {
-                        std::cout << tp[l] << " kpc, ";
-                        }
-      std::cout << "): " << tval << "\n";
-      }
-*/
 void print_ev_grid(std::vector<std::vector<std::vector<std::vector<double>>>>  b_grid,
   std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) {
 
@@ -45,82 +60,37 @@ void print_ev_grid(std::vector<std::vector<std::vector<std::vector<double>>>>  b
         }
     }
 
+
+
 int main() {
 
+  std::map <std::string, std::vector<double>> position_dict;
+
+
+  // Define some positions in Galactic cartesian coordinates (units are kpc)
+  position_dict["origin"] =  {0., 0., 0.};
+  position_dict["pos_on_x_axis"] = {1.7, 0., 0.};
+  position_dict["pos_on_y_axis"] = {0., -2.1, 0.};
+  position_dict["pos_on_z_axis"] = {0., 0., 1.35};
+  position_dict["pos_on_xy_plane"] = {1.9, -2.9, 0.};
+  position_dict["pos_on_yz_plane"] = {0., 2.1, -1.6};
+  position_dict["pos_on_xz_plane"] = {-2.7, 0., 1.25};
+
+  // Define a grid in Galactic cartesian coordinates (units are kpc)
   const std::vector<double> grid_x {{2., 4., 0., 1., .4}};
   const std::vector<double> grid_y {{4., 6., 0.1, 0., .2}};
   const std::vector<double> grid_z {{-0.2, 0.8, 0.2, 0., 1.}};
 
-  JF12MagneticField<std::vector<double>> jf12_1;
-  JF12MagneticField<std::vector<double>> jf12_2;
-  auto jf12_3 = jf12_1 + jf12_2;
-  //YMW16ThermalElectronField ymw16;
 
-  // Define some positions in Galactic cartesian coordinates (units are kpc)
-  std::vector<double> test_pos{{1., 2., 0.}};
-  std::vector<double> origin{{0., 0., 0.}};
-  std::vector<double> pos_on_x_axis{{.123, 0., 0.}};
-  std::vector<double> pos_on_y_axis{{0., .432, 0.}};
-  std::vector<double> pos_on_z_axis{{0., 0., 1.2}};
-  std::vector<double> pos_on_xy_plane{{.123, -.213, 0.}};
-  std::vector<double> pos_on_yz_plane{{0., -.232, -.3}};
-  std::vector<double> pos_on_xz_plane{{-.24, 0., 1.2}};
+  // using pointer here since RegularField is abstract
+  std::map <std::string, std::shared_ptr<RegularField<std::vector<double>, std::vector<double>>>> model_dict;
+
+  model_dict["Jansson Farrar"] = std::shared_ptr<JF12MagneticField<std::vector<double>>> (new JF12MagneticField<std::vector<double>>());
+  model_dict["Jaffe"] = std::shared_ptr<JaffeMagneticField<std::vector<double>>> (new JaffeMagneticField<std::vector<double>>());
+  model_dict["Helix"] = std::shared_ptr<HelixMagneticField<std::vector<double>>> (new HelixMagneticField<std::vector<double>>());
 
 
-  std::vector<double> jf12_test_pos = jf12_1.getField(test_pos);
-  print_magnetic_pos(jf12_test_pos, test_pos, "test_pos");
-  std::vector<double> jf12_origin = jf12_1.getField(origin);
-  print_magnetic_pos(jf12_origin , origin , "origin");
-  std::vector<double> jf12_pos_on_x_axis = jf12_1.getField(pos_on_x_axis);
-  print_magnetic_pos(jf12_pos_on_x_axis, pos_on_x_axis , "pos_on_x_axis");
-  std::vector<double> jf12_pos_on_y_axis = jf12_1.getField(pos_on_y_axis);
-  print_magnetic_pos(jf12_pos_on_y_axis, pos_on_y_axis , "pos_on_y_axis");
-  std::vector<double> jf12_pos_on_z_axis = jf12_1.getField(pos_on_z_axis);
-  print_magnetic_pos(jf12_pos_on_z_axis, pos_on_z_axis , "pos_on_z_axis");
-  std::vector<double> jf12_pos_on_xy_plane = jf12_1.getField(pos_on_xy_plane);
-  print_magnetic_pos(jf12_pos_on_xy_plane, pos_on_xy_plane , "pos_on_xy_plane");
-  std::vector<double> jf12_pos_on_yz_plane = jf12_1.getField(pos_on_yz_plane);
-  print_magnetic_pos(jf12_pos_on_yz_plane, pos_on_yz_plane , "pos_on_yz_plane");
-  std::vector<double> jf12_pos_on_xz_plane = jf12_1.getField(pos_on_xz_plane);
-  print_magnetic_pos(jf12_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
-
-  std::cout << "\n Now the summed field: " << std::endl;
-  std::vector<double> jf12_sum_test_pos = jf12_3.getField(test_pos);
-  print_magnetic_pos(jf12_sum_test_pos, test_pos, "test_pos_sum");
-  std::vector<double> jf12_sum_origin = jf12_3.getField(origin);
-  print_magnetic_pos(jf12_sum_origin , origin , "origin");
-  std::vector<double> jf12_sum_pos_on_x_axis = jf12_3.getField(pos_on_x_axis);
-  print_magnetic_pos(jf12_sum_pos_on_x_axis, pos_on_x_axis , "pos_on_x_axis");
-  std::vector<double> jf12_sum_pos_on_y_axis = jf12_3.getField(pos_on_y_axis);
-  print_magnetic_pos(jf12_sum_pos_on_y_axis, pos_on_y_axis , "pos_on_y_axis");
-  std::vector<double> jf12_sum_pos_on_z_axis = jf12_3.getField(pos_on_z_axis);
-  print_magnetic_pos(jf12_sum_pos_on_z_axis, pos_on_z_axis , "pos_on_z_axis");
-  std::vector<double> jf12_sum_pos_on_xy_plane = jf12_3.getField(pos_on_xy_plane);
-  print_magnetic_pos(jf12_sum_pos_on_xy_plane, pos_on_xy_plane , "pos_on_xy_plane");
-  std::vector<double> jf12_sum_pos_on_yz_plane = jf12_3.getField(pos_on_yz_plane);
-  print_magnetic_pos(jf12_sum_pos_on_yz_plane, pos_on_yz_plane , "pos_on_yz_plane");
-  std::vector<double> jf12_sum_pos_on_xz_plane = jf12_3.getField(pos_on_xz_plane);
-  print_magnetic_pos(jf12_sum_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
-
-/*
-  double ymw_test_pos = ymw16.getField(test_pos);
-  print_thermal_pos(ymw_test_pos, test_pos, "test_pos");
-  double ymw_origin = ymw16.getField(origin);
-  print_thermal_pos(ymw_origin , origin , "origin");
-  double ymw_pos_on_x_axis = ymw16.getField(pos_on_x_axis);
-  print_thermal_pos(ymw_pos_on_x_axis, pos_on_x_axis , "pos_on_x_axis");
-  double ymw_pos_on_y_axis = ymw16.getField(pos_on_y_axis);
-  print_thermal_pos(ymw_pos_on_y_axis, pos_on_y_axis , "pos_on_y_axis");
-  double ymw_pos_on_z_axis = ymw16.getField(pos_on_z_axis);
-  print_thermal_pos(ymw_pos_on_z_axis, pos_on_z_axis , "pos_on_z_axis");
-  double ymw_pos_on_xy_plane = ymw16.getField(pos_on_xy_plane);
-  print_thermal_pos(ymw_pos_on_xy_plane, pos_on_xy_plane , "pos_on_xy_plane");
-  double ymw_pos_on_yz_plane = ymw16.getField(pos_on_yz_plane);
-  print_thermal_pos(ymw_pos_on_yz_plane, pos_on_yz_plane , "pos_on_yz_plane");
-  double ymw_pos_on_xz_plane = ymw16.getField(pos_on_xz_plane);
-  print_thermal_pos(ymw_pos_on_xz_plane, pos_on_xz_plane , "pos_on_xz_plane");
-*/
-
+  print_pos(position_dict, model_dict);
 
   //std::vector<double> jf12_grid = jf12_1.evaluate_model_on_grid(grid_x, grid_y, grid_z);
 
@@ -129,16 +99,15 @@ int main() {
   //print_ev_grid(jf12_grid, grid_x, grid_y, grid_z);
 
 
-  std::cout << "\n b_arm_1: " << jf12_1.b_arm_1 << std::endl;
+//  std::cout << "\n b_arm_1: " << jf12.b_arm_1 << std::endl;
 
 
 
-  jf12_1.b_arm_1 = 40.;
+  //jf12.b_arm_1 = 40.;
 
-  std::cout << "\n updated b_arm_1: " << jf12_1.b_arm_1 << std::endl;
+  //std::cout << "\n updated b_arm_1: " << jf12.b_arm_1 << std::endl;
 
-  // Evaluate moel again
-  std::vector<double> jf12_val2 = jf12_1.getField(test_pos);
-  print_magnetic_pos(jf12_val2, test_pos, "updated jf12, test_pos");
+  // Evaluate model again
+  //std::vector<double> jf12_val2 = jf12.getField(position_dict.at("pos_on_xy_plane"));
   return 0;
 }
