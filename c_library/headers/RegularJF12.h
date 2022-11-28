@@ -1,14 +1,49 @@
+#include <functional>
 #include <cmath>
 #include <cassert>
 #include <iostream>
-#include "../headers/hamunits.h"
-#include "../headers/MagneticField.h"
 
-// This line is needed to avoid linker errors due to templates
-template class JF12MagneticField<std::vector<double>>;
 
-template <typename G>
-std::vector<double> JF12MagneticField<G>::at_position(const double &x, const double &y, const double &z) const {
+template<typename G>
+class JF12MagneticField : public RegularField<G, std::vector<double>> {
+  protected:
+    bool DEBUG = false;
+  public:
+    using RegularField<G, std::vector<double>> :: RegularField;
+
+    JF12MagneticField() : RegularField<G, std::vector<double>>() {};
+    ~JF12MagneticField() {};
+
+    SumRegularField<G, std::vector<double>> operator+(const RegularField<G, std::vector<double>>& f) {
+         SumRegularField<G, std::vector<double>> sum(*this, f);
+         return sum;
+       }
+
+
+    double b_arm_1 = 0.1;
+    double b_arm_2 = 3.0;
+    double b_arm_3 = -0.9;
+    double b_arm_4 = -0.8;
+    double b_arm_5 = -2.0;
+    double b_arm_6 = -4.2;
+    double b_arm_7 = 0.0;
+    double b_ring = 0.1;
+    double h_disk = 0.40;
+    double w_disk = 0.27;
+    // toroidal halo parameters
+    double Bn = 1.4;
+    double Bs = -1.1;
+    double rn = 9.22;
+    double rs = 16.7;
+    double wh = 0.20;
+    double z0 = 5.3;
+    // X-field parameters
+    double B0_X = 4.6;
+    double Xtheta_const = 49;
+    double rpc_X = 4.8;
+    double r0_X= 2.9;
+
+    std::vector<double> at_position(const double &x, const double &y, const double &z) const {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
@@ -183,3 +218,4 @@ std::vector<double> JF12MagneticField<G>::at_position(const double &x, const dou
 
       return B_cart;
   }
+ };

@@ -1,9 +1,9 @@
 import numpy as np
 
-from ImagineModels import RegularMagneticField, cyl2cart
+from ImagineModels import RegularVectorField, cyl2cart
 
 
-class AxiSymmetricSpiral(RegularMagneticField):
+class AxiSymmetricSpiral(RegularVectorField):
     """
             FUNCTION
                 ===  ASS : AxiSymmetric Spiral Galactic magnetic field model ===
@@ -66,9 +66,10 @@ class AxiSymmetricSpiral(RegularMagneticField):
         super().__init__()
 
     def evaluate_grid(self, grid_x, grid_y, grid_z):
-        return self._evaluate_grid(grid_x, grid_y, grid_z, self.evaluate_at_pos)
+        # This will not work, still need to wrap "evaluate_function_on_grid"
+        return self._evaluate_grid(grid_x, grid_y, grid_z, self.at_position)
 
-    def evaluate_at_pos(self, pos):
+    def at_position(self, pos):
         rho, z, phi = cyl2cart(pos)
         b_amp = self.b0_of_r(rho, z)
         ### Tilt angle
