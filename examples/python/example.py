@@ -5,14 +5,18 @@ import numpy as np
 # load model
 
 jf12 = im.JF12RegularField()
+jaffe = im.JaffeMagneticField()
+helix = im.HelixMagneticField()
 
 # define a position in cartesian Galactic coordinates (kpc)
 
 x, y, z = [1., -3., 0.1]
 
-# evaluate the model at the position
+# evaluate the models at the position
 
-b_at_pos = jf12.at_position(x, y, z)
+b_at_pos_jf12 = jf12.at_position(x, y, z)
+b_at_pos_jaffe = jaffe.at_position(x, y, z)
+b_at_pos_helix = helix.at_position(x, y, z)
 
 # define grid axes in cartesian Galactic coordinates (kpc)
 
@@ -32,12 +36,8 @@ b_grid = jf12.on_grid(grid_x, grid_y, grid_z)
 b_at_pos = jf12.at_position(x, y, z)
 
 print(b_at_pos)
-print('Hi')
 for i in range(5):
-    print('Hi')
     xx = np.random.uniform(-4, 4, i + 3)
     yy = np.random.uniform(-4, 4, 2*i + 2)
     zz = np.random.uniform(-4, 4, 3*i)
-    print('Hi')
-    print('xx ', xx)
     print(jf12.on_grid(xx, yy, zz))

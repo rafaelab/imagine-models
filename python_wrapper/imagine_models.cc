@@ -105,62 +105,62 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("rpc_X", &JF12MagneticField<py::array_t<double>>::rpc_X)
         .def_readwrite("r0_X", &JF12MagneticField<py::array_t<double>>::r0_X);
 
-    py::class_<HelixMagneticField<py::array_t<double>>, RegularMagneticField<py::array_t<double>, std::vector<double>>, PyHelixMagneticField>(m, "HelixMagneticField")
+    py::class_<HelixMagneticField<py::array_t<double>>, RegularField<py::array_t<double>, std::vector<double>>, PyHelixMagneticField>(m, "HelixMagneticField")
         .def(py::init<>())
-        .def("at_position", &HelixMagneticField::evaluate_at_pos,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        .def("at_position", &HelixMagneticField<py::array_t<double>>::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
   //      .def("dampx_grid", &HelixMagneticField::dampx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
   //      .def("dampy_grid", &HelixMagneticField::dampy_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
   //      .def("dampz_grid", &HelixMagneticField::dampz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-        .def_readwrite("ampx", &HelixMagneticField::ampx)
-        .def_readwrite("ampy", &HelixMagneticField::ampy)
-        .def_readwrite("ampz", &HelixMagneticField::ampz)
-        .def_readwrite("rmin", &HelixMagneticField::rmin)
-        .def_readwrite("rmax", &HelixMagneticField::rmax);
+        .def_readwrite("ampx", &HelixMagneticField<py::array_t<double>>::ampx)
+        .def_readwrite("ampy", &HelixMagneticField<py::array_t<double>>::ampy)
+        .def_readwrite("ampz", &HelixMagneticField<py::array_t<double>>::ampz)
+        .def_readwrite("rmin", &HelixMagneticField<py::array_t<double>>::rmin)
+        .def_readwrite("rmax", &HelixMagneticField<py::array_t<double>>::rmax);
 
-    py::class_<JaffeMagneticField<py::array_t<double>>, RegularMagneticField<py::array_t<double>, std::vector<double>>, PyJaffeMagneticField>(m, "JaffeMagneticField")
+    py::class_<JaffeMagneticField<py::array_t<double>>, RegularField<py::array_t<double>, std::vector<double>>, PyJaffeMagneticField>(m, "JaffeMagneticField")
         .def(py::init<>())
-        .def("at_position", &JaffeMagneticField::evaluate_at_pos, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-        .def_readwrite("quadruple", &JaffeMagneticField::quadruple)
-        .def_readwrite("bss", &JaffeMagneticField::bss)
+        .def("at_position", &JaffeMagneticField<py::array_t<double>>::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        .def_readwrite("quadruple", &JaffeMagneticField<py::array_t<double>>::quadruple)
+        .def_readwrite("bss", &JaffeMagneticField<py::array_t<double>>::bss)
 
-        .def_readwrite("disk_amp", &JaffeMagneticField::disk_amp)
-        .def_readwrite("disk_z0", &JaffeMagneticField::disk_z0)
-        .def_readwrite("halo_amp",  &JaffeMagneticField::halo_amp)
-        .def_readwrite("halo_z0",  &JaffeMagneticField::halo_z0)
-        .def_readwrite("r_inner",  &JaffeMagneticField::r_inner)
-        .def_readwrite("r_scale",  &JaffeMagneticField::r_scale)
-        .def_readwrite("r_peak",  &JaffeMagneticField::r_peak)
+        .def_readwrite("disk_amp", &JaffeMagneticField<py::array_t<double>>::disk_amp)
+        .def_readwrite("disk_z0", &JaffeMagneticField<py::array_t<double>>::disk_z0)
+        .def_readwrite("halo_amp",  &JaffeMagneticField<py::array_t<double>>::halo_amp)
+        .def_readwrite("halo_z0",  &JaffeMagneticField<py::array_t<double>>::halo_z0)
+        .def_readwrite("r_inner",  &JaffeMagneticField<py::array_t<double>>::r_inner)
+        .def_readwrite("r_scale",  &JaffeMagneticField<py::array_t<double>>::r_scale)
+        .def_readwrite("r_peak",  &JaffeMagneticField<py::array_t<double>>::r_peak)
 
-        .def_readwrite("ring", &JaffeMagneticField::ring)
-        .def_readwrite("bar", &JaffeMagneticField::bar)
+        .def_readwrite("ring", &JaffeMagneticField<py::array_t<double>>::ring)
+        .def_readwrite("bar", &JaffeMagneticField<py::array_t<double>>::bar)
          // either ring or bar!
-        .def_readwrite("ring_amp", &JaffeMagneticField::ring_amp)
-        .def_readwrite("ring_r", &JaffeMagneticField::ring_r)
-        .def_readwrite("bar_amp", &JaffeMagneticField::bar_amp)
-        .def_readwrite("bar_a", &JaffeMagneticField::bar_a)
-        .def_readwrite("bar_b", &JaffeMagneticField::bar_b)
-        .def_readwrite("bar_phi0", &JaffeMagneticField::bar_phi0)
+        .def_readwrite("ring_amp", &JaffeMagneticField<py::array_t<double>>::ring_amp)
+        .def_readwrite("ring_r", &JaffeMagneticField<py::array_t<double>>::ring_r)
+        .def_readwrite("bar_amp", &JaffeMagneticField<py::array_t<double>>::bar_amp)
+        .def_readwrite("bar_a", &JaffeMagneticField<py::array_t<double>>::bar_a)
+        .def_readwrite("bar_b", &JaffeMagneticField<py::array_t<double>>::bar_b)
+        .def_readwrite("bar_phi0", &JaffeMagneticField<py::array_t<double>>::bar_phi0)
 
-        .def_readwrite("arm_num",  &JaffeMagneticField::arm_num)
-        .def_readwrite("arm_r0",  &JaffeMagneticField::arm_r0)
-        .def_readwrite("arm_z0",  &JaffeMagneticField::arm_z0)
-        .def_readwrite("arm_phi1",  &JaffeMagneticField::arm_phi1)
-        .def_readwrite("arm_phi2",  &JaffeMagneticField::arm_phi2)
-        .def_readwrite("arm_phi3",  &JaffeMagneticField::arm_phi3)
-        .def_readwrite("arm_phi4",  &JaffeMagneticField::arm_phi4)
-        .def_readwrite("arm_amp1",  &JaffeMagneticField::arm_amp1)
-        .def_readwrite("arm_amp2",  &JaffeMagneticField::arm_amp2)
-        .def_readwrite("arm_amp3",  &JaffeMagneticField::arm_amp3)
-        .def_readwrite("arm_amp4",  &JaffeMagneticField::arm_amp4)
-        .def_readwrite("arm_pitch",  &JaffeMagneticField::arm_pitch)
+        .def_readwrite("arm_num",  &JaffeMagneticField<py::array_t<double>>::arm_num)
+        .def_readwrite("arm_r0",  &JaffeMagneticField<py::array_t<double>>::arm_r0)
+        .def_readwrite("arm_z0",  &JaffeMagneticField<py::array_t<double>>::arm_z0)
+        .def_readwrite("arm_phi1",  &JaffeMagneticField<py::array_t<double>>::arm_phi1)
+        .def_readwrite("arm_phi2",  &JaffeMagneticField<py::array_t<double>>::arm_phi2)
+        .def_readwrite("arm_phi3",  &JaffeMagneticField<py::array_t<double>>::arm_phi3)
+        .def_readwrite("arm_phi4",  &JaffeMagneticField<py::array_t<double>>::arm_phi4)
+        .def_readwrite("arm_amp1",  &JaffeMagneticField<py::array_t<double>>::arm_amp1)
+        .def_readwrite("arm_amp2",  &JaffeMagneticField<py::array_t<double>>::arm_amp2)
+        .def_readwrite("arm_amp3",  &JaffeMagneticField<py::array_t<double>>::arm_amp3)
+        .def_readwrite("arm_amp4",  &JaffeMagneticField<py::array_t<double>>::arm_amp4)
+        .def_readwrite("arm_pitch",  &JaffeMagneticField<py::array_t<double>>::arm_pitch)
 
-        .def_readwrite("comp_c",  &JaffeMagneticField::comp_c)
-        .def_readwrite("comp_d",  &JaffeMagneticField::comp_d)
-        .def_readwrite("comp_r",  &JaffeMagneticField::comp_r)
-        .def_readwrite("comp_p",  &JaffeMagneticField::comp_p);
+        .def_readwrite("comp_c",  &JaffeMagneticField<py::array_t<double>>::comp_c)
+        .def_readwrite("comp_d",  &JaffeMagneticField<py::array_t<double>>::comp_d)
+        .def_readwrite("comp_r",  &JaffeMagneticField<py::array_t<double>>::comp_r)
+        .def_readwrite("comp_p",  &JaffeMagneticField<py::array_t<double>>::comp_p);
 
 /////////////////////////////Thermal Electron Field/////////////////////////////
-
+/*
     py::class_<YMW16, RegularField<py::array_t<double>, double>, PyYMW16>(m, "YMW16Component")
         .def(py::init<>())
         .def("at_position", &YMW16ThickDisc::evaluate_at_pos, "pos"_a)
@@ -183,5 +183,5 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("t2_k2",  &YMW16ThinDisc::t2_k2)
         .def_readwrite("t2_a2",  &YMW16ThinDisc::t2_a2)
         .def_readwrite("t2_b2",  &YMW16ThinDisc::t2_b2);
-
+*/
         }
