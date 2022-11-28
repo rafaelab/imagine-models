@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <algorithm>
+#include <fftw3.h>
 
 // #include "exceptions.h"
 
@@ -155,5 +156,53 @@ public:
   virtual T at_position(const double &x, const double &y, const double &z) const = 0;
 
   std::vector<double> on_grid(const G &grid_x, const G &grid_y, const G &grid_z) = 0;
+
+
+  virtual spatial_profile(const double &x, const double &y, const double &z) const = 0;
+
+  // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
+  // original author: https://github.com/gioacchinowang
+  double spectrum(const double &k, const double rms, const double k0, const double k1, const double a0, const double a1) const {
+  const double p0 = rms*rms;
+  const double unit = 1. / (4 * cgs::pi * k * k);   // units fixing, wave vector in 1/kpc units
+  // power laws
+  const double band1{double(k < k1)};
+  const double band2{double(k > k1) * double(k < k0)};
+  const double band3{double(k > k0)};
+  const double P =
+      band1 *
+          std::pow(k0 / k1, a1) *
+          std::pow(k / k1, 6.0) +
+      band2 / std::pow(k / k0, a1) +
+      band3 / std::pow(k / k0, a0);
+  return P * p0 * unit;
+}
+
+// this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
+// original author: https://github.com/gioacchinowang
+std::vector<double> divergence_cleaner(const Hamvec<3, ham_float> &k,
+                       const Hamvec<3, ham_float> &b) const {
+
+  double k_length = 0;
+  double b_length = 0;
+  double b_dot_k = 0;
+  for (int i = 0; i < 3; ++i) {
+    k_length += static_cast<double>(k[i] * k[i]);
+    b_length += static_cast<double>(b[i] * b[i]);
+    b_dot_k += static_cast<double>(b[i] * k[i]);
+    }
+  if (k_length == 0 or b_length == 0) {
+    return b;
+    }
+  k_length = std::sqrt(k_length);
+
+  const double inv_k_mod = 1. / k_length;
+  // multiply \sqrt(3) for preserving spectral power statistically
+  return std::vector<double>{
+      1.73205081 * (b[0] - k[0] * b_dot_k * inv_k_mod),
+      1.73205081 * (b[1] - k[1] * b_dot_k * inv_k_mod),
+      1.73205081 * (b[2] - k[2] * b_dot_k * inv_k_mod)};
+}
+
 
 };
