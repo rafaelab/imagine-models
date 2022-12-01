@@ -182,18 +182,19 @@ template<typename G, typename T>
 class RandomField  : public Field<G, T>  {
 protected:
     // Fields
+    int ndim = 0;
+    std::vector<fftw_plan> c2r;
+    std::vector<fftw_plan> r2c;
     // constructors
-    using Field<G, T> :: Field;
-
-    RandomField() : Field<G, T>() {};
+    //RandomField() : Field<G, T>() {};
+    RandomField(int i) : Field<G, T>(), ndim(i) {};
+    RandomField(int i, int shape_x, int shape_y, int shape_z) : Field<G, T>(), ndim(i) {};
     ~RandomField() {
       if (clean_switch) {
-      fftw_destroy_plan(plan_c0_bw);
-      fftw_destroy_plan(plan_c1_bw);
-      fftw_destroy_plan(plan_c0_fw);
-      fftw_destroy_plan(plan_c1_fw);
-      fftw_free(c0);
-      fftw_free(c1);
+        for (int i=0; i< ndim; i++) {
+          fftw_destroy_plan(c2r[i]);
+          fftw_destroy_plan(r2c[i]);
+        }
       #ifdef _OPENMP
             fftw_cleanup_threads();
       #else
@@ -210,7 +211,7 @@ public:
   std::unique_ptr<ham_float[]> bx, by, bz;
   // Fourier domain magnetic field
   // for/backward FFT plans
-  fftw_plan plan_c0_bw, plan_c1_bw, plan_c0_fw, plan_c1_fw;
+  int seed;
   // for destructor
   bool clean_switch = false;
   // methods
@@ -218,76 +219,96 @@ public:
 
   std::vector<double> on_grid(const G &grid_x, const G &grid_y, const G &grid_z) = 0;
 
-  std::vector<double> on_grid(const int &nx, const int &ny, const int &nz, const double &dx, const double &dy, const double &dz) const {
-      std::vector<fftw_complex> random_numbers = random_numbers();
-      fftw_execute_dft(plan_c0_bw, c0, c0);
-      fftw_execute_dft(plan_c1_bw, c1, c1);
+  std::vector<double> on_grid(const std::vector<int> &n, const std::vector<double> &zeropoint, const std::vector<double> &increment) const {
+      std::vector<fftw_complex> b = draw_random_numbers(n, increment, seed);
+      for (int i=0; i< ndim; i++) {
+          fftw_execute_dft(c2r[i], b[i], b[i]);
+      }
+      auto b = RandomField::evaluate_function_on_grid(n, zeropoint, increment,
+        [this](double &xx, double &yy, double &zz) {
+          int _nx = (int)((xx - zeropoint[0])/increment[0])
+          int _ny = (int)((yy - zeropoint[1])/increment[1])
+          int _nz = (int)((zz - zeropoint[2])/increment[2])
+          return b[_nz + n[2]*(_ny + n[1]*_nx) ]*spatial_profile(xx, yy, zz);
+        });
+
+      for (int i=0; i< ndim; i++) {
+          fftw_execute_dft(r2c[i], b[i], b[i]);
+      }
+
+      b = divergence_cleaner(b)
+
+      for (int i=0; i< ndim; i++) {
+          fftw_execute_dft(c2r[i], b[i], b[i]);
+      }
+
+      retrun b;
+      fftw_free(c0);
+      fftw_free(c1);
   };
 
 
   virtual spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
 
-  std::vector<fftw_complex> draw_random_numbers(const double &nx, const double &ny, const double &nz, const double &dx, const double &dy, const double &dz, const int seed) const {
+  std::vector<fftw_complex> draw_random_numbers(const std::vector<int> &n, const std::vector<double> &increment, const int seed) const {
 
-  fftw_complex *c0, *c1;
-  #ifdef _OPENMP
-    random_device r;
-    std::vector<std::default_random_engine> generators;
-    gsl_rng **threadvec = new gsl_rng *[omp_get_max_threads()];
-    for (int i = 0, N = omp_get_max_threads(); i < N; ++i) {
-    generators.emplace_back(default_random_engine(r()));
-      }
-  #else
-    gsl_rng *r{gsl_rng_alloc(gsl_rng_taus)};
-    gsl_rng_set(r, toolkit::random_seed(seed));
-  #endif
-    // start Fourier space filling, physical k in 1/kpc dimension
-    // physical dk^3
-    const double  dk3 = 1. / (lx * ly * lz);
-  #ifdef _OPENMP
-  #pragma omp parallel for schedule(static)
-  #endif
-    for int i = 0; i < nx; ++i) {
-  #ifdef _OPENMP
-      auto seed_id = threadvec[omp_get_thread_num()];
-  #else
-      auto seed_id = r;
-  #endif
-      double kx = i / dx;
-      if (i >= (nx + 1) / 2)
-        kx -= 1. / dx;
-      // it's faster to calculate indeces manually
-      const int idx_lv1 = i * ny * nz;
-      for (int j = 0; j < ny; ++j) {
-        double ky = j / ly;
-        if (j >= (ny + 1) / 2)
-          ky -= 1. / dy;
-        const int idx_lv2 = idx_lv1 + j * nz;
-        for int l = 0; l < nz; ++l) {
-          // 0th term is fixed to zero in allocation
-          if (i == 0 and j == 0 and l == 0)
-            continue;
-          double kz = 1. / dz};
-          if (l >= (nz + 1) / 2)
-            kz -= 1. / dz;
-          const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
-          const int idx = idx_lv2 + l;
-          // turbulent power is shared in following pattern
-          // P ~ (bx^2 + by^2 + bz^2)
-          // c0^2 ~ c1^2 ~ (bx^2 + by^2) ~ P*2/3
-          // as renormalization comes in PHASE II,
-          // 1/3, P0 in spectrum, dk3 are numerically redundant
-          // while useful for precision check
-          const double sigma = std::sqrt(0.33333333 * spectrum(ks, rms, k0, k1, a0, a1) * dk3);
-          c0[idx][0] = sigma * gsl_ran_ugaussian(seed_id);
-          c0[idx][1] = sigma * gsl_ran_ugaussian(seed_id);
-          c1[idx][0] = sigma * gsl_ran_ugaussian(seed_id);
-          c1[idx][1] = sigma * gsl_ran_ugaussian(seed_id); //Hermitian symmetry??
-        } // l
-      }   // j
-    }     // i
+    lx = n[0]*increment[0]
+    ly = n[1]*increment[1]
+    lz = n[2]*increment[2]
+    std::vector<*fftw_complex> out(ndim, fftw_malloc(sizeof(fftw_complex) * nx*ny*nz);
 
+    #ifdef _OPENMP
+      std::seed_seq seq{seed}
+      std::vector<std::mt19937> generators;
+      std::vector<std::uint32_t> seeds(omp_get_max_threads());
+      seq.generate(seeds.begin(), seeds.end());
+      for (int i = 0, N = omp_get_max_threads(); i < N; ++i) {
+        generators.emplace_back(std::mt19937(seeds[i]);
+        }
+    #else
+      auto gen = std::mt19937(seed)
+    #endif
+      // start Fourier space filling, physical k in 1/kpc dimension
+      // physical dk^3
+      const double  dk3 = 1. / (lx * ly * lz);
+    #ifdef _OPENMP
+    #pragma omp parallel for schedule(static)
+    #endif
+      for (int i = 0; i < n[0]; ++i) {
+    #ifdef _OPENMP
+        auto gen = generators[omp_get_thread_num()];
+    #else
+        auto seed_id = r;
+    #endif
+        double kx = i / increment[0];
+        if (i >= (n[0] + 1) / 2)
+          kx -= 1. / increment[0];
+        // it's faster to calculate indeces manually
+        const int idx_lv1 = i * n[1] * n[2];
+        for (int j = 0; j < n[1]; ++j) {
+          double ky = j / increment[1];
+          if (j >= (n[1] + 1) / 2)
+            ky -= 1. / increment[1];
+          const int idx_lv2 = idx_lv1 + j * n[2];
+          for (int l = 0; l < n[2]/2 + 1; ++l) {
+            // 0th term is fixed to zero in allocation, last loop runs only until nz/2 due to complex array and real outputs
+            if (i == 0 and j == 0 and l == 0)
+              continue;
+            double kz = 1. / increment[2]};
+            const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
+            const int idx = idx_lv2 + l;
+            const double sigma = std::sqrt(0.33333333 * spectrum(ks, rms, k0, k1, a0, a1) * dk3);
+            std::normal_distribution<> nd{0,sigma};
+            for (int m=0; m<ndim; m++) {
+              out[m][idx][0] = nd(gen);
+              out[m][idx][1] = nd(gen);
+              }
+          } // l
+        }   // j
+      }     // i
+      //free random memory!!!!
+      return out;
     }
 
   // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
@@ -307,29 +328,56 @@ public:
 
 // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
 // original author: https://github.com/gioacchinowang
-std::vector<double> divergence_cleaner(const std::vector<double> &k,
-                                       const std::vector<double> &b) const {
-
-  double k_length = 0;
-  double b_length = 0;
-  double b_dot_k = 0;
-  for (int i = 0; i < 3; ++i) {
-    k_length += static_cast<double>(k[i] * k[i]);
-    b_length += static_cast<double>(b[i] * b[i]);
-    b_dot_k += static_cast<double>(b[i] * k[i]);
+std::vector<double> divergence_cleaner(std::vector<fftw_complex> &b_complex) const {
+  if (ndim !=3) {
+    throw DivergenceException();
     }
-  if (k_length == 0 or b_length == 0) {
-    return b;
-    }
-  k_length = std::sqrt(k_length);
 
-  const double inv_k_mod = 1. / k_length;
-  // multiply \sqrt(3) for preserving spectral power statistically
-  return std::vector<double>{
-      1.73205081 * (b[0] - k[0] * b_dot_k * inv_k_mod),
-      1.73205081 * (b[1] - k[1] * b_dot_k * inv_k_mod),
-      1.73205081 * (b[2] - k[2] * b_dot_k * inv_k_mod)};
-}
+  #ifdef _OPENMP
+  #pragma omp parallel for schedule(static)
+    #endif
+    for (int i = 0; i < nx; ++i) {
+      double kx = i / dx;
+      if (i >= (nx + 1) / 2)
+        kx -= 1. / dx;
+        // it's faster to calculate indeces manually
+      const int idx_lv1 = i * ny * nz;
+      for (int j = 0; j < ny; ++j) {
+        double ky = j / ly;
+        if (j >= (ny + 1) / 2)
+          ky -= 1. / dy;
+        const int idx_lv2 = idx_lv1 + j * nz;
+        for (int l = 0; l < nz/2 + 1; ++l) {
+          // 0th term is fixed to zero in allocation
+          if (i == 0 and j == 0 and l == 0)
+            continue;
+          double kz = 1. / dz};
+          const int idx = idx_lv2 + l;
+          double k_length = 0;
+          double b_length = 0;
+          double b_dot_k = 0;
+          for (int m=0; m<ndim; m++) {
+            k_length += static_cast<double>(k[m] * k[m]);
+            b_length += static_cast<double>(b[m] * b[m]);
+            b_dot_k += static_cast<double>(b[m] * k[m]);
+            }
+          if (k_length == 0 or b_length == 0) {
+            continue;
+            }
+          k_length = std::sqrt(k_length);
+
+          const double inv_k_mod = 1. / k_length;
+          for (int m=0; m<ndim; m++) {
+          // multiply \sqrt(3) for preserving spectral power statistically
+              b_complex[m][idx] = 1.73205081 * (b_complex[m][idx] - k[m] * b_dot_k * inv_k_mod)};
+           }
+       } // l
+     }   // j
+    }     // i
+    return b_complex;
+
+
+  }
 
 
 };
