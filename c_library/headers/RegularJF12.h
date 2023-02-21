@@ -3,22 +3,18 @@
 #include <cassert>
 #include <iostream>
 
+#include "Field.h"
+#include "RegularField.h"
 
-template<typename G>
-class JF12MagneticField : public RegularField<G, std::vector<double>> {
+
+class JF12MagneticField : public RegularVectorField {
   protected:
     bool DEBUG = false;
   public:
-    using RegularField<G, std::vector<double>> :: RegularField;
+    using RegularVectorField :: RegularVectorField;
 
-    JF12MagneticField() : RegularField<G, std::vector<double>>() {};
+    JF12MagneticField() : RegularVectorField() {};
     ~JF12MagneticField() {};
-
-    SumRegularField<G, std::vector<double>> operator+(const RegularField<G, std::vector<double>>& f) {
-         SumRegularField<G, std::vector<double>> sum(*this, f);
-         return sum;
-       }
-
 
     double b_arm_1 = 0.1;
     double b_arm_2 = 3.0;

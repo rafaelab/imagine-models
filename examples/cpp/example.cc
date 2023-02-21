@@ -1,7 +1,9 @@
 
 #include "../../c_library/headers/hamunits.h"
-#include "../../c_library/headers/AbstractFields.h"
+#include "../../c_library/headers/Field.h"
+#include "../../c_library/headers/RegularField.h"
 #include "../../c_library/headers/RegularJF12.h"
+#include "../../c_library/headers/RandomJF12.h"
 #include "../../c_library/headers/Jaffe.h"
 #include "../../c_library/headers/Helix.h"
 #include <cassert>
@@ -11,7 +13,7 @@
 #include <memory>
 
 void print_pos(std::map <std::string, std::vector<double>> pd,
-               std::map <std::string, std::shared_ptr<RegularField<std::vector<double>, std::vector<double>>>> md) {
+               std::map <std::string, std::shared_ptr<RegularVectorField>> md) {
 
       auto model_iter = md.begin();
 
@@ -83,14 +85,18 @@ int main() {
 
 
   // using pointer here since RegularField is abstract
-  std::map <std::string, std::shared_ptr<RegularField<std::vector<double>, std::vector<double>>>> model_dict;
+  std::map <std::string, std::shared_ptr<RegularVectorField>> regular_model_dict;
 
-  model_dict["Jansson Farrar"] = std::shared_ptr<JF12MagneticField<std::vector<double>>> (new JF12MagneticField<std::vector<double>>());
-  model_dict["Jaffe"] = std::shared_ptr<JaffeMagneticField<std::vector<double>>> (new JaffeMagneticField<std::vector<double>>());
-  model_dict["Helix"] = std::shared_ptr<HelixMagneticField<std::vector<double>>> (new HelixMagneticField<std::vector<double>>());
+  regular_model_dict["Jansson Farrar regular"] = std::shared_ptr<JF12MagneticField> (new JF12MagneticField());
+  regular_model_dict["Jaffe"] = std::shared_ptr<JaffeMagneticField<std::vector<double>>> (new JaffeMagneticField<std::vector<double>>());
+  regular_model_dict["Helix"] = std::shared_ptr<HelixMagneticField<std::vector<double>>> (new HelixMagneticField<std::vector<double>>());
 
 
-  print_pos(position_dict, model_dict);
+  print_pos(position_dict, regular_model_dict);
+
+  std::map <std::string, std::shared_ptr<RandomField<std::vector<double>, std::vector<double>>>> random_model_dict;
+
+  JF12RandomField<std::vector<double>> jf12random(1000);
 
   //std::vector<double> jf12_grid = jf12_1.evaluate_model_on_grid(grid_x, grid_y, grid_z);
 

@@ -15,5 +15,5 @@ public:
 class DivergenceException : public std::logic_error
 {
 public:
-    DivergenceException () : std::logic_error{"Divergence cleaner only works in three dimensions"} {}
+    DivergenceException () : std::logic_error{"The divergence of a vectorfield can only be calculated in 3 dimensions"} {}
 };

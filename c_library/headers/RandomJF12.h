@@ -3,15 +3,16 @@
 #include <cassert>
 #include <iostream>
 
+#include "Field.h"
+#include "RandomField.h"
 
-template<typename G>
-class JF12RandomField : public RandomField<G, std::vector<double>> {
+class JF12RandomField : public RandomVectorField {
   protected:
     bool DEBUG = false;
   public:
-    using RandomField<G, std::vector<double>> :: RandomField;
+    using RandomVectorField :: RandomVectorField;
 
-    JF12RandomField() : RandomField<G, std::vector<double>>() {};
+    JF12RandomField() : RandomVectorField() {};
     ~JF12RandomField() {};
 
     const double b0_1 = b0_1;
@@ -31,6 +32,41 @@ class JF12RandomField : public RandomField<G, std::vector<double>> {
 
     const double Rmax = 20.;
     const double rho_GC = 1.;
+
+    void _on_grid(std::initializer_list<fftw_plan> forward, std::initializer_list<fftw_plan> backward, const std::vector<int> &n, const std::vector<double> &zeropoint, const std::vector<double> &increment, const int seed) {
+
+      draw_random_numbers({field_vec_comp_x, field_vec_comp_y, field_vec_comp_z}, n, increment, seed);
+
+      fftw_execute(c2r_x);
+      fftw_execute(c2r_y);
+      fftw_execute(c2r_z);
+
+      auto multiply_profile = [&](double xx, double yy, double zz) {
+          int _nx = (int)((xx - zeropoint[0])/increment[0]); 
+          int _ny = (int)((yy - zeropoint[1])/increment[1]);
+          int _nz = (int)((zz - zeropoint[2])/increment[2]);
+          double sp = spatial_profile(xx, yy, zz);
+          std::vector<double> v = {
+            field_vec_real_x[_nz + n[2]*(_ny + n[1]*_nx)]*sp, 
+            field_vec_real_y[_nz + n[2]*(_ny + n[1]*_nx)]*sp, 
+            field_vec_real_z[_nz + n[2]*(_ny + n[1]*_nx)]*sp
+            };
+          return v;
+        };
+
+      evaluate_function_on_grid(field_vec_real_x, field_vec_real_y, field_vec_real_z, n, zeropoint, increment, multiply_profile);
+
+      fftw_execute(r2c_x);
+      fftw_execute(r2c_y);
+      fftw_execute(r2c_z);
+      
+      divergence_cleaner(field_vec_comp_x, field_vec_comp_y, field_vec_comp_z, n, increment);
+
+      fftw_execute(c2r_x);
+      fftw_execute(c2r_y);
+      fftw_execute(c2r_z);
+    }
+
 
     double spatial_profile(const double &x, const double &y, const double &z) const {
 
