@@ -1,3 +1,9 @@
+class GridException : public std::invalid_argument
+{
+public:
+    GridException () : std::invalid_argument{"The class has not been initialized with a grid, hence on_grid can only be called with a grid provided."} {}
+};
+
 class NotImplementedException : public std::logic_error
 {
 public:
