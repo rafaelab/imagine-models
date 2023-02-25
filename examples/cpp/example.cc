@@ -3,16 +3,16 @@
 #include "../../c_library/headers/Field.h"
 #include "../../c_library/headers/RegularField.h"
 #include "../../c_library/headers/RegularJF12.h"
-#include "../../c_library/headers/RandomJF12.h"
-#include "../../c_library/headers/Jaffe.h"
-#include "../../c_library/headers/Helix.h"
+//#include "../../c_library/headers/RandomJF12.h"
+//#include "../../c_library/headers/Jaffe.h"
+//#include "../../c_library/headers/Helix.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
 #include <map>
 #include <memory>
 
-void print_pos(std::map <std::string, std::vector<double>> pd,
+void print_pos(std::map <std::string, std::array<double, 3>> pd,
                std::map <std::string, std::shared_ptr<RegularVectorField>> md) {
 
       auto model_iter = md.begin();
@@ -22,7 +22,7 @@ void print_pos(std::map <std::string, std::vector<double>> pd,
         auto position_iter = pd.begin();
         std::cout << "The nodel " << model_iter->first << " is evaluated \n\n";
         while (position_iter != pd.end()) {
-          std::vector<double> mval = (*(model_iter->second)).getField(position_iter->second);
+          std::array<double, 3> mval = (*(model_iter->second)).getField(position_iter->second);
 
           std::cout << "Position: ";
           for (size_t l = 0; l < (position_iter->second).size(); l++) {
@@ -66,7 +66,7 @@ void print_ev_grid(std::vector<std::vector<std::vector<std::vector<double>>>>  b
 
 int main() {
 
-  std::map <std::string, std::vector<double>> position_dict;
+  std::map <std::string, std::array<double, 3>> position_dict;
 
 
   // Define some positions in Galactic cartesian coordinates (units are kpc)
@@ -88,15 +88,15 @@ int main() {
   std::map <std::string, std::shared_ptr<RegularVectorField>> regular_model_dict;
 
   regular_model_dict["Jansson Farrar regular"] = std::shared_ptr<JF12MagneticField> (new JF12MagneticField());
-  regular_model_dict["Jaffe"] = std::shared_ptr<JaffeMagneticField<std::vector<double>>> (new JaffeMagneticField<std::vector<double>>());
-  regular_model_dict["Helix"] = std::shared_ptr<HelixMagneticField<std::vector<double>>> (new HelixMagneticField<std::vector<double>>());
+  //regular_model_dict["Jaffe"] = std::shared_ptr<JaffeMagneticField<std::vector<double>>> (new JaffeMagneticField<std::vector<double>>());
+  //regular_model_dict["Helix"] = std::shared_ptr<HelixMagneticField<std::vector<double>>> (new HelixMagneticField<std::vector<double>>());
 
 
   print_pos(position_dict, regular_model_dict);
 
-  std::map <std::string, std::shared_ptr<RandomField<std::vector<double>, std::vector<double>>>> random_model_dict;
+  //std::map <std::string, std::shared_ptr<RandomField<std::vector<double>, std::vector<double>>>> random_model_dict;
 
-  JF12RandomField<std::vector<double>> jf12random(1000);
+  //JF12RandomField<std::vector<double>> jf12random(1000);
 
   //std::vector<double> jf12_grid = jf12_1.evaluate_model_on_grid(grid_x, grid_y, grid_z);
 

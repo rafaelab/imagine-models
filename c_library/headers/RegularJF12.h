@@ -39,7 +39,7 @@ class JF12MagneticField : public RegularVectorField {
     double rpc_X = 4.8;
     double r0_X= 2.9;
 
-    std::vector<double> at_position(const double &x, const double &y, const double &z) const {
+    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
@@ -67,7 +67,7 @@ class JF12MagneticField : public RegularVectorField {
 
       // define boundaries for where magnetic field is zero (outside of galaxy)
       if (r > Rmax || rho < rho_GC) {
-        return std::vector<double>{0., 0., 0.};
+        return std::array<double, 3> {0., 0., 0.};
       }
 
       //------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ class JF12MagneticField : public RegularVectorField {
       }
 
       // X-field in cylindrical coordinates
-      double B_cyl_X[3] = {B_X * cos(Xtheta) * r_sign, 0., B_X * sin(Xtheta)};
+      std::array<double, 3> B_cyl_X = {B_X * cos(Xtheta) * r_sign, 0., B_X * sin(Xtheta)};
 
       if (DEBUG) {
 
@@ -201,13 +201,13 @@ class JF12MagneticField : public RegularVectorField {
 
 
       // add fields together
-      std::vector<double> B_cyl{0.0, 0.0, 0.0};
+      std::array<double, 3> B_cyl{0.0, 0.0, 0.0};
       B_cyl[0] = B_cyl_disk[0] + B_cyl_h[0] + B_cyl_X[0];
       B_cyl[1] = B_cyl_disk[1] + B_cyl_h[1] + B_cyl_X[1];
       B_cyl[2] = B_cyl_disk[2] + B_cyl_h[2] + B_cyl_X[2];
 
       // convert field to cartesian coordinates
-      std::vector<double> B_cart{0.0, 0.0, 0.0};
+      std::array<double, 3> B_cart{0.0, 0.0, 0.0};
       B_cart[0] = B_cyl[0] * cos(phi) - B_cyl[1] * sin(phi);
       B_cart[1] = B_cyl[0] * sin(phi) + B_cyl[1] * cos(phi);
       B_cart[2] = B_cyl[2];

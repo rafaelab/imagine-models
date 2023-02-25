@@ -1,3 +1,6 @@
+#ifndef EXCEPTION_H
+#define EXCEPTION_H
+
 class GridException : public std::invalid_argument
 {
 public:
@@ -23,3 +26,5 @@ class DivergenceException : public std::logic_error
 public:
     DivergenceException () : std::logic_error{"The divergence of a vectorfield can only be calculated in 3 dimensions"} {}
 };
+
+#endif

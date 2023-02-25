@@ -18,30 +18,31 @@ protected:
   // -----FIELDS-----
   int ndim;
 
-  int[3] shape;
-  double[3] zeropoint;
-  double[3] increment;
+  std::array<int, 3> shape;
+  std::array<double, 3> zeropoint;
+  std::array<double, 3> increment;
   int array_size;
 
-  static std::vector<double> grid_x;
-  static std::vector<double> grid_y;
-  static std::vector<double> grid_z;
+  std::vector<double> grid_x;
+  std::vector<double> grid_y;
+  std::vector<double> grid_z;
 
   GRIDTYPE class_eval;
 
-  bool has_grid;
+  bool has_grid = false;
   bool regular_grid;
 
   // -----CONSTRUCTORS-----
 
-  ~Field() = default;
+  ~Field() {this->free_memory(has_grid);};
 
-  Field(int shape, double zeropoint, double increment) : shape(shape), zeropoint(zeropoint), increment(increment) {
+  Field(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : shape(shape), zeropoint(zeropoint), increment(increment) {
     array_size = 1;
     for (const int sh : shape) 
       array_size = array_size*sh;
     has_grid = true;
     regular_grid = true;
+    this->allocate_memory(has_grid, array_size);
   };
 
   Field(std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : grid_x(grid_x), grid_y(grid_y), grid_z(grid_z) {
@@ -51,16 +52,21 @@ protected:
     array_size = 1;
     for (const int sh : shape) 
       array_size = array_size*sh;
+    this->allocate_memory(has_grid, array_size);
   };
 
   Field() {
     has_grid = false;
+    this->allocate_memory(has_grid, 0);
   };
-
+  
+  virtual void allocate_memory(bool not_empty, int sz) = 0;
+  virtual void free_memory(bool not_empty) = 0;
 
 public:
 
   // -----METHODS-----
+
 
   // -----Interface functions-----
 
@@ -88,18 +94,18 @@ public:
 
   virtual GRIDTYPE on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z) = 0;
 
-  virtual GRIDTYPE on_grid(const std::array<int> &n, const std::array<double> &zeropoint, const std::array<double> &increment) = 0;
+  virtual GRIDTYPE on_grid(const std::array<int, 3> &n, const std::array<double, 3> &zeropoint, const std::array<double, 3> &increment) = 0;
 
   // This is the interface function to CRPRopa
-  double getField(const std::vector<double> &pos_vec) const {
-    return at_position(pos_vec[0], pos_vec[1], pos_vec[2]);
+  POSTYPE getField(const std::array<double, 3> &pos_arr) const {
+    return at_position(pos_arr[0], pos_arr[1], pos_arr[2]);
   }
   
   // -----Helper functions-----
 
 // Evaluate scalar valued functions on irregular grids
   static void evaluate_function_on_grid(double *fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<double(double, double, double)> eval) {
-    std::vector<int> size{(int)ggx.size(), ggy.size(), ggz.size()};
+    std::vector<int> size{(int)ggx.size(), (int)ggy.size(), (int)ggz.size()};
     for (int i=0; i < size[0]; i++) {
       int m = i*size[1]*size[2];
       for (int j=0; j < size[1]; j++) {
@@ -112,7 +118,7 @@ public:
     }
 
   // Evaluate scalar valued functions on regular grids
-  static void evaluate_function_on_grid(double *fval, const std::vector<int> &size, const std::vector<double> &zp, const std::vector<double> &inc, std::function<double(double, double, double)> eval) {
+  static void evaluate_function_on_grid(double *fval, const std::array<int, 3> &size, const std::array<double, 3> &zp, const std::array<double, 3> &inc, std::function<double(double, double, double)> eval) {
      for (int i=0; i < size[0]; i++) {
          int m = i*size[0];
          for (int j=0; j < size[1]; j++) {
@@ -120,18 +126,18 @@ public:
              for (int k=0; k < size[2]; k++) {
                  fval[m + n + k] = eval(zp[0] + i*inc[0], zp[1] + j*inc[1], zp[2] + k*inc[2]);
          }   }   }
-     }
+    }
 
 
   // Evaluate vector valued functions on irregular grids (replace with template for ndim?)
-  static void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<double[3](double, double, double)> eval) {
-    std::vector<int> size{(int)ggx.size(), ggy.size(), ggz.size()};
+  static void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<std::array<double, 3>(double, double, double)> eval) {
+    std::vector<int> size{(int)ggx.size(), (int)ggy.size(), (int)ggz.size()};
      for (int i=0; i < size[0]; i++) {
          int m = i*size[1]*size[2];
          for (int j=0; j < size[1]; j++) {
              int n = j*size[2];
              for (int k=0; k < size[2]; k++) {
-                 T v = eval(ggx.at(i), ggy.at(j), ggz.at(k));
+                 std::array<double, 3> v = eval(ggx.at(i), ggy.at(j), ggz.at(k));
                  fval[0][m + n + k] = v[0];
                  fval[1][m + n + k] = v[1];
                  fval[2][m + n + k] = v[2];
@@ -141,15 +147,15 @@ public:
    }
 
   // Evaluate vector valued functions on regular grids
-  static void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::vector<int> &size,
-                                  const std::vector<double> &zp, const std::vector<double> &inc,
-                                  std::function<std::vector<double>(double, double, double)> eval) {
+  static void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::array<int, 3> &size,
+                                  const std::array<double, 3> &zp, const std::array<double, 3> &inc,
+                                  std::function<std::array<double, 3>(double, double, double)> eval) {
       for (int i=0; i < size[0]; i++) {
           int m = i*size[1]*size[2];
           for (int j=0; j < size[1]; j++) {
               int n = j*size[2];
               for (int k=0; k < size[2]; k++) {
-                  std::vector<double> v = eval(zp[0] + i*inc[0], zp[1] + j*inc[1], zp[2] + k*inc[2]);
+                  std::array<double, 3> v = eval(zp[0] + i*inc[0], zp[1] + j*inc[1], zp[2] + k*inc[2]);
                   fval[0][m + n + k] = v[0];
                   fval[1][m + n + k] = v[1];
                   fval[2][m + n + k] = v[2];

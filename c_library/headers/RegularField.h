@@ -3,14 +3,11 @@
 
 
 #include <vector>
-#include <cassert>
+#include <array>
 #include <stdexcept>
 #include <functional>
 #include <iostream>
 #include <algorithm>
-#include <fftw3.h>
-#include <random>
-#include <memory>
 
 #include "exceptions.h"
 #include "Field.h"
@@ -18,31 +15,33 @@
 class RegularScalarField : public Field<double, double*>  {
 protected:
     // Fields
-    const int ndim = 1;
 
     // Constructors
 
     // RegularField() : Field<T>() {};
     // Methods
+void allocate_memory(bool not_empty, int arr_sz) {
+  if (not_empty) {
+    class_eval = new double[arr_sz];
+    }
+  else {
+    class_eval = 0;
+    };
+  }
+
+void free_memory(bool not_empty) {
+  if (not_empty) {
+    delete class_eval;
+  };
+}
 
 public:
   // -----CONSTRUCTORS-----
   
-  //using Field<double, double*> :: Field;
-  ~RegularScalarField() = default;
+  using Field<double, double*> :: Field;
 
-  RegularScalarField(int shape, double zeropoint, double increment) {
-    RegularScalarField : Field<double, double*>(shape=shape, zeropoint=zeropoint, increment=increment);
-    class_eval = new double[array_size];
-  };
-
-
-  RegularScalarField(std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) {
-    RegularScalarField : Field<double, double*>(grid_x, grid_y, grid_z);
-    class_eval = new double[array_size];
-  };
   // Fields
-
+  const int ndim = 1;
   // Methods
 
   double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z) {
@@ -52,7 +51,7 @@ public:
     return function_eval;
   }
 
-  double* on_grid(const std::vector<int> &n, const std::vector<double> &zeropoint, const std::vector<double> &increment) {
+  double* on_grid(const std::array<int, 3> &n, const std::array<double, 3> &zeropoint, const std::array<double, 3> &increment) {
     double* function_eval;
     evaluate_function_on_grid(function_eval, n, zeropoint, increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
@@ -62,7 +61,7 @@ public:
 };
 
 
-class RegularVectorField : public Field<double[3], std::array<double*, 3>>  {
+class RegularVectorField : public Field<std::array<double, 3>, std::array<double*, 3>>  {
 protected:
     // Fields
 
@@ -70,26 +69,32 @@ protected:
 
     // RegularField() : Field<T>() {};
     // Methods
+void allocate_memory(bool not_empty, int arr_sz) {
+  if (not_empty) {
+    class_eval[0] = new double[arr_sz];
+    class_eval[1] = new double[arr_sz];
+    class_eval[2] = new double[arr_sz];
+    }
+  else {
+    class_eval[0] = 0;
+    class_eval[1] = 0;
+    class_eval[2] = 0;
+    };
+  }
+
+void free_memory(bool not_empty) {
+  if (not_empty) {
+    delete class_eval[0];
+    delete class_eval[1];
+    delete class_eval[2];
+  };
+}
+
 
 public:
+
   // Constructors
-  using Field<double[3], std::array<double*, 3>> :: Field;
-  virtual ~RegularVectorField() = default;
-
-    RegularVectorField(int shape, double zeropoint, double increment) {
-    RegularVectorField : Field<double, double*>(shape, zeropoint, increment);
-    class_eval[0] = new double[array_size];
-    class_eval[1] = new double[array_size];
-    class_eval[2] = new double[array_size];
-  };
-
-
-  RegularVectorField(std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) {
-    RegularVectorField : Field<double, double*>(grid_x, grid_y, grid_z);
-    class_eval[0] = new double[array_size];
-    class_eval[1] = new double[array_size];
-    class_eval[2] = new double[array_size];
-  };
+  using Field<std::array<double, 3>, std::array<double*, 3>> :: Field;
   // Fields
 
   // Methods
@@ -102,7 +107,7 @@ public:
     return function_eval;
   }
 
- std::array<double*, 3> on_grid(const std::vector<int> &n, const std::vector<double> &zeropoint, const std::vector<double> &increment) {
+ std::array<double*, 3> on_grid(const std::array<int, 3> &n, const std::array<double, 3> &zeropoint, const std::array<double, 3> &increment) {
     std::array<double*, 3> function_eval;
     evaluate_function_on_grid(function_eval, n, zeropoint, increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
