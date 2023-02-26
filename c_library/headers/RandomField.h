@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <cassert>
-#include <stdexcept>
 #include <functional>
 #include <iostream>
 #include <algorithm>

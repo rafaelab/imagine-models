@@ -1,6 +1,8 @@
 #ifndef EXCEPTION_H
 #define EXCEPTION_H
 
+#include <stdexcept>
+
 class GridException : public std::invalid_argument
 {
 public:

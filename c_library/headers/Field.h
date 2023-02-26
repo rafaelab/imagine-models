@@ -6,6 +6,7 @@
 #include <array>
 #include <functional>
 #include <algorithm>
+#include <iostream>
 #include <memory>
 
 #include "exceptions.h"
@@ -16,12 +17,12 @@ template<typename POSTYPE, typename GRIDTYPE>
 class Field {
 protected:
   // -----FIELDS-----
-  int ndim;
+  int ndim = 0;
 
   std::array<int, 3> shape;
   std::array<double, 3> zeropoint;
   std::array<double, 3> increment;
-  int array_size;
+  int array_size = 0;
 
   std::vector<double> grid_x;
   std::vector<double> grid_y;
@@ -57,11 +58,15 @@ protected:
 
   Field() {
     has_grid = false;
-    this->allocate_memory(has_grid, 0);
+    //this->allocate_memory(has_grid, 0);
   };
   
-  virtual void allocate_memory(bool not_empty, int sz) = 0;
-  virtual void free_memory(bool not_empty) = 0;
+  virtual void allocate_memory(bool not_empty, int sz) {
+    std::cout<< "parent allocate: "  <<std::endl;
+  };
+  virtual void free_memory(bool not_empty) {
+    std::cout<< "parent free: "  <<std::endl;
+  };
 
 public:
 

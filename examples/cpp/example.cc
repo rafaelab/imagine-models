@@ -3,9 +3,9 @@
 #include "../../c_library/headers/Field.h"
 #include "../../c_library/headers/RegularField.h"
 #include "../../c_library/headers/RegularJF12.h"
+#include "../../c_library/headers/Jaffe.h"
+#include "../../c_library/headers/Helix.h"
 //#include "../../c_library/headers/RandomJF12.h"
-//#include "../../c_library/headers/Jaffe.h"
-//#include "../../c_library/headers/Helix.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -20,7 +20,7 @@ void print_pos(std::map <std::string, std::array<double, 3>> pd,
 
       while (model_iter != md.end()) {
         auto position_iter = pd.begin();
-        std::cout << "The nodel " << model_iter->first << " is evaluated \n\n";
+        std::cout << "The model " << model_iter->first << " is evaluated: \n\n";
         while (position_iter != pd.end()) {
           std::array<double, 3> mval = (*(model_iter->second)).getField(position_iter->second);
 
@@ -88,8 +88,8 @@ int main() {
   std::map <std::string, std::shared_ptr<RegularVectorField>> regular_model_dict;
 
   regular_model_dict["Jansson Farrar regular"] = std::shared_ptr<JF12MagneticField> (new JF12MagneticField());
-  //regular_model_dict["Jaffe"] = std::shared_ptr<JaffeMagneticField<std::vector<double>>> (new JaffeMagneticField<std::vector<double>>());
-  //regular_model_dict["Helix"] = std::shared_ptr<HelixMagneticField<std::vector<double>>> (new HelixMagneticField<std::vector<double>>());
+  regular_model_dict["Jaffe"] = std::shared_ptr<JaffeMagneticField> (new JaffeMagneticField());
+  regular_model_dict["Helix"] = std::shared_ptr<HelixMagneticField> (new HelixMagneticField());
 
 
   print_pos(position_dict, regular_model_dict);

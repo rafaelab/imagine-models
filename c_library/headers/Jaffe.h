@@ -2,14 +2,15 @@
 #include <vector>
 #include <iostream>
 
+#include "Field.h"
+#include "RegularField.h"
 
-template<typename G>
-class JaffeMagneticField : public RegularField<G, std::vector<double>>  {
+class JaffeMagneticField : public RegularVectorField {
     protected:
       bool DEBUG = false;
     public:
 
-    using RegularField<G, std::vector<double>> :: RegularField;
+    using RegularVectorField :: RegularVectorField;
 
       bool quadruple = false; // quadruple pattern in halo
       bool bss = false; // bi-symmetric
@@ -50,14 +51,14 @@ class JaffeMagneticField : public RegularField<G, std::vector<double>>  {
       double comp_r = 12; // radial cutoff scale, kpc
       double comp_p = 3; //cutoff power
 
-      std::vector<double> at_position(const double &x, const double &y, const double &z) const {
+      std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
           double inner_b{0};
           if (ring) {
             inner_b = ring_amp;}
           else if (bar) {
             inner_b = bar_amp;}
-          std::vector<double> bhat = orientation(x, y, z);
-          std::vector<double> btot{0., 0., 0.};
+          std::array<double, 3> bhat = orientation(x, y, z);
+          std::array<double, 3> btot{0., 0., 0.};
           double scaling = radial_scaling(x, y) *
                  (disk_amp * disk_scaling(z) +
                   halo_amp * halo_scaling(z));
@@ -74,7 +75,7 @@ class JaffeMagneticField : public RegularField<G, std::vector<double>>  {
 
           // spiral arm region
           else {
-            std::vector<double> arm_amp{arm_amp1, arm_amp2, arm_amp3, arm_amp4};
+            std::array<double, 4> arm_amp{arm_amp1, arm_amp2, arm_amp3, arm_amp4};
             for (decltype(arm.size()) i = 0; i < arm.size(); ++i) {
               for(int j=0;j<bhat.size();++j) {
                 btot[j] += bhat[j] * arm[i] * arm_amp[i];}
@@ -84,14 +85,14 @@ class JaffeMagneticField : public RegularField<G, std::vector<double>>  {
           return btot;
         }
 
-    std::vector<double> orientation(const double &x, const double &y, const double &z) const {
+    std::array<double, 3> orientation(const double &x, const double &y, const double &z) const {
           const double r{
               sqrt(x * x + y * y)}; // cylindrical frame
           const double r_lim = ring_r;
           const double bar_lim{bar_a + 0.5 * comp_d};
           const double cos_p = std::cos(arm_pitch);
           const double sin_p = std::sin(arm_pitch); // pitch angle
-          std::vector<double> tmp{0., 0., 0.};
+          std::array<double, 3> tmp{0., 0., 0.};
           double quadruple{1};
           if (r < 0.5) // forbiden region
             return tmp;
@@ -194,7 +195,7 @@ class JaffeMagneticField : public RegularField<G, std::vector<double>>  {
                             comp_r};
           const double c0{1. / comp_c - 1.};
           std::vector<double> a0 = dist2arm(x, y);
-          const double r_scaling{radial_scaling(z)};
+          const double r_scaling{radial_scaling(x, y)};
           const double z_scaling{arm_scaling(z)};
           // only difference from normal arm_compress
           const double d0_inv{(r_scaling) / comp_d};
@@ -233,7 +234,7 @@ class JaffeMagneticField : public RegularField<G, std::vector<double>>  {
             // in spiral arm, return vector with arm_num elements
             else {
               // loop through arms
-              std::vector<double> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
+              std::array<double, 4> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
               for (int i = 0; i < arm_num; ++i) {
                 double d_ang{arm_phi[i] - theta};
                 double d_rad{
@@ -271,7 +272,7 @@ class JaffeMagneticField : public RegularField<G, std::vector<double>>  {
             // in spiral arm, return vector with arm_num elements
             else {
               // loop through arms
-              std::vector<double> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
+              std::array<double, 4> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
               for (int i = 0; i < arm_num; ++i) {
                 double d_ang{arm_phi[i] - theta};
                 double d_rad{

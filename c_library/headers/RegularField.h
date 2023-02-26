@@ -17,6 +17,7 @@ protected:
     // Fields
 
     // Constructors
+      RegularScalarField () : Field<double, double*>() {std::cout << "RS Constructor Used" << std::endl;};
 
     // RegularField() : Field<T>() {};
     // Methods
@@ -66,11 +67,15 @@ protected:
     // Fields
 
     // Constructors
-
+      RegularVectorField () : Field<std::array<double, 3>, std::array<double*, 3>>() {std::cout << "RS Constructor Used" << std::endl;
+      allocate_memory(has_grid, array_size);
+      };
     // RegularField() : Field<T>() {};
     // Methods
-void allocate_memory(bool not_empty, int arr_sz) {
+void allocate_memory(bool not_empty, int arr_sz) override {
+  std::cout<< "regular allocate "  <<std::endl;
   if (not_empty) {
+    
     class_eval[0] = new double[arr_sz];
     class_eval[1] = new double[arr_sz];
     class_eval[2] = new double[arr_sz];
@@ -82,7 +87,7 @@ void allocate_memory(bool not_empty, int arr_sz) {
     };
   }
 
-void free_memory(bool not_empty) {
+void free_memory(bool not_empty) override {
   if (not_empty) {
     delete class_eval[0];
     delete class_eval[1];

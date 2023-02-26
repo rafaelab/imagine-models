@@ -13,8 +13,8 @@ class JF12MagneticField : public RegularVectorField {
   public:
     using RegularVectorField :: RegularVectorField;
 
-    JF12MagneticField() : RegularVectorField() {};
-    ~JF12MagneticField() {};
+    //JF12MagneticField() : RegularVectorField() {};
+    //~JF12MagneticField() {};
 
     double b_arm_1 = 0.1;
     double b_arm_2 = 3.0;
