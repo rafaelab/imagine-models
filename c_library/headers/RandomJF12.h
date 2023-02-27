@@ -33,38 +33,41 @@ class JF12RandomField : public RandomVectorField {
     const double Rmax = 20.;
     const double rho_GC = 1.;
 
-    void _on_grid(std::initializer_list<fftw_plan> forward, std::initializer_list<fftw_plan> backward, const std::vector<int> &n, const std::vector<double> &zeropoint, const std::vector<double> &increment, const int seed) {
+    void _on_grid(std::array<double*, 3> freal,  std::array<fftw_complex*, 3> fcomp,  std::array<fftw_plan, 3> forward, std::array<fftw_plan, 3> backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
 
-      draw_random_numbers({field_vec_comp_x, field_vec_comp_y, field_vec_comp_z}, n, increment, seed);
+      draw_random_numbers(fcomp, grid_shape, grid_increment, seed);
 
-      fftw_execute(c2r_x);
-      fftw_execute(c2r_y);
-      fftw_execute(c2r_z);
+      for (int i =0; i<3; ++i) {
+        fftw_execute(c2r[i]);
+      }
 
       auto multiply_profile = [&](double xx, double yy, double zz) {
-          int _nx = (int)((xx - zeropoint[0])/increment[0]); 
-          int _ny = (int)((yy - zeropoint[1])/increment[1]);
-          int _nz = (int)((zz - zeropoint[2])/increment[2]);
+          int _nx = (int)((xx - grid_zeropoint[0])/grid_increment[0]); 
+          int _ny = (int)((yy - grid_zeropoint[1])/grid_increment[1]);
+          int _nz = (int)((zz - grid_zeropoint[2])/grid_increment[2]);
           double sp = spatial_profile(xx, yy, zz);
-          std::vector<double> v = {
-            field_vec_real_x[_nz + n[2]*(_ny + n[1]*_nx)]*sp, 
-            field_vec_real_y[_nz + n[2]*(_ny + n[1]*_nx)]*sp, 
-            field_vec_real_z[_nz + n[2]*(_ny + n[1]*_nx)]*sp
+          int idx = _nz + grid_shape[2]*(_ny + grid_shape[1]*_nx);
+          std::array<double, 3> fr = {, (*freal[1])[idx], (*freal[2])[idx]};
+          std::array<double, 3> v = {
+            (*(freal[0]))[idx]*sp, 
+            (*freal[1])[idx]*sp, 
+            (*freal[2])[idx]*sp
             };
           return v;
         };
 
-      evaluate_function_on_grid(field_vec_real_x, field_vec_real_y, field_vec_real_z, n, zeropoint, increment, multiply_profile);
+      evaluate_function_on_grid(freal, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
 
-      fftw_execute(r2c_x);
-      fftw_execute(r2c_y);
-      fftw_execute(r2c_z);
+      for (int i =0; i<3; ++i) {
+        fftw_execute(r2c[i]);
+      }
+
       
-      divergence_cleaner(field_vec_comp_x, field_vec_comp_y, field_vec_comp_z, n, increment);
+      divergence_cleaner(fcomp[0], fcomp[1], fcomp[2], grid_shape, grid_increment);
 
-      fftw_execute(c2r_x);
-      fftw_execute(c2r_y);
-      fftw_execute(c2r_z);
+      for (int i =0; i<3; ++i) {
+        fftw_execute(c2r[i]);
+      }
     }
 
 

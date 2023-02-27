@@ -16,9 +16,6 @@ class RegularScalarField : public Field<double, double*>  {
 protected:
     // Fields
 
-    // Constructors
-      RegularScalarField () : Field<double, double*>() {std::cout << "RS Constructor Used" << std::endl;};
-
     // RegularField() : Field<T>() {};
     // Methods
 void allocate_memory(bool not_empty, int arr_sz) {
@@ -38,8 +35,20 @@ void free_memory(bool not_empty) {
 
 public:
   // -----CONSTRUCTORS-----
+
+  ~RegularScalarField() {free_memory(has_grid);};
   
-  using Field<double, double*> :: Field;
+  RegularScalarField () : Field<double, double*>() {
+      allocate_memory(has_grid, array_size);
+      };
+
+  RegularScalarField (std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : Field<double, double*>(shape, zeropoint, increment) {
+      allocate_memory(has_grid, array_size);
+      };
+
+  RegularScalarField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<double, double*>(grid_x, grid_y, grid_z) {
+      allocate_memory(has_grid, array_size);
+      };
 
   // Fields
   const int ndim = 1;
@@ -52,9 +61,9 @@ public:
     return function_eval;
   }
 
-  double* on_grid(const std::array<int, 3> &n, const std::array<double, 3> &zeropoint, const std::array<double, 3> &increment) {
+  double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment) {
     double* function_eval;
-    evaluate_function_on_grid(function_eval, n, zeropoint, increment,
+    evaluate_function_on_grid(function_eval, grid_shape, grid_zeropoint, grid_increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return function_eval;
   }
@@ -66,24 +75,16 @@ class RegularVectorField : public Field<std::array<double, 3>, std::array<double
 protected:
     // Fields
 
-    // Constructors
-      RegularVectorField () : Field<std::array<double, 3>, std::array<double*, 3>>() {std::cout << "RS Constructor Used" << std::endl;
-      allocate_memory(has_grid, array_size);
-      };
     // RegularField() : Field<T>() {};
     // Methods
 void allocate_memory(bool not_empty, int arr_sz) override {
-  std::cout<< "regular allocate "  <<std::endl;
   if (not_empty) {
-    
     class_eval[0] = new double[arr_sz];
     class_eval[1] = new double[arr_sz];
     class_eval[2] = new double[arr_sz];
     }
   else {
-    class_eval[0] = 0;
-    class_eval[1] = 0;
-    class_eval[2] = 0;
+    class_eval = {0, 0, 0};
     };
   }
 
@@ -98,23 +99,58 @@ void free_memory(bool not_empty) override {
 
 public:
 
+  ~RegularVectorField() {free_memory(has_grid);};
+
   // Constructors
-  using Field<std::array<double, 3>, std::array<double*, 3>> :: Field;
+  RegularVectorField () : Field<std::array<double, 3>, std::array<double*, 3>>() {
+      allocate_memory(has_grid, array_size);
+      };
+
+  RegularVectorField (std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  grid_increment) : Field<std::array<double, 3>, std::array<double*, 3>>(shape, zeropoint, grid_increment) {
+      allocate_memory(has_grid, array_size);
+      };
+
+  RegularVectorField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<std::array<double, 3>, std::array<double*, 3>>(grid_x, grid_y, grid_z) {
+      allocate_memory(has_grid, array_size);
+      };
+
+
   // Fields
 
+  const int ndim = 3;
   // Methods
 
+  std::array<double*, 3> on_grid(int seed = 0) {
+    if (not has_grid) {
+      throw GridException();
+    }
+    if (has_grid) { 
+      if (regular_grid) {
+        evaluate_function_on_grid(class_eval, shape, zeropoint, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+        return class_eval;
+      }
+      else {
+        evaluate_function_on_grid(class_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+        return class_eval;
+      }
+    }
+    else
+      return class_eval;
 
-  std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z) {
+  }
+
+  std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     std::array<double*, 3> function_eval;
+    std::cout << "The ref to b_grid when created 1 " << &function_eval << " \n\n";
     evaluate_function_on_grid(function_eval, grid_x, grid_y, grid_z,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+    std::cout << "The ref to b_grid when created 2" << &function_eval << " \n\n";
     return function_eval;
   }
 
- std::array<double*, 3> on_grid(const std::array<int, 3> &n, const std::array<double, 3> &zeropoint, const std::array<double, 3> &increment) {
+ std::array<double*, 3> on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, int seed = 0) {
     std::array<double*, 3> function_eval;
-    evaluate_function_on_grid(function_eval, n, zeropoint, increment,
+    evaluate_function_on_grid(function_eval, grid_shape, grid_zeropoint, grid_increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return function_eval;
   }
