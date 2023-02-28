@@ -45,9 +45,9 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(std::array<fftw_complex
           const int idx = idx_lv2 + l;
           const double sigma = std::sqrt(0.33333333 * spectrum(ks, rms, k0, k1, a0, a1) * dk3);
           std::normal_distribution<> nd{0, sigma};
-          for (auto element: c_fields) {
-            (*element)[idx][0] = nd(gen);
-            (*element)[idx][1] = nd(gen);
+          for (auto element: vec) {
+            element[idx][0] = nd(gen);
+            element[idx][1] = nd(gen);
           //  c_field[m][idx][1] = nd(gen);
             }
         } // l

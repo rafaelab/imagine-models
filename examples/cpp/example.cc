@@ -5,7 +5,8 @@
 #include "../../c_library/headers/RegularJF12.h"
 #include "../../c_library/headers/Jaffe.h"
 #include "../../c_library/headers/Helix.h"
-//#include "../../c_library/headers/RandomJF12.h"
+#include "../../c_library/headers/RandomJF12.h"
+#include "../../c_library/headers/EnsslinSteininger.h"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -196,9 +197,10 @@ int main() {
 
   print_ev_grid_irreg(reg_mods, grid_x, grid_y, grid_z);
 
-  //std::map <std::string, std::shared_ptr<RandomField<std::vector<double>, std::vector<double>>>> random_model_dict;
+  std::map <std::string, std::shared_ptr<RandomField<std::vector<double>, std::vector<double>>>> rand_mods;
 
-  //JF12RandomField<std::vector<double>> jf12random(1000);
+  JF12RandomField jf12random();
+  ESField esrandom();
 
   //std::vector<double> jf12_grid = jf12_1.evaluate_model_on_grid(grid_x, grid_y, grid_z);
 

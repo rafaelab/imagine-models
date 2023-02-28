@@ -47,11 +47,10 @@ class JF12RandomField : public RandomVectorField {
           int _nz = (int)((zz - grid_zeropoint[2])/grid_increment[2]);
           double sp = spatial_profile(xx, yy, zz);
           int idx = _nz + grid_shape[2]*(_ny + grid_shape[1]*_nx);
-          std::array<double, 3> fr = {, (*freal[1])[idx], (*freal[2])[idx]};
           std::array<double, 3> v = {
-            (*(freal[0]))[idx]*sp, 
-            (*freal[1])[idx]*sp, 
-            (*freal[2])[idx]*sp
+            (freal[0])[idx]*sp, 
+            (freal[1])[idx]*sp, 
+            (freal[2])[idx]*sp
             };
           return v;
         };

@@ -27,20 +27,25 @@ public:
 
   // Fields
   int seed = 0;
+  double rms;
+  double k0;
+  double k1;
+  double a0;
+  double a1;
 
   // methods
   POSTYPE at_position(const double &x, const double &y, const double &z) const {
     throw NotImplementedException();
     // Here comes the interpolator
-    T c{0};
+    POSTYPE c{0};
     return c;
   }
   
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  double on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z) {
+  GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z) {
     throw NotImplementedException();
-    std::vector<double> c{0};
+    GRIDTYPE c{0};
     return c;
   }
 
@@ -57,7 +62,6 @@ public:
 class RandomScalarField : public RandomField<double, double*>  {
 protected:
     // Fields
-    int ndim = 1;
     bool recreate_fftw_plans;
     fftw_plan c2r;
     fftw_plan r2c;
@@ -106,7 +110,7 @@ public:
 
   // Fields
 
-  int global_seed = 0;
+  const int ndim = 1;
   // for destructor
   bool clean_switch = false;
   // methods
@@ -136,7 +140,6 @@ public:
 class RandomVectorField : public RandomField<std::array<double, 3>, std::array<double*, 3>>  {
 protected:
     // Fields
-    int ndim = 3;
 
     std::array<fftw_plan, 3> r2c;
     std::array<fftw_plan, 3> c2r;
@@ -212,11 +215,13 @@ public:
 
     } 
     _on_grid(eval_temp, eval_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, nseed);
+    return eval_temp;
     
   }
 
   std::array<double*, 3> on_grid(int nseed) {
     _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, nseed);
+    return class_eval;
   }
   
 
