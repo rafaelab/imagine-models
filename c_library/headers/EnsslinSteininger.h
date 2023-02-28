@@ -17,12 +17,12 @@ class ESField : public RandomVectorField {
     std::array<double, 3> observer{8.5, 0, 0};
 
 
-    void _on_grid(std::array<double*, 3> freal,  std::array<fftw_complex*, 3> fcomp,  std::array<fftw_plan, 3> forward, std::array<fftw_plan, 3> backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+    void _on_grid(std::array<double*, 3> freal,  std::array<fftw_complex*, 3> fcomp,  std::array<fftw_plan, 3> real_to_comp, std::array<fftw_plan, 3> comp_to_real, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
 
       draw_random_numbers(fcomp, grid_shape, grid_increment, seed);
 
       for (int i =0; i<3; ++i) {
-        fftw_execute(c2r[i]);
+        fftw_execute(comp_to_real[i]);
       }
 
       auto multiply_profile = [&](double xx, double yy, double zz) {
@@ -42,14 +42,14 @@ class ESField : public RandomVectorField {
       evaluate_function_on_grid(freal, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
 
       for (int i =0; i<3; ++i) {
-        fftw_execute(r2c[i]);
+        fftw_execute(real_to_comp[i]);
       }
 
       
       divergence_cleaner(fcomp[0], fcomp[1], fcomp[2], grid_shape, grid_increment);
 
       for (int i =0; i<3; ++i) {
-        fftw_execute(c2r[i]);
+        fftw_execute(comp_to_real[i]);
       }
     }
 

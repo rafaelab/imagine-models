@@ -27,11 +27,11 @@ public:
 
   // Fields
   int seed = 0;
-  double rms;
-  double k0;
-  double k1;
-  double a0;
-  double a1;
+  double rms = 1;
+  double k0 = 1;
+  double k1= 10;
+  double a0 = 1;
+  double a1 = 1;
 
   // methods
   POSTYPE at_position(const double &x, const double &y, const double &z) const {
@@ -210,8 +210,8 @@ public:
     for (int i=0; i < ndim; ++i) {
       eval_temp[i] = (double*) fftw_malloc(sizeof(fftw_complex) * shape[0]*shape[1]*(shape[2]+2));
       eval_comp_temp[i]= reinterpret_cast<fftw_complex*>( eval_temp[i]);
-      r2c[i] = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], eval_temp[i], eval_comp_temp[i], FFTW_MEASURE);
-      c2r[i] = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], eval_comp_temp[i], eval_temp[i],  FFTW_MEASURE);
+      r2c_temp[i] = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], eval_temp[i], eval_comp_temp[i], FFTW_MEASURE);
+      c2r_temp[i] = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], eval_comp_temp[i], eval_temp[i],  FFTW_MEASURE);
 
     } 
     _on_grid(eval_temp, eval_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, nseed);

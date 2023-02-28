@@ -55,14 +55,15 @@ public:
   // Methods
 
   double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z) {
-    double* function_eval;
+    double *function_eval = new double[grid_x.size()*grid_y.size()*grid_z.size()];
+    //auto function_eval = std::make_shared<double>();
     evaluate_function_on_grid(function_eval, grid_x, grid_y, grid_z,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return function_eval;
   }
 
   double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment) {
-    double* function_eval;
+    double *function_eval = new double[grid_x.size()*grid_y.size()*grid_z.size()];
     evaluate_function_on_grid(function_eval, grid_shape, grid_zeropoint, grid_increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return function_eval;
@@ -141,6 +142,9 @@ public:
 
   std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     std::array<double*, 3> function_eval;
+    for (int i = 0; i<3; ++i) {
+      function_eval[i] = new double[grid_x.size()*grid_y.size()*grid_z.size()];
+    }
     std::cout << "The ref to b_grid when created 1 " << &function_eval << " \n\n";
     evaluate_function_on_grid(function_eval, grid_x, grid_y, grid_z,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
@@ -150,6 +154,9 @@ public:
 
  std::array<double*, 3> on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, int seed = 0) {
     std::array<double*, 3> function_eval;
+    for (int i = 0; i<3; ++i) {
+      function_eval[i] = new double[grid_x.size()*grid_y.size()*grid_z.size()];
+    }
     evaluate_function_on_grid(function_eval, grid_shape, grid_zeropoint, grid_increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return function_eval;

@@ -1,9 +1,9 @@
 template<typename POSTYPE, typename GRIDTYPE>
 void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(std::array<fftw_complex*, 3> vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed)  {
 
-  int lx = grid_shape[0]*grid_increment[0];
-  int ly = grid_shape[1]*grid_increment[1];
-  int lz = grid_shape[2]*grid_increment[2];
+  double lx = grid_shape[0]*grid_increment[0];
+  double ly = grid_shape[1]*grid_increment[1];
+  double lz = grid_shape[2]*grid_increment[2];
 
   #ifdef _OPENMP
     std::seed_seq seq{seed}
