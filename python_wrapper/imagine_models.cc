@@ -29,49 +29,104 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
 }
 
 
+template <typename Sequence>
+inline py::list from_pointer_array_to_list_pyarray(Sequence &&seq, size_t arr_size) {
+  typedef typename std::remove_reference<decltype(*std::declval<Sequence::value_type>())>::type T;
+  auto tsize = seq.size();
+  py::list li;
+  for (int i = 0; i<tsize; ++i) {
+    auto data = seq[i];
+    py::capsule free_when_done(foo, [](void *f) {
+        T *foo = reinterpret_cast<T *>(f);
+        std::cerr << "Element [0] = " << foo[0] << "\n";
+            std::cerr << "freeing memory @ " << f << "\n";
+        delete[] foo;
+        });
+    li.append(py::array(size, data, free_when_done));
+  }
+  return li;
+}
+
+template <typename Ptr>
+inline py::array_t<typename std::remove_reference<decltype(*std::declval<Ptr>())>::type> from_pointer_to_pyarray(Ptr data, size_t arr_size) {
+    typedef typename std::remove_reference<decltype(*std::declval<Ptr>())>::type T;
+    py::capsule free_when_done(foo, [](void *f) {
+        T *foo = reinterpret_cast<T *>(f);
+        std::cerr << "Element [0] = " << foo[0] << "\n";
+            std::cerr << "freeing memory @ " << f << "\n";
+        delete[] foo;
+        })
+  return py::array(arr_size, data, free_when_done);
+}
+
 
 PYBIND11_MODULE(_ImagineModels, m) {
     m.doc() = "IMAGINE Model Library";
 
 /////////////////////////////////Base classes/////////////////////////////////
 
-// Vector Base Class
-    py::class_<Field<py::array_t<double>, std::vector<double>>, PyVectorField>(m, "VectorField")
-        .def(py::init<>());
-
+// Vector Base Classes
+    py::class_<Field<std::array<double, 3>, std::array<double*, 3>>, PyVectorBaseField>(m, "VectorBaseField")
+        .def(py::init<>())
+        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
 
 // Scalar Base Class
-    py::class_<Field<py::array_t<double>, double>, PyScalarField>(m, "ScalarField")
-        .def(py::init<>());
+    py::class_<Field<double, double*>, PyRegularScalarField>(m, "ScalarBaseField")
+        .def(py::init<>())
+        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
+        
 
-/////////////////////////////////Regular Field Basc/////////////////////////////////
+/////////////////////////////////Regular Field Bases/////////////////////////////////
 
 // Regular Vector Base Class
-    py::class_<RegularField<py::array_t<double>, std::vector<double>>, Field<py::array_t<double>, std::vector<double>>, PyRegularVectorField>(m, "RegularVectorField")
+    py::class_<RegularVectorField, Field<std::array<double, 3>, std::array<double*, 3>>, PyRegularVectorField>(m, "RegularVectorField")
         .def(py::init<>())
+        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def("on_grid", [](RegularField<py::array_t<double>, std::vector<double>> &self, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z)  {
-          std::vector<double> f = self.on_grid(grid_x, grid_y, grid_z);
+        .def("on_grid", [](RegularVectorField &self, std::vector<double> &grid_x,  std::vector<double>  &grid_y, std::vector<double>  &grid_z)  {
+            std::array<double*, 3> f = self.on_grid(grid_x, grid_y, grid_z);
+            std::cout << "on grid f size " << f.size() << std::endl;
+            int si = 3;
+            auto li = from_pointer_array_to_list_pyarray(std::move(f), self.array_size());
+            //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
+            for (int i = 0; i< si; ++i ) {
+                (li[i]).resize({(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size(), si});
+            }
+            return py::tuple(li);},
+            "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::take_ownership)
+
+
+        .def("on_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment)  {
+          std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment);
           std::cout << "on grid f size " << f.size() << std::endl;
-          int sx = grid_x.size();
-          int sy = grid_y.size();
-          int sz = grid_z.size();
           int si = 3;
           auto arr = as_pyarray(std::move(f));
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          arr.resize({sx, sy, sz, si});
+          arr.resize({grid_shape[0], grid_shape[1], grid_shape[2], si});
           return arr;},
-          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::move);
+          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, py::return_value_policy::take_ownership)
+
+        .def("on_grid", [](RegularVectorField &self)  {
+          std::array<double*, 3> f = self.on_grid();
+          std::cout << "on grid f size " << f.size() << std::endl;
+          int si = 3;
+          auto arr = as_pyarray(std::move(f));
+          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
+          arr.resize({self.shape[0], self.shape[1], self.shape[2], si});
+          return arr;}, py::return_value_policy::move);
 
 // Regular Scalar Base Class
-    py::class_<RegularField<py::array_t<double>, double>, Field<py::array_t<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
+    py::class_<RegularScalarField, Field<py::array_t<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
         .def(py::init<>())
-        .def("on_grid", [](RegularField<py::array_t<double>, std::vector<double>> &self, py::array_t<double> &grid_x, py::array_t<double> &grid_y, py::array_t<double> &grid_z)  {
-          std::vector<double> f = self.on_grid(grid_x, grid_y, grid_z);
-          int sx = grid_x.size();
-          int sy = grid_y.size();
-          int sz = grid_z.size();
-          auto arr = as_pyarray(std::move(f));
+        .def("on_grid", [](RegularScalarField &self, std::vector<double> &grid_x,  std::vector<double>  &grid_y, std::vector<double>  &grid_z)  {
+          double* f = self.on_grid(grid_x, grid_y, grid_z);
+          size_t sx = grid_x.size();
+          size_t sy = grid_y.size();
+          size_t sz = grid_z.size();
+          auto arr = from_pointer_to_pyarray(f, sx*sy*sz);
           arr.resize({sx, sy, sz});
           return arr;},
           "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::move);
@@ -81,83 +136,83 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
 /////////////////////////////////Regular Fields/////////////////////////////////
 
-    py::class_<JF12MagneticField<py::array_t<double>>, RegularField<py::array_t<double>, std::vector<double>>, PyJF12MagneticField>(m, "JF12RegularField")
+    py::class_<JF12MagneticField, RegularVectorField>(m, "JF12RegularField")
         .def(py::init<>())
-        .def("at_position", &JF12MagneticField<py::array_t<double>>::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-        .def_readwrite("b_arm_1", &JF12MagneticField<py::array_t<double>>::b_arm_1)
-        .def_readwrite("b_arm_2", &JF12MagneticField<py::array_t<double>>::b_arm_2)
-        .def_readwrite("b_arm_3", &JF12MagneticField<py::array_t<double>>::b_arm_3)
-        .def_readwrite("b_arm_4", &JF12MagneticField<py::array_t<double>>::b_arm_4)
-        .def_readwrite("b_arm_5", &JF12MagneticField<py::array_t<double>>::b_arm_5)
-        .def_readwrite("b_arm_6", &JF12MagneticField<py::array_t<double>>::b_arm_6)
-        .def_readwrite("b_arm_7", &JF12MagneticField<py::array_t<double>>::b_arm_7)
-        .def_readwrite("b_ring", &JF12MagneticField<py::array_t<double>>::b_ring)
-        .def_readwrite("h_disk", &JF12MagneticField<py::array_t<double>>::h_disk)
-        .def_readwrite("w_disk", &JF12MagneticField<py::array_t<double>>::w_disk)
-        .def_readwrite("Bn", &JF12MagneticField<py::array_t<double>>::Bn)
-        .def_readwrite("Bs", &JF12MagneticField<py::array_t<double>>::Bs)
-        .def_readwrite("rn", &JF12MagneticField<py::array_t<double>>::rn)
-        .def_readwrite("rs", &JF12MagneticField<py::array_t<double>>::rs)
-        .def_readwrite("wh", &JF12MagneticField<py::array_t<double>>::wh)
-        .def_readwrite("z0", &JF12MagneticField<py::array_t<double>>::z0)
-        .def_readwrite("B0_X", &JF12MagneticField<py::array_t<double>>::B0_X)
-        .def_readwrite("Xtheta_const", &JF12MagneticField<py::array_t<double>>::Xtheta_const)
-        .def_readwrite("rpc_X", &JF12MagneticField<py::array_t<double>>::rpc_X)
-        .def_readwrite("r0_X", &JF12MagneticField<py::array_t<double>>::r0_X);
+        .def("at_position", &JF12MagneticField::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        .def_readwrite("b_arm_1", &JF12MagneticField::b_arm_1)
+        .def_readwrite("b_arm_2", &JF12MagneticField::b_arm_2)
+        .def_readwrite("b_arm_3", &JF12MagneticField::b_arm_3)
+        .def_readwrite("b_arm_4", &JF12MagneticField::b_arm_4)
+        .def_readwrite("b_arm_5", &JF12MagneticField::b_arm_5)
+        .def_readwrite("b_arm_6", &JF12MagneticField::b_arm_6)
+        .def_readwrite("b_arm_7", &JF12MagneticField::b_arm_7)
+        .def_readwrite("b_ring", &JF12MagneticField::b_ring)
+        .def_readwrite("h_disk", &JF12MagneticField::h_disk)
+        .def_readwrite("w_disk", &JF12MagneticField::w_disk)
+        .def_readwrite("Bn", &JF12MagneticField::Bn)
+        .def_readwrite("Bs", &JF12MagneticField::Bs)
+        .def_readwrite("rn", &JF12MagneticField::rn)
+        .def_readwrite("rs", &JF12MagneticField::rs)
+        .def_readwrite("wh", &JF12MagneticField::wh)
+        .def_readwrite("z0", &JF12MagneticField::z0)
+        .def_readwrite("B0_X", &JF12MagneticField::B0_X)
+        .def_readwrite("Xtheta_const", &JF12MagneticField::Xtheta_const)
+        .def_readwrite("rpc_X", &JF12MagneticField::rpc_X)
+        .def_readwrite("r0_X", &JF12MagneticField::r0_X);
 
-    py::class_<HelixMagneticField<py::array_t<double>>, RegularField<py::array_t<double>, std::vector<double>>, PyHelixMagneticField>(m, "HelixMagneticField")
+    py::class_<HelixMagneticField, RegularVectorField, HelixMagneticField>(m, "HelixMagneticField")
         .def(py::init<>())
-        .def("at_position", &HelixMagneticField<py::array_t<double>>::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        .def("at_position", &HelixMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
   //      .def("dampx_grid", &HelixMagneticField::dampx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
   //      .def("dampy_grid", &HelixMagneticField::dampy_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
   //      .def("dampz_grid", &HelixMagneticField::dampz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-        .def_readwrite("ampx", &HelixMagneticField<py::array_t<double>>::ampx)
-        .def_readwrite("ampy", &HelixMagneticField<py::array_t<double>>::ampy)
-        .def_readwrite("ampz", &HelixMagneticField<py::array_t<double>>::ampz)
-        .def_readwrite("rmin", &HelixMagneticField<py::array_t<double>>::rmin)
-        .def_readwrite("rmax", &HelixMagneticField<py::array_t<double>>::rmax);
+        .def_readwrite("ampx", &HelixMagneticField::ampx)
+        .def_readwrite("ampy", &HelixMagneticField::ampy)
+        .def_readwrite("ampz", &HelixMagneticField::ampz)
+        .def_readwrite("rmin", &HelixMagneticField::rmin)
+        .def_readwrite("rmax", &HelixMagneticField::rmax);
 
-    py::class_<JaffeMagneticField<py::array_t<double>>, RegularField<py::array_t<double>, std::vector<double>>, PyJaffeMagneticField>(m, "JaffeMagneticField")
+    py::class_<JaffeMagneticField, RegularVectorField>(m, "JaffeMagneticField")
         .def(py::init<>())
-        .def("at_position", &JaffeMagneticField<py::array_t<double>>::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-        .def_readwrite("quadruple", &JaffeMagneticField<py::array_t<double>>::quadruple)
-        .def_readwrite("bss", &JaffeMagneticField<py::array_t<double>>::bss)
+        .def("at_position", &JaffeMagneticField::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        .def_readwrite("quadruple", &JaffeMagneticField::quadruple)
+        .def_readwrite("bss", &JaffeMagneticField::bss)
 
-        .def_readwrite("disk_amp", &JaffeMagneticField<py::array_t<double>>::disk_amp)
-        .def_readwrite("disk_z0", &JaffeMagneticField<py::array_t<double>>::disk_z0)
-        .def_readwrite("halo_amp",  &JaffeMagneticField<py::array_t<double>>::halo_amp)
-        .def_readwrite("halo_z0",  &JaffeMagneticField<py::array_t<double>>::halo_z0)
-        .def_readwrite("r_inner",  &JaffeMagneticField<py::array_t<double>>::r_inner)
-        .def_readwrite("r_scale",  &JaffeMagneticField<py::array_t<double>>::r_scale)
-        .def_readwrite("r_peak",  &JaffeMagneticField<py::array_t<double>>::r_peak)
+        .def_readwrite("disk_amp", &JaffeMagneticField::disk_amp)
+        .def_readwrite("disk_z0", &JaffeMagneticField::disk_z0)
+        .def_readwrite("halo_amp",  &JaffeMagneticField::halo_amp)
+        .def_readwrite("halo_z0",  &JaffeMagneticField::halo_z0)
+        .def_readwrite("r_inner",  &JaffeMagneticField::r_inner)
+        .def_readwrite("r_scale",  &JaffeMagneticField::r_scale)
+        .def_readwrite("r_peak",  &JaffeMagneticField::r_peak)
 
-        .def_readwrite("ring", &JaffeMagneticField<py::array_t<double>>::ring)
-        .def_readwrite("bar", &JaffeMagneticField<py::array_t<double>>::bar)
+        .def_readwrite("ring", &JaffeMagneticField::ring)
+        .def_readwrite("bar", &JaffeMagneticField::bar)
          // either ring or bar!
-        .def_readwrite("ring_amp", &JaffeMagneticField<py::array_t<double>>::ring_amp)
-        .def_readwrite("ring_r", &JaffeMagneticField<py::array_t<double>>::ring_r)
-        .def_readwrite("bar_amp", &JaffeMagneticField<py::array_t<double>>::bar_amp)
-        .def_readwrite("bar_a", &JaffeMagneticField<py::array_t<double>>::bar_a)
-        .def_readwrite("bar_b", &JaffeMagneticField<py::array_t<double>>::bar_b)
-        .def_readwrite("bar_phi0", &JaffeMagneticField<py::array_t<double>>::bar_phi0)
+        .def_readwrite("ring_amp", &JaffeMagneticField::ring_amp)
+        .def_readwrite("ring_r", &JaffeMagneticField::ring_r)
+        .def_readwrite("bar_amp", &JaffeMagneticField::bar_amp)
+        .def_readwrite("bar_a", &JaffeMagneticField::bar_a)
+        .def_readwrite("bar_b", &JaffeMagneticField::bar_b)
+        .def_readwrite("bar_phi0", &JaffeMagneticField::bar_phi0)
 
-        .def_readwrite("arm_num",  &JaffeMagneticField<py::array_t<double>>::arm_num)
-        .def_readwrite("arm_r0",  &JaffeMagneticField<py::array_t<double>>::arm_r0)
-        .def_readwrite("arm_z0",  &JaffeMagneticField<py::array_t<double>>::arm_z0)
-        .def_readwrite("arm_phi1",  &JaffeMagneticField<py::array_t<double>>::arm_phi1)
-        .def_readwrite("arm_phi2",  &JaffeMagneticField<py::array_t<double>>::arm_phi2)
-        .def_readwrite("arm_phi3",  &JaffeMagneticField<py::array_t<double>>::arm_phi3)
-        .def_readwrite("arm_phi4",  &JaffeMagneticField<py::array_t<double>>::arm_phi4)
-        .def_readwrite("arm_amp1",  &JaffeMagneticField<py::array_t<double>>::arm_amp1)
-        .def_readwrite("arm_amp2",  &JaffeMagneticField<py::array_t<double>>::arm_amp2)
-        .def_readwrite("arm_amp3",  &JaffeMagneticField<py::array_t<double>>::arm_amp3)
-        .def_readwrite("arm_amp4",  &JaffeMagneticField<py::array_t<double>>::arm_amp4)
-        .def_readwrite("arm_pitch",  &JaffeMagneticField<py::array_t<double>>::arm_pitch)
+        .def_readwrite("arm_num",  &JaffeMagneticField::arm_num)
+        .def_readwrite("arm_r0",  &JaffeMagneticField::arm_r0)
+        .def_readwrite("arm_z0",  &JaffeMagneticField::arm_z0)
+        .def_readwrite("arm_phi1",  &JaffeMagneticField::arm_phi1)
+        .def_readwrite("arm_phi2",  &JaffeMagneticField::arm_phi2)
+        .def_readwrite("arm_phi3",  &JaffeMagneticField::arm_phi3)
+        .def_readwrite("arm_phi4",  &JaffeMagneticField::arm_phi4)
+        .def_readwrite("arm_amp1",  &JaffeMagneticField::arm_amp1)
+        .def_readwrite("arm_amp2",  &JaffeMagneticField::arm_amp2)
+        .def_readwrite("arm_amp3",  &JaffeMagneticField::arm_amp3)
+        .def_readwrite("arm_amp4",  &JaffeMagneticField::arm_amp4)
+        .def_readwrite("arm_pitch",  &JaffeMagneticField::arm_pitch)
 
-        .def_readwrite("comp_c",  &JaffeMagneticField<py::array_t<double>>::comp_c)
-        .def_readwrite("comp_d",  &JaffeMagneticField<py::array_t<double>>::comp_d)
-        .def_readwrite("comp_r",  &JaffeMagneticField<py::array_t<double>>::comp_r)
-        .def_readwrite("comp_p",  &JaffeMagneticField<py::array_t<double>>::comp_p);
+        .def_readwrite("comp_c",  &JaffeMagneticField::comp_c)
+        .def_readwrite("comp_d",  &JaffeMagneticField::comp_d)
+        .def_readwrite("comp_r",  &JaffeMagneticField::comp_r)
+        .def_readwrite("comp_p",  &JaffeMagneticField::comp_p);
 
 /////////////////////////////Thermal Electron Field/////////////////////////////
 /*

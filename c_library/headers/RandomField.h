@@ -95,7 +95,8 @@ public:
     };
 
   RandomScalarField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField<double, double*>(shape, zeropoint, increment) {
-    allocate_memory(has_grid, array_size);
+    size_t ar_sz = array_size();
+    allocate_memory(has_grid, ar_sz);
 
     };
 
@@ -130,7 +131,13 @@ public:
   }
 
   double* on_grid(const int seed) {
-    return _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, seed);
+    if (not has_grid) 
+      throw GridException();
+    if (has_grid)
+      return _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, seed);
+    else
+      return class_eval;
+
   }
 
 
@@ -177,10 +184,12 @@ public:
 
 
   RandomVectorField() : RandomField() {
-    allocate_memory(has_grid, array_size);
+    size_t ar_sz = array_size();
+    allocate_memory(has_grid, ar_sz);
     };
   RandomVectorField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField(shape, zeropoint, increment) {
-    allocate_memory(has_grid, array_size);
+    size_t ar_sz = array_size();
+    allocate_memory(has_grid, ar_sz);
     };
   ~RandomVectorField() {
     free_memory(has_grid);

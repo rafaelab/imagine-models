@@ -19,15 +19,6 @@ protected:
   // -----FIELDS-----
   int ndim = 0;
 
-  std::array<int, 3> shape;
-  std::array<double, 3> zeropoint;
-  std::array<double, 3> increment;
-  int array_size = 0;
-
-  std::vector<double> grid_x;
-  std::vector<double> grid_y;
-  std::vector<double> grid_z;
-
   GRIDTYPE class_eval;
 
   bool has_grid = false;
@@ -37,10 +28,7 @@ protected:
 
   ~Field() {};
 
-  Field(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : shape(shape), zeropoint(zeropoint), increment(increment) {
-    array_size = 1;
-    for (const int sh : shape) 
-      array_size = array_size*sh;
+  Field(std::array<int, 3> grid_shape, std::array<double, 3>  grid_zeropoint, std::array<double, 3>  grid_increment) : shape(grid_shape), zeropoint(grid_zeropoint), increment(grid_increment) {
     has_grid = true;
     regular_grid = true;
   };
@@ -49,9 +37,6 @@ protected:
     has_grid = true;
     regular_grid = false;
     shape = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
-    array_size = 1;
-    for (const int sh : shape) 
-      array_size = array_size*sh;
   };
 
   Field() {
@@ -62,10 +47,27 @@ protected:
   virtual void free_memory(bool not_empty) = 0;
 
 public:
+  // -----FIELDS-----
+
+  std::array<int, 3> shape;
+  std::array<double, 3> zeropoint;
+  std::array<double, 3> increment;
+  std::vector<double> grid_x;
+  std::vector<double> grid_y;
+  std::vector<double> grid_z;
 
   // -----METHODS-----
 
-
+  size_t array_size() {
+    if (has_grid) {
+      size_t arsz = 1;
+      for (const int sh : shape) 
+        arsz = arsz*sh;
+      return arsz;
+      }
+    else 
+      return 0;
+  }
   // -----Interface functions-----
 
   // Evaluate the model at Galactic position (x, y, z). 

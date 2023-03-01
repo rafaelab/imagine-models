@@ -39,15 +39,18 @@ public:
   ~RegularScalarField() {free_memory(has_grid);};
   
   RegularScalarField () : Field<double, double*>() {
-      allocate_memory(has_grid, array_size);
+      size_t ar_sz = array_size();
+      allocate_memory(has_grid, ar_sz);
       };
 
   RegularScalarField (std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : Field<double, double*>(shape, zeropoint, increment) {
-      allocate_memory(has_grid, array_size);
+      size_t ar_sz = array_size();
+      allocate_memory(has_grid, ar_sz);
       };
 
   RegularScalarField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<double, double*>(grid_x, grid_y, grid_z) {
-      allocate_memory(has_grid, array_size);
+      size_t ar_sz = array_size();
+      allocate_memory(has_grid, ar_sz);
       };
 
   // Fields
@@ -104,15 +107,18 @@ public:
 
   // Constructors
   RegularVectorField () : Field<std::array<double, 3>, std::array<double*, 3>>() {
-      allocate_memory(has_grid, array_size);
+      size_t ar_sz = array_size();
+      allocate_memory(has_grid, ar_sz);
       };
 
   RegularVectorField (std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  grid_increment) : Field<std::array<double, 3>, std::array<double*, 3>>(shape, zeropoint, grid_increment) {
-      allocate_memory(has_grid, array_size);
+      size_t ar_sz = array_size();
+      allocate_memory(has_grid, ar_sz);
       };
 
   RegularVectorField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<std::array<double, 3>, std::array<double*, 3>>(grid_x, grid_y, grid_z) {
-      allocate_memory(has_grid, array_size);
+      size_t ar_sz = array_size();
+      allocate_memory(has_grid, ar_sz);
       };
 
 
