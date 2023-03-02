@@ -1,5 +1,5 @@
 //#include <pybind11/pybind11.h>
-//#include <pybind11/stl.h>
+#include <pybind11/stl.h>
 //#include <pybind11/numpy.h>
 #include <pybind11/functional.h>
 #include <iostream>
@@ -29,54 +29,35 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
 }
 
 
-template <typename Sequence>
-inline py::list from_pointer_array_to_list_pyarray(Sequence &&seq, size_t arr_size) {
-  typedef typename std::remove_reference<decltype(*std::declval<Sequence::value_type>())>::type T;
-  auto tsize = seq.size();
+inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z) {
+  size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
   py::list li;
-  for (int i = 0; i<tsize; ++i) {
-    auto data = seq[i];
-    py::capsule free_when_done(foo, [](void *f) {
-        T *foo = reinterpret_cast<T *>(f);
-        std::cerr << "Element [0] = " << foo[0] << "\n";
-            std::cerr << "freeing memory @ " << f << "\n";
-        delete[] foo;
+  for (int i = 0; i<3; ++i) {
+    py::capsule free_when_done(seq[i], [](void *f) {
+        std::unique_ptr<double>(reinterpret_cast<double*>(f));
         });
-    li.append(py::array(size, data, free_when_done));
+    py::array_t<double> arr = py::array(arr_size, seq[i], free_when_done);
+    li.append(arr.reshape({arr_size_x, arr_size_y, arr_size_z}));
   }
   return li;
 }
 
-template <typename Ptr>
-inline py::array_t<typename std::remove_reference<decltype(*std::declval<Ptr>())>::type> from_pointer_to_pyarray(Ptr data, size_t arr_size) {
-    typedef typename std::remove_reference<decltype(*std::declval<Ptr>())>::type T;
-    py::capsule free_when_done(foo, [](void *f) {
-        T *foo = reinterpret_cast<T *>(f);
-        std::cerr << "Element [0] = " << foo[0] << "\n";
+inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z) {
+    py::capsule free_when_done(data, [](void *f) {
+        double *data = reinterpret_cast<double *>(f);
+        std::cerr << "Element [0] = " << data[0] << "\n";
             std::cerr << "freeing memory @ " << f << "\n";
-        delete[] foo;
-        })
-  return py::array(arr_size, data, free_when_done);
+        delete[] data;
+        });
+
+  size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
+  py::array_t<double> arr = py::array(arr_size, data, free_when_done);
+  return arr.reshape({arr_size_x, arr_size_y, arr_size_z});
 }
 
 
 PYBIND11_MODULE(_ImagineModels, m) {
     m.doc() = "IMAGINE Model Library";
-
-/////////////////////////////////Base classes/////////////////////////////////
-
-// Vector Base Classes
-    py::class_<Field<std::array<double, 3>, std::array<double*, 3>>, PyVectorBaseField>(m, "VectorBaseField")
-        .def(py::init<>())
-        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
-        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
-
-// Scalar Base Class
-    py::class_<Field<double, double*>, PyRegularScalarField>(m, "ScalarBaseField")
-        .def(py::init<>())
-        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
-        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
-        
 
 /////////////////////////////////Regular Field Bases/////////////////////////////////
 
@@ -90,12 +71,12 @@ PYBIND11_MODULE(_ImagineModels, m) {
             std::array<double*, 3> f = self.on_grid(grid_x, grid_y, grid_z);
             std::cout << "on grid f size " << f.size() << std::endl;
             int si = 3;
-            auto li = from_pointer_array_to_list_pyarray(std::move(f), self.array_size());
+            size_t sx = grid_x.size();
+            size_t sy = grid_y.size();
+            size_t sz = grid_z.size();
+            auto li = from_pointer_array_to_list_pyarray(f, sx, sy, sz);
             //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-            for (int i = 0; i< si; ++i ) {
-                (li[i]).resize({(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size(), si});
-            }
-            return py::tuple(li);},
+            return li;},
             "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::take_ownership)
 
 
@@ -103,9 +84,11 @@ PYBIND11_MODULE(_ImagineModels, m) {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment);
           std::cout << "on grid f size " << f.size() << std::endl;
           int si = 3;
-          auto arr = as_pyarray(std::move(f));
+          size_t sx = grid_shape[0];
+          size_t sy = grid_shape[1];
+          size_t sz = grid_shape[2];
+          auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          arr.resize({grid_shape[0], grid_shape[1], grid_shape[2], si});
           return arr;},
           "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, py::return_value_policy::take_ownership)
 
@@ -113,23 +96,45 @@ PYBIND11_MODULE(_ImagineModels, m) {
           std::array<double*, 3> f = self.on_grid();
           std::cout << "on grid f size " << f.size() << std::endl;
           int si = 3;
-          auto arr = as_pyarray(std::move(f));
+          size_t sx = self.shape[0];
+          size_t sy = self.shape[1];
+          size_t sz = self.shape[2];
+          auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          arr.resize({self.shape[0], self.shape[1], self.shape[2], si});
           return arr;}, py::return_value_policy::move);
+        
 
 // Regular Scalar Base Class
-    py::class_<RegularScalarField, Field<py::array_t<double>, double>, PyRegularScalarField>(m, "RegularScalarField")
+    py::class_<RegularScalarField, Field<double, double*>, PyRegularScalarField>(m, "RegularScalarField")
         .def(py::init<>())
         .def("on_grid", [](RegularScalarField &self, std::vector<double> &grid_x,  std::vector<double>  &grid_y, std::vector<double>  &grid_z)  {
-          double* f = self.on_grid(grid_x, grid_y, grid_z);
+          double* f = self.on_grid(grid_x, grid_y, grid_z, 0);
           size_t sx = grid_x.size();
           size_t sy = grid_y.size();
           size_t sz = grid_z.size();
-          auto arr = from_pointer_to_pyarray(f, sx*sy*sz);
+          auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
           arr.resize({sx, sy, sz});
           return arr;},
-          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::move);
+          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::move)
+        
+        .def("on_grid", [](RegularScalarField &self, std::array<int, 3>  grid_shape, std::array<double, 3>  grid_zeropoint, std::array<double, 3>  grid_increment)  {
+          double* f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, 0);
+          size_t sx = grid_shape[0];
+          size_t sy = grid_shape[1];
+          size_t sz = grid_shape[2];
+          auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
+          return arr;},
+          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, py::return_value_policy::move)
+
+
+        .def("on_grid", [](RegularScalarField &self)  {
+          double* f = self.on_grid(0);
+          size_t sx = self.shape[0];
+          size_t sy = self.shape[1];
+          size_t sz = self.shape[2];
+          auto arr = from_pointer_to_pyarray(f, sx, sy ,sz);
+          return arr;}, py::return_value_policy::move);
+
 /////////////////////////////////Random Fields/////////////////////////////////
 
 //TODO
@@ -160,7 +165,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("rpc_X", &JF12MagneticField::rpc_X)
         .def_readwrite("r0_X", &JF12MagneticField::r0_X);
 
-    py::class_<HelixMagneticField, RegularVectorField, HelixMagneticField>(m, "HelixMagneticField")
+    py::class_<HelixMagneticField, RegularVectorField>(m, "HelixMagneticField")
         .def(py::init<>())
         .def("at_position", &HelixMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
   //      .def("dampx_grid", &HelixMagneticField::dampx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)

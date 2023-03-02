@@ -26,8 +26,6 @@ protected:
 
   // -----CONSTRUCTORS-----
 
-  ~Field() {};
-
   Field(std::array<int, 3> grid_shape, std::array<double, 3>  grid_zeropoint, std::array<double, 3>  grid_increment) : shape(grid_shape), zeropoint(grid_zeropoint), increment(grid_increment) {
     has_grid = true;
     regular_grid = true;
@@ -47,6 +45,8 @@ protected:
   virtual void free_memory(bool not_empty) = 0;
 
 public:
+
+  ~Field() {};
   // -----FIELDS-----
 
   std::array<int, 3> shape;
