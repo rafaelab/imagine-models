@@ -118,7 +118,13 @@ public:
 
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  virtual double* _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
+  double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
+    throw NotImplementedException();
+    //std::vector<double> c{0};
+    //return c;
+  }
+
+  virtual void _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
 
   double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
     double* field_real_temp = 0;
@@ -127,14 +133,17 @@ public:
     field_comp_temp = reinterpret_cast<fftw_complex*>( field_real_temp);
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], field_real_temp,field_comp_temp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], field_comp_temp, field_real_temp,  FFTW_MEASURE);
-    return _on_grid(field_real_temp, field_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, seed);
+    _on_grid(field_real_temp, field_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, seed);
+    return field_real_temp;
   }
 
   double* on_grid(const int seed) {
     if (not has_grid) 
       throw GridException();
-    if (has_grid)
-      return _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, seed);
+    if (has_grid) {
+      _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, seed);
+      return class_eval;
+      }
     else
       return class_eval;
 

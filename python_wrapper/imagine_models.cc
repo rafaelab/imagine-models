@@ -59,11 +59,17 @@ inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size
 PYBIND11_MODULE(_ImagineModels, m) {
     m.doc() = "IMAGINE Model Library";
 
-/////////////////////////////////Regular Field Bases/////////////////////////////////
+////////////////////////////////Field Bases/////////////////////////////////
 
     py::class_<Field<std::array<double, 3>, std::array<double*, 3>>,  PyVectorFieldBase>(m, "VectorFieldBase");
 
     py::class_<Field<double, double*>,  PyScalarFieldBase>(m, "ScalarFieldBase");
+
+    py::class_<RandomField<std::array<double, 3>, std::array<double*, 3>>,  PyVectorRandomFieldBase>(m, "VectorRandomFieldBase");
+
+    py::class_<RandomField<double, double*>,  PyScalarRandomFieldBase>(m, "ScalarRandomFieldBase");
+
+/////////////////////////////////Regular Field Bases/////////////////////////////////
 
 // Regular Vector Base Class
     py::class_<RegularVectorField, Field<std::array<double, 3>, std::array<double*, 3>>, PyRegularVectorField>(m, "RegularVectorField")
@@ -111,6 +117,9 @@ PYBIND11_MODULE(_ImagineModels, m) {
 // Regular Scalar Base Class
     py::class_<RegularScalarField, Field<double, double*>, PyRegularScalarField>(m, "RegularScalarField")
         .def(py::init<>())
+        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
+
         .def("on_grid", [](RegularScalarField &self, std::vector<double> &grid_x,  std::vector<double>  &grid_y, std::vector<double>  &grid_z)  {
           double* f = self.on_grid(grid_x, grid_y, grid_z, 0);
           size_t sx = grid_x.size();
@@ -141,7 +150,18 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
 /////////////////////////////////Random Fields/////////////////////////////////
 
-//TODO
+// Random Vector Base Class
+    py::class_<RandomVectorField, RandomField<std::array<double, 3>, std::array<double*, 3>>, PyRandomVectorField>(m, "RandomVectorField")
+        .def(py::init<>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
+
+
+// Random Scalar Base Class
+    py::class_<RandomScalarField, RandomField<double, double*>, PyRandomScalarField>(m, "RandomScalarField")
+        .def(py::init<>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
+
+      
 
 /////////////////////////////////Regular Fields/////////////////////////////////
 
