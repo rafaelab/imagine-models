@@ -1,4 +1,4 @@
-from _ImagineModels import VectorField, ScalarField, RegularVectorField, RegularVectorField, \
+from _ImagineModels import VectorFieldBase, ScalarFieldBase, RegularVectorField, RegularScalarField, \
     JF12RegularField, JaffeMagneticField, HelixMagneticField
 # from _ImagineModels import ThermalElectronField, RegularThermalElectronField, YMW16Component
 

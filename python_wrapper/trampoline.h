@@ -19,6 +19,43 @@ using Array3PointerType = std::array<double*, 3>; // Only for PYBIND11_OVERRIDE_
 
 // These classes are necessary to override virtual functions when binding abstract c++ classes
 
+class PyScalarFieldBase: public Field<double, double*> {
+public:
+    using Field<double, double*>:: Field; // Inherit constructors
+    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, Field, at_position, x, y, z); }
+
+    double* on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, seed); }
+    
+    double* on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z, int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, grid_x, grid_y, grid_z, seed); }
+
+    double* on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+
+
+    void allocate_memory(bool not_empty, int sz) override {PYBIND11_OVERRIDE_PURE(void, Field, allocate_memory, not_empty, sz); }
+    
+    void free_memory(bool not_empty) override {PYBIND11_OVERRIDE_PURE(void, Field, free_memory, not_empty); }
+    
+};
+
+
+class PyVectorFieldBase: public Field<std::array<double, 3>, std::array<double*, 3>> {
+public:
+    using Field<std::array<double, 3>, std::array<double*, 3>>:: Field; // Inherit constructors
+    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(Array3Type, Field, at_position, x, y, z); }
+
+    std::array<double*, 3> on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, seed); }
+    
+    std::array<double*, 3> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z, int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, grid_x, grid_y, grid_z, seed); }
+
+    std::array<double*, 3> on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+
+
+    void allocate_memory(bool not_empty, int sz) override {PYBIND11_OVERRIDE_PURE(void, Field, allocate_memory, not_empty, sz); }
+    
+    void free_memory(bool not_empty) override {PYBIND11_OVERRIDE_PURE(void, Field, free_memory, not_empty); }
+    
+};
+
 
 class PyRegularVectorField: public RegularVectorField {
 public:

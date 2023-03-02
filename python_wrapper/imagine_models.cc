@@ -61,6 +61,10 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
 /////////////////////////////////Regular Field Bases/////////////////////////////////
 
+    py::class_<Field<std::array<double, 3>, std::array<double*, 3>>,  PyVectorFieldBase>(m, "VectorFieldBase");
+
+    py::class_<Field<double, double*>,  PyScalarFieldBase>(m, "ScalarFieldBase");
+
 // Regular Vector Base Class
     py::class_<RegularVectorField, Field<std::array<double, 3>, std::array<double*, 3>>, PyRegularVectorField>(m, "RegularVectorField")
         .def(py::init<>())
