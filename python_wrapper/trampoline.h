@@ -8,17 +8,8 @@
 #include "../c_library/headers/Helix.h"
 #include "../c_library/headers/Jaffe.h"
 //#include "../c_library/headers/ThermalElectronField.h"
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
 #include <iostream>
 
-PYBIND11_MAKE_OPAQUE(std::vector<double>);
-PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
-PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
-
-namespace py = pybind11;
 using Array3Type = std::array<double, 3>;
 using Array3PointerType = std::array<double*, 3>; // Only for PYBIND11_OVERRIDE_PURE macro, else gets confused by commas 
 

@@ -1,8 +1,13 @@
-//#include <pybind11/pybind11.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <pybind11/stl.h>
-//#include <pybind11/numpy.h>
 #include <pybind11/functional.h>
+#include <pybind11/stl_bind.h>
 #include <iostream>
+
+//PYBIND11_MAKE_OPAQUE(std::vector<double>);
+//PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
+//PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
 
 #include "trampoline.h"
 // #include "thermal_trampoline.h"
@@ -12,7 +17,8 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 
-// helper function to avoid making a copy when returning a py::array_t
+// helper functions to avoid making a copy when returning a py::array_t
+// based on
 // author: https://github.com/YannickJadoul
 // source: https://github.com/pybind/pybind11/issues/1042#issuecomment-642215028
 template <typename Sequence>
