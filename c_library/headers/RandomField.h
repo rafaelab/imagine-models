@@ -28,10 +28,11 @@ public:
   // Fields
   int seed = 0;
   double rms = 1;
-  double k0 = 1;
-  double k1= 10;
-  double a0 = 1;
-  double a1 = 1;
+  double k0 = 10; // 1/injection sale, 1/kpc
+  double k1= 0.1; //  inverse cascading cutoff, 1/kpc
+  double a0 = 1.7; // Kolmogorov
+  double a1 = 0; // inverse cascade
+  double rho = 0; // [0, inf[
 
   // methods
   POSTYPE at_position(const double &x, const double &y, const double &z) const {
@@ -124,7 +125,8 @@ public:
     //return c;
   }
 
-  virtual void _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
+  // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. This function as a empty default implementation, as otherwise this would imply problems for the binding to python (Since the fftw_plan woould need to be wrapped).
+  void _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {};
 
   double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
     double* field_real_temp = 0;
@@ -242,8 +244,8 @@ public:
     return class_eval;
   }
   
-
-  virtual void _on_grid(std::array<double*, 3> rf, std::array<fftw_complex*, 3> cf, std::array<fftw_plan, 3> forward, std::array<fftw_plan, 3> backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
+  // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. This function as a empty default implementation, as otherwise this would imply problems for the binding to python (Since the fftw_plan woould need to be wrapped).
+  void _on_grid(std::array<double*, 3> rf, std::array<fftw_complex*, 3> cf, std::array<fftw_plan, 3> forward, std::array<fftw_plan, 3> backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {};
   
 // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
 // original author: https://github.com/gioacchinowang

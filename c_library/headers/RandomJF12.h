@@ -15,23 +15,23 @@ class JF12RandomField : public RandomVectorField {
     JF12RandomField() : RandomVectorField() {};
     ~JF12RandomField() {};
 
-    const double b0_1 = b0_1;
-    const double b0_2 = b0_2;
-    const double b0_3 = b0_3;
-    const double b0_4 = b0_4;
-    const double b0_5 = b0_5;
-    const double b0_6 = b0_6;
-    const double b0_7 = b0_7;
-    const double b0_8 = b0_8;
+    double b0_1 = 10.81; // uG
+    double b0_2 = 6.96; // uG
+    double b0_3 = 9.59; // uG
+    double b0_4 = 6.96; // uG
+    double b0_5 = 1.96; // uG
+    double b0_6 = 16.34; // uG
+    double b0_7 = 37.29; // uG
+    double b0_8 = 10.35; // uG
+    double b0_int = 7.63; // uG
+    double z0_spiral = 0.61; // kpc
 
-    const double b0_int = b0_int;
-    const double z0_spiral = z0_spiral;
-    const double b0_halo = b0_halo;
-    const double r0_halo = r0_halo;
-    const double z0_halo = z0_halo;
+    double b0_halo = 4.68; // uG
+    double r0_halo = 10.97; // kpc
+    double z0_halo = 2.84; // kpc
 
-    const double Rmax = 20.;
-    const double rho_GC = 1.;
+    double Rmax = 20.;
+    double rho_GC = 1.;
 
     void _on_grid(std::array<double*, 3> freal,  std::array<fftw_complex*, 3> fcomp,  std::array<fftw_plan, 3> forward, std::array<fftw_plan, 3> backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
 

@@ -6,7 +6,7 @@
 #include "Field.h"
 #include "RandomField.h"
 
-class ESField : public RandomVectorField {
+class ESRandomField : public RandomVectorField {
   protected:
     bool DEBUG = false;
   public:

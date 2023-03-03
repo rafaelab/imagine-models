@@ -120,7 +120,7 @@ class CMakeBuild(build_ext):
 setup(
     name="ImagineModels",
     version="0.0.1",
-    author="Sebastian Hutschenreuter & ??",
+    author="Sebastian Hutschenreuter",
     author_email="hutsch@astro.ru.nl",
     description="IMAGINE Model Library",
     long_description="",

@@ -3,6 +3,8 @@
 #include "../c_library/headers/RegularField.h"
 #include "../c_library/headers/RandomField.h"
 #include "../c_library/headers/RegularJF12.h"
+#include "../c_library/headers/EnsslinSteininger.h"
+#include "../c_library/headers/RandomJF12.h"
 #include "../c_library/headers/Helix.h"
 #include "../c_library/headers/Jaffe.h"
 //#include "../c_library/headers/ThermalElectronField.h"
@@ -11,7 +13,10 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 #include <iostream>
-// PYBIND11_MAKE_OPAQUE(std::vector<double>);
+
+PYBIND11_MAKE_OPAQUE(std::vector<double>);
+PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
+PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
 
 namespace py = pybind11;
 using Array3Type = std::array<double, 3>;
@@ -137,8 +142,6 @@ public:
     std::array<double*, 3> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z, int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RandomVectorField, on_grid, grid_x, grid_y, grid_z, seed); }
 
     std::array<double*, 3> on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RandomVectorField, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
-
-    virtual void _on_grid(std::array<double*, 3> rf, std::array<fftw_complex*, 3> cf, std::array<fftw_plan, 3> forward, std::array<fftw_plan, 3> backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override {PYBIND11_OVERRIDE_PURE(void, RandomVectorField, _on_grid, rf, cf, forward, backward, grid_shape, grid_zeropoint, grid_increment, seed); }
 };
 
 
@@ -155,33 +158,8 @@ public:
 
     double* on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE(double*, RandomScalarField, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
 
-    virtual void _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override {PYBIND11_OVERRIDE_PURE(void, RandomScalarField, _on_grid, rf, cf, forward, backward, grid_shape, grid_zeropoint, grid_increment, seed); }
 };
 
-/*
-class PyJF12MagneticField : public JF12MagneticField {
-public:
-    using JF12MagneticField::JF12MagneticField; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, at_position, x, y, z); }
-    std::array<double*, 3> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, JF12MagneticField, on_grid,  grid_x, grid_y, grid_z); }
-};
-
-
-class PyHelixMagneticField : public HelixMagneticField {
-public:
-    using HelixMagneticField::HelixMagneticField; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE(std::vector<double>, HelixMagneticField, at_position, x, y, z); }
-    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, HelixMagneticField, on_grid,  grid_x, grid_y, grid_z); }
-};
-
-class PyJaffeMagneticField : public JaffeMagneticField {
-public:
-    using JaffeMagneticField::JaffeMagneticField; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE(std::vector<double>, JaffeMagneticField, at_position, x, y, z); }
-    std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const override {PYBIND11_OVERRIDE(std::vector<double>, JaffeMagneticField, on_grid,  grid_x, grid_y, grid_z); }
-
-};
-*/
 /*
     std::vector<double> on_grid(const py::array_t<double>& grid_x, const py::array_t<double>& grid_y, const py::array_t<double>& grid_z) const {
       std::cout << "trampoline says hi " << std::endl;
@@ -195,8 +173,3 @@ public:
       return on_grid(grid_x, grid_y, grid_z);
       }
 */
-//class PyRandomField : public RandomField {
-//public:
-//    using RandomField::RandomField; // Inherit constructors
-//    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(std::vector<double>, RandomField, at_position, x, y, z); }
-//};
