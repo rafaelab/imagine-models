@@ -1,12 +1,5 @@
-
-#include "../../c_library/headers/hamunits.h"
-#include "../../c_library/headers/Field.h"
-#include "../../c_library/headers/RegularField.h"
-#include "../../c_library/headers/RegularJF12.h"
-#include "../../c_library/headers/Jaffe.h"
-#include "../../c_library/headers/Helix.h"
-#include "../../c_library/headers/RandomJF12.h"
-#include "../../c_library/headers/EnsslinSteininger.h"
+#include <RegularModels>
+#include "RandomModels.h"
 
 #include <cassert>
 #include <iostream>
@@ -195,24 +188,24 @@ int main() {
   std::map <std::string, std::shared_ptr<RandomVectorField>> rand_mods;
 
   rand_mods["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField());
-  rand_mods["Ensslin Steininger"] = std::shared_ptr<ESField> (new ESField());
+  rand_mods["Ensslin Steininger"] = std::shared_ptr<ESRandomField> (new ESRandomField());
 
 
   std::map <std::string, std::shared_ptr<RandomVectorField>> rand_mods_w_reg_grid;
 
-  rand_mods_w_reg_grid["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField(shape, zeropoint, increment));
-  rand_mods_w_reg_grid["Ensslin Steininger"] = std::shared_ptr<ESField> (new ESField(shape, zeropoint, increment));
+  //rand_mods_w_reg_grid["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField(shape, zeropoint, increment));
+  rand_mods_w_reg_grid["Ensslin Steininger"] = std::shared_ptr<ESRandomField> (new ESRandomField(shape, zeropoint, increment));
 
 
 
   print_pos(position_dict, reg_mods);
 
 
-  print_ev_grid_no_grid(reg_mods_w_irreg_grid, {5, 5, 5});
+  //print_ev_grid_no_grid(reg_mods_w_irreg_grid, {5, 5, 5});
 
   print_ev_grid_no_grid(rand_mods_w_reg_grid, {5, 5, 5});
 
-  print_ev_grid_irreg(reg_mods, grid_x, grid_y, grid_z);
+  //print_ev_grid_irreg(reg_mods, grid_x, grid_y, grid_z);
 
 
 
