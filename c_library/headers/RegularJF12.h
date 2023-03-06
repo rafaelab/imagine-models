@@ -39,7 +39,11 @@ class JF12MagneticField : public RegularVectorField {
     double rpc_X = 4.8;
     double r0_X= 2.9;
 
-    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const;
+};
+    
+    /*
+     {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
@@ -215,3 +219,4 @@ class JF12MagneticField : public RegularVectorField {
       return B_cart;
   }
  };
+*/

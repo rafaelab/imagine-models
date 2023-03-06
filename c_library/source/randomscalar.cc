@@ -1,5 +1,6 @@
-template<typename POSTYPE, typename GRIDTYPE>
-void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(std::array<fftw_complex*, 3> vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed)  {
+#include "../headers/RandomField.h"
+
+void RandomScalarField::draw_random_numbers(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed)  {
 
   double lx = grid_shape[0]*grid_increment[0];
   double ly = grid_shape[1]*grid_increment[1];
@@ -45,29 +46,12 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(std::array<fftw_complex
           const int idx = idx_lv2 + l;
           const double sigma = std::sqrt(0.33333333 * spectrum(ks, rms, k0, k1, a0, a1) * dk3);
           std::normal_distribution<> nd{0, sigma};
-          for (auto element: vec) {
-            element[idx][0] = nd(gen);
-            element[idx][1] = nd(gen);
+          vec[idx][0] = nd(gen);
+          vec[idx][1] = nd(gen);
           //  c_field[m][idx][1] = nd(gen);
-            }
+        
         } // l
       }   // j
     }     // i
   };
 
-  // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
-  // original author: https://github.com/gioacchinowang
-template<typename POSTYPE, typename GRIDTYPE>
-double RandomField<POSTYPE, GRIDTYPE>::spectrum(const double &abs_k, const double &rms, const double &k0, const double &k1, const double &a0, const double &a1) const {
-const double p0 = rms*rms;
-double pi = 3.141592653589793;
-const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
-// power laws
-const double band1 = double(abs_k < k1);
-const double band2 = double(abs_k > k1) * double(abs_k < k0);
-const double band3 = double(abs_k > k0);
-const double P = band1 * std::pow(k0 / k1, a1) * std::pow(abs_k / k1, 6.0) +
-                 band2 / std::pow(abs_k / k0, a1) +
-                 band3 / std::pow(abs_k / k0, a0);
-return P * p0 * unit;
-}

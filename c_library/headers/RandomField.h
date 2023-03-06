@@ -38,27 +38,36 @@ public:
   POSTYPE at_position(const double &x, const double &y, const double &z) const {
     throw NotImplementedException();
     // Here comes the interpolator
-    POSTYPE c{0};
-    return c;
   }
   
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
   GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z) {
     throw NotImplementedException();
-    GRIDTYPE c{0};
-    return c;
   }
 
-  // below breaks for the scalar field
-  void draw_random_numbers(std::array<fftw_complex*, 3> c_fields, const std::array<int, 3> &grid_shape, const std::array<double, 3>  &grid_increment, const int seed);
-
-  double spectrum(const double &abs_k, const double &rms, const double &k0, const double &k1, const double &a0, const double &a1) const;
+  // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
+  // original author: https://github.com/gioacchinowang
+  double spectrum(const double &abs_k, const double &rms, const double &k0, const double &k1, const double &a0, const double &a1) const {
+      const double p0 = rms*rms;
+      double pi = 3.141592653589793;
+      const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
+      // power laws
+      const double band1 = double(abs_k < k1);
+      const double band2 = double(abs_k > k1) * double(abs_k < k0);
+      const double band3 = double(abs_k > k0);
+      const double P = band1 * std::pow(k0 / k1, a1) * std::pow(abs_k / k1, 6.0) +
+                      band2 / std::pow(abs_k / k0, a1) +
+                      band3 / std::pow(abs_k / k0, a0);
+      return P * p0 * unit;
+      }
 
 };
 
+
 //include the random field method implementations (at this position, due to the use of templates)
-#include "RandomField.tpp"
+// #include "RandomField.tpp"
+
 
 class RandomScalarField : public RandomField<double, double*>  {
 protected:
@@ -119,16 +128,19 @@ public:
 
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
+  void draw_random_numbers(fftw_complex* c_fields, const std::array<int, 3> &grid_shape, const std::array<double, 3>  &grid_increment, const int seed);
+
   double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     throw NotImplementedException();
     //std::vector<double> c{0};
     //return c;
   }
 
-  // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. This function as a empty default implementation, as otherwise this would imply problems for the binding to python (Since the fftw_plan woould need to be wrapped).
-  void _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {};
+  // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. This function as a empty default implementation, as otherwise this would make the binding to python unnecessarily complicated (Since the fftw_plan woould need to be wrapped).
+  virtual void _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
 
   double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+    std::cout<< "Random Field on grid input" << std::endl;
     double* field_real_temp = 0;
     fftw_complex* field_comp_temp = 0;
     field_real_temp = (double*) fftw_malloc(sizeof(fftw_complex) * shape[0]*shape[1]*(shape[2]+2));
@@ -140,6 +152,7 @@ public:
   }
 
   double* on_grid(const int seed) {
+    std::cout<< "Random Field on grid no input" << std::endl;
     if (not has_grid) 
       throw GridException();
     if (has_grid) {
@@ -153,6 +166,7 @@ public:
 
 
 };
+
 
 
 class RandomVectorField : public RandomField<std::array<double, 3>, std::array<double*, 3>>  {
@@ -216,6 +230,9 @@ public:
   }
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
+  void draw_random_numbers(std::array<fftw_complex*, 3> c_fields, const std::array<int, 3> &grid_shape, const std::array<double, 3>  &grid_increment, const int seed);
+
+
   std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     throw NotImplementedException();
     //std::vector<double> c{0};
@@ -240,12 +257,13 @@ public:
   }
 
   std::array<double*, 3> on_grid(int nseed) {
+    std::cout << "Random Vector on grid func" << std::endl;
     _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, nseed);
     return class_eval;
   }
   
   // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. This function as a empty default implementation, as otherwise this would imply problems for the binding to python (Since the fftw_plan woould need to be wrapped).
-  void _on_grid(std::array<double*, 3> rf, std::array<fftw_complex*, 3> cf, std::array<fftw_plan, 3> forward, std::array<fftw_plan, 3> backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {};
+  virtual void _on_grid(std::array<double*, 3> &freal, std::array<fftw_complex*, 3> &fcomp, std::array<fftw_plan, 3> &forward, std::array<fftw_plan, 3> &backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
   
 // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
 // original author: https://github.com/gioacchinowang

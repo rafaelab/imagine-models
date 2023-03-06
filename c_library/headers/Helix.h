@@ -16,15 +16,7 @@ class HelixMagneticField : public RegularVectorField  {
         double rmax = 3.;
         double rmin = 0.;
 
-        std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const {
-          const double r{sqrt(x*x + y*y)}; // radius in cylindrical coordinates
-          const double phi{atan2(y, x) + M_PI / 2.0}; // azimuthal angle in cylindrical coordinates#
-          std::array<double, 3> b{0.0, 0.0, 0.0};
-          if ((r > rmin) && (r < rmax)) {
-            b = std::array<double, 3> {ampx * std::cos(phi), ampy * std::sin(phi), ampz};
-            }
-          return b;
-        };
+        std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const;
         //std::vector<double> evaluate_at_pos(const std::vector<double> &pos) const override;
         /*
         std::vector<double> _dampx_at_pos(const std::vector<double> &pos) const;

@@ -2,13 +2,12 @@
 #include <cassert>
 #include <iostream>
 #include "../headers/hamunits.h"
-#include "../headers/MagneticField.h"
+#include "../headers/RegularJF12.h"
 
 // This line is needed to avoid linker errors due to templates
-template class JF12MagneticField<std::vector<double>>;
+//template class JF12MagneticField<std::vector<double>>;
 
-template <typename G>
-std::vector<double> JF12MagneticField<G>::at_position(const double &x, const double &y, const double &z) const {
+std::array<double, 3> JF12MagneticField::at_position(const double &x, const double &y, const double &z) const {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
@@ -36,7 +35,7 @@ std::vector<double> JF12MagneticField<G>::at_position(const double &x, const dou
 
       // define boundaries for where magnetic field is zero (outside of galaxy)
       if (r > Rmax || rho < rho_GC) {
-        return std::vector<double>{0., 0., 0.};
+        return std::array<double, 3>{0., 0., 0.};
       }
 
       //------------------------------------------------------------------------------
@@ -170,13 +169,13 @@ std::vector<double> JF12MagneticField<G>::at_position(const double &x, const dou
 
 
       // add fields together
-      std::vector<double> B_cyl{0.0, 0.0, 0.0};
+      std::array<double, 3> B_cyl{0.0, 0.0, 0.0};
       B_cyl[0] = B_cyl_disk[0] + B_cyl_h[0] + B_cyl_X[0];
       B_cyl[1] = B_cyl_disk[1] + B_cyl_h[1] + B_cyl_X[1];
       B_cyl[2] = B_cyl_disk[2] + B_cyl_h[2] + B_cyl_X[2];
 
       // convert field to cartesian coordinates
-      std::vector<double> B_cart{0.0, 0.0, 0.0};
+      std::array<double, 3> B_cart{0.0, 0.0, 0.0};
       B_cart[0] = B_cyl[0] * cos(phi) - B_cyl[1] * sin(phi);
       B_cart[1] = B_cyl[0] * sin(phi) + B_cyl[1] * cos(phi);
       B_cart[2] = B_cyl[2];
