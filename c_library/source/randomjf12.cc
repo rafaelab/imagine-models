@@ -54,6 +54,8 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
 
 void JF12RandomField::_on_grid(std::array<double*, 3> &freal,  std::array<fftw_complex*, 3> &fcomp,  std::array<fftw_plan, 3> &real_to_comp, std::array<fftw_plan, 3> &comp_to_real, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
 
+     int grid_size = grid_shape[0]*grid_shape[1]*grid_shape[2];
+
      draw_random_numbers(fcomp, grid_shape, grid_increment, seed);
 
       for (int i =0; i<3; ++i) {
@@ -85,5 +87,7 @@ void JF12RandomField::_on_grid(std::array<double*, 3> &freal,  std::array<fftw_c
 
       for (int i =0; i<3; ++i) {
         fftw_execute(c2r[i]);
+        for (int s = 0; s < grid_size; ++s)
+          (freal[i])[s] /= grid_size;  
       }
 };

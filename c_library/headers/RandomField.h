@@ -82,8 +82,8 @@ protected:
 
   void allocate_memory(bool not_empty, int arr_sz) {
     if (not_empty) {
-    class_eval = (double*) fftw_malloc(sizeof(fftw_complex) * shape[0]*shape[1]*(shape[2]+2));
-     class_eval_comp = reinterpret_cast<fftw_complex*>( class_eval);
+    class_eval = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
+    class_eval_comp = reinterpret_cast<fftw_complex*>( class_eval);
     r2c = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], class_eval, class_eval_comp, FFTW_MEASURE);
     c2r = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], class_eval_comp, class_eval,  FFTW_MEASURE);
       }
@@ -143,7 +143,7 @@ public:
     std::cout<< "Random Field on grid input" << std::endl;
     double* field_real_temp = 0;
     fftw_complex* field_comp_temp = 0;
-    field_real_temp = (double*) fftw_malloc(sizeof(fftw_complex) * shape[0]*shape[1]*(shape[2]+2));
+    field_real_temp = (double*) fftw_alloc_real(grid_shape[0]*grid_shape[1]*2*(grid_shape[2]/2 + 1));
     field_comp_temp = reinterpret_cast<fftw_complex*>( field_real_temp);
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], field_real_temp,field_comp_temp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], field_comp_temp, field_real_temp,  FFTW_MEASURE);
@@ -185,8 +185,8 @@ protected:
   void allocate_memory(bool not_empty, int arr_sz) {
     if (not_empty) {
       for (int i=0; i < ndim; ++i) {
-        class_eval[i] = (double*) fftw_malloc(sizeof(fftw_complex) * shape[0]*shape[1]*(shape[2]+2));
-        class_eval_comp[i]= reinterpret_cast<fftw_complex*>( class_eval[i]);
+        class_eval[i] = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
+        class_eval_comp[i] = reinterpret_cast<fftw_complex*>(class_eval[i]);
         r2c[i] = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], class_eval[i], class_eval_comp[i], FFTW_MEASURE);
         c2r[i] = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], class_eval_comp[i], class_eval[i],  FFTW_MEASURE);
         } 
@@ -245,13 +245,16 @@ public:
     std::array<fftw_complex*, 3> eval_comp_temp;
     std::array<double*, 3> eval_temp;
     for (int i=0; i < ndim; ++i) {
-      eval_temp[i] = (double*) fftw_malloc(sizeof(fftw_complex) * shape[0]*shape[1]*(shape[2]+2));
+      eval_temp[i] = (double*) fftw_alloc_real(grid_shape[0]*grid_shape[1]*2*(grid_shape[2]/2 + 1));
       eval_comp_temp[i]= reinterpret_cast<fftw_complex*>( eval_temp[i]);
-      r2c_temp[i] = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], eval_temp[i], eval_comp_temp[i], FFTW_MEASURE);
-      c2r_temp[i] = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], eval_comp_temp[i], eval_temp[i],  FFTW_MEASURE);
-
+      r2c_temp[i] = fftw_plan_dft_r2c_3d(grid_shape[0], grid_shape[1], grid_shape[2], eval_temp[i], eval_comp_temp[i], FFTW_MEASURE);
+      c2r_temp[i] = fftw_plan_dft_c2r_3d(grid_shape[0], grid_shape[1], grid_shape[2], eval_comp_temp[i], eval_temp[i],  FFTW_MEASURE);
     } 
     _on_grid(eval_temp, eval_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, nseed);
+    for (int i=0; i < ndim; ++i) {
+      fftw_destroy_plan(c2r_temp[i]);
+      fftw_destroy_plan(r2c_temp[i]);
+    }
     return eval_temp;
     
   }
