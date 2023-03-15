@@ -1,5 +1,5 @@
-#include <RegularModels>
-#include "RandomModels.h"
+#include <ImagineModels/RegularModels.h>
+#include <ImagineModels/RandomModels.h>
 
 #include <cassert>
 #include <iostream>
@@ -55,7 +55,7 @@ void print_ev_grid_no_grid(std::map <std::string, std::shared_ptr<VECTORFIELD>> 
           for (size_t j = 0; j < sy; j++) {
               for (size_t k = 0; k < sz; k++) {
                   for (size_t l = 0; l < 3; l++) {
-                      std::cout << (b_grid[l])[sz*sy*i + sz*j + k] << " ";
+                      std::cout <<  i << ", " <<  j << ", "<<  k << ": " <<  (b_grid[l])[sz*sy*i + sz*j + k] <<  std::endl;
                       }
                   std::cout<<"\n";
                   }
@@ -64,6 +64,9 @@ void print_ev_grid_no_grid(std::map <std::string, std::shared_ptr<VECTORFIELD>> 
       std::cout << "\n";
       ++model_iter;
     }
+    //delete b_grid[0];
+    //delete b_grid[1];
+    //delete b_grid[2];
   }
 
 template void print_ev_grid_no_grid<RegularVectorField>(std::map <std::string, std::shared_ptr<RegularVectorField>> md, std::array<double, 3> siz); 
@@ -95,9 +98,6 @@ void print_ev_grid_reg(std::map <std::string, std::shared_ptr<VECTORFIELD>> md, 
         }
       std::cout << "\n";
       ++model_iter;
-      delete b_grid[0];
-      delete b_grid[1];
-      delete b_grid[2];
     }
   }
 
@@ -193,7 +193,7 @@ int main() {
 
   std::map <std::string, std::shared_ptr<RandomVectorField>> rand_mods_w_reg_grid;
 
-  //rand_mods_w_reg_grid["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField(shape, zeropoint, increment));
+  rand_mods_w_reg_grid["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField(shape, zeropoint, increment));
   rand_mods_w_reg_grid["Ensslin Steininger"] = std::shared_ptr<ESRandomField> (new ESRandomField(shape, zeropoint, increment));
 
 
@@ -203,7 +203,7 @@ int main() {
 
   //print_ev_grid_no_grid(reg_mods_w_irreg_grid, {5, 5, 5});
 
-  print_ev_grid_no_grid(rand_mods_w_reg_grid, {5, 5, 5});
+  print_ev_grid_no_grid(rand_mods_w_reg_grid, {4, 3, 2});
 
   //print_ev_grid_irreg(reg_mods, grid_x, grid_y, grid_z);
 
