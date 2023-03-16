@@ -1,8 +1,6 @@
+template<typename POSTYPE, typename GRIDTYPE>
+void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed)  {
 
-#include "../headers/hamunits.h"
-#include "../headers/RandomField.h"
-
-void RandomVectorField::draw_random_numbers(std::array<fftw_complex*, 3> vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed)  {
 
   bool debug_random =false;
   auto gen = std::mt19937(seed);
@@ -40,16 +38,16 @@ void RandomVectorField::draw_random_numbers(std::array<fftw_complex*, 3> vec,  c
         // at first we deal with the monopoles and nyqist terms in 3d, in order to ensure a real field
         if (l == 0 and j == 0 and i == 0) {
           // Full Monopole is set to zero, dealt with seperately in the outer scope
-          for (auto element: vec) {
-            element[0][1] = 0.;
-            element[0][0] = 0.;
-          }
+          vec[0][1] = 0.;
+          vec[0][0] = 0.;
+        
           continue;
         }
 
-        double kz = (double)l / (nyqind_z*2);
+        double kz = (double)l / lz;
         const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
-        double sigma = spectrum(ks, 1., 1./grid_shape[0], 1., -2., -2.);
+        // TODO: make parameters below free
+        double sigma = simple_spectrum(ks, 1., 1./(3*grid_shape[0]), 2.);
         std::normal_distribution<double> nd{0, sigma};
 
         const int idx = idx_lv2 + l;
@@ -81,17 +79,16 @@ void RandomVectorField::draw_random_numbers(std::array<fftw_complex*, 3> vec,  c
 
         if (is_nyquist) {
           // enforcing real nyqist term
-          for (auto element: vec) {
-            element[idx][1] = 0.;
-            element[idx][0] = nd(gen);
-          }
+          vec[idx][1] = 0.;
+          vec[idx][0] = nd(gen);
+          
 
           if (debug_random) {
             no_of_nyqists += 1;
             no_of_rand += 1;
             std::cout <<  "\nNyqist: \n" << "Indices, i: " << i << ", j: " << j << ", l: " << l << std::endl;
             std::cout <<  "array index " << idx <<  std::endl;
-            std::cout <<  "array val (real/imag)" << vec[0][idx][0] << ", " << vec[0][idx][1] << std::endl;
+            std::cout <<  "array val (real/imag)" << vec[idx][0] << ", " << vec[idx][1] << std::endl;
             std::cout <<  "\n";
           }
           continue;
@@ -113,47 +110,44 @@ void RandomVectorField::draw_random_numbers(std::array<fftw_complex*, 3> vec,  c
               std::cout <<  "j conjugate Line Indices, i: " << i << ", j: " << (grid_shape[1] -j) << ", l: " << l << std::endl;
               }
             }
-          for (auto element: vec) {
-            element[idx][1] = -element[line_idx][1];
-            element[idx][0] = element[line_idx][0];
-          }
+          vec[idx][1] = -vec[line_idx][1];
+          vec[idx][0] = vec[line_idx][0];
+          
 
           if (debug_random) {
             no_of_lc += 1;
             std::cout <<  "array index " << idx <<  std::endl;
             std::cout <<  "conj array index " << line_idx << std::endl;
-            std::cout <<  "array val (real/imag)" << vec[0][idx][0] << ", " << vec[0][idx][1] << std::endl;
-            std::cout <<  "conj array val (real/imag)" << vec[0][line_idx][0] << ", " << vec[0][line_idx][1] << std::endl;
+            std::cout <<  "array val (real/imag)" << vec[idx][0] << ", " << vec[idx][1] << std::endl;
+            std::cout <<  "conj array val (real/imag)" << vec[line_idx][0] << ", " << vec[line_idx][1] << std::endl;
             std::cout <<  "\n";
           }
         }
         else if (is_plane_conjugate) {
           // enforcing hermitian symmetry in the edge x-y planes
           int plane_idx =  (grid_shape[0] - i) * grid_shape[1] * sz_half + (grid_shape[1] - j) * sz_half + l;
-          for (auto element: vec) {
-            element[idx][1] = -element[plane_idx][1];
-            element[idx][0] = element[plane_idx][0];
-          }
+          vec[idx][1] = -vec[plane_idx][1];
+          vec[idx][0] = vec[plane_idx][0];
+          
           if (debug_random) {
             no_of_pc += 1;
             std::cout <<  "\nPlane conjugate: \n" << "Indices, i: " << i << ", j: " << j << ", l: " << l << std::endl;
             std::cout <<  "Plane Indices, i: " << (grid_shape[0] - i) << ", j: " << (grid_shape[1] - j) << ", l: " << l << std::endl;
             std::cout <<  "array index " << idx << std::endl;
             std::cout <<  "conj array index " << plane_idx << std::endl;
-            std::cout <<  "array val (real/imag)" << vec[0][idx][0] << ", " << vec[0][idx][1] << std::endl;
-            std::cout <<  "conj array val (real/imag)" << vec[0][plane_idx][0] << ", " << vec[0][plane_idx][1] << std::endl;
+            std::cout <<  "array val (real/imag)" << vec[idx][0] << ", " << vec[idx][1] << std::endl;
+            std::cout <<  "conj array val (real/imag)" << vec[plane_idx][0] << ", " << vec[plane_idx][1] << std::endl;
             std::cout <<  "\n";
           }
         }
         else {
 
-          for (auto element: vec) {
-            element[idx][1] = nd(gen);
-            element[idx][0] = nd(gen);
-            }
+          vec[idx][1] = nd(gen);
+          vec[idx][0] = nd(gen);
+          
           if (debug_random) {
             std::cout <<  "array index " << idx << std::endl;
-            std::cout <<  "array val (real/imag)" << vec[0][idx][0] << ", " << vec[0][idx][1] << std::endl;
+            std::cout <<  "array val (real/imag)" << vec[idx][0] << ", " << vec[idx][1] << std::endl;
             std::cout <<  "\n";
             no_of_rand += 2;
             no_of_free += 1;
@@ -173,9 +167,7 @@ void RandomVectorField::draw_random_numbers(std::array<fftw_complex*, 3> vec,  c
 
 }
 
-
 /*
-
   double lx = grid_shape[0]*grid_increment[0];
   double ly = grid_shape[1]*grid_increment[1];
   double lz = grid_shape[2]*grid_increment[2];
@@ -213,33 +205,20 @@ void RandomVectorField::draw_random_numbers(std::array<fftw_complex*, 3> vec,  c
         const int idx_lv2 = idx_lv1 + j * grid_shape[2];
         for (int l = 0; l < grid_shape[2]/2 + 1; ++l) {
           // 0th term is fixed to zero in allocation, last loop runs only until nz/2 due to complex array and real outputs
-          if (i == 0 and j == 0 and l == 0) {
-            for (auto element: vec) {
-            element[0][0] = nd(gen);
-            element[idx][1] = nd(gen);
-            std::cout << "component: " << _control << std::endl;
-            _control = _control + 1;
-            std::cout << "VECTOR RANDOM NUMBERS: real " << element[idx][0] << " imag " <<  element[idx][1] << std::endl;
-            }
-            continue; 
-            }
+          if (i == 0 and j == 0 and l == 0)
+            continue;
           double kz = 1. / lz;
           const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
           const int idx = idx_lv2 + l;
           const double sigma = std::sqrt(0.33333333 * spectrum(ks, rms, k0, k1, a0, a1) * dk3);
           std::normal_distribution<> nd{0, sigma};
-          std::cout << "VECTOR RANDOM NUMBERS: " << std::endl;
-          int _control = 0;
-          for (auto element: vec) {
-            element[idx][0] = nd(gen);
-            element[idx][1] = nd(gen);
-            std::cout << "component: " << _control << std::endl;
-            _control = _control + 1;
-            std::cout << "VECTOR RANDOM NUMBERS: real " << element[idx][0] << " imag " <<  element[idx][1] << std::endl;
+          vec[idx][0] = nd(gen);
+          vec[idx][1] = nd(gen);
           //  c_field[m][idx][1] = nd(gen);
-            }
+        
         } // l
       }   // j
     }     // i
   };
-  */
+
+*/

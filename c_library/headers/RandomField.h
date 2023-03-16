@@ -27,6 +27,8 @@ public:
 
   // Fields
   int seed = 0;
+
+  // TODO: right now these parameters are not used (fixed spectrum in draw random numbers)
   double rms = 1;
   double k0 = 10; // 1/injection sale, 1/kpc
   double k1= 0.1; //  inverse cascading cutoff, 1/kpc
@@ -42,13 +44,23 @@ public:
   
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
+  void draw_random_numbers(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed); 
+
   GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z) {
     throw NotImplementedException();
   }
 
+  double simple_spectrum(const double &abs_k, const double &rms, const double &k0, const double &s) const {
+      const double p0 = rms*rms;
+      double pi = 3.141592653589793;
+      const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
+      const double P = 1 / std::pow((abs_k + k0), s);
+      return P * p0 * unit;
+      }
+
   // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
   // original author: https://github.com/gioacchinowang
-  double spectrum(const double &abs_k, const double &rms, const double &k0, const double &k1, const double &a0, const double &a1) const {
+  double hammurabi_spectrum(const double &abs_k, const double &rms, const double &k0, const double &k1, const double &a0, const double &a1) const {
       const double p0 = rms*rms;
       double pi = 3.141592653589793;
       const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
@@ -66,7 +78,7 @@ public:
 
 
 //include the random field method implementations (at this position, due to the use of templates)
-// #include "RandomField.tpp"
+#include "random.tpp"
 
 
 class RandomScalarField : public RandomField<double, double*>  {
@@ -128,8 +140,6 @@ public:
 
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  void draw_random_numbers(fftw_complex* c_fields, const std::array<int, 3> &grid_shape, const std::array<double, 3>  &grid_increment, const int seed);
-
   double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     throw NotImplementedException();
     //std::vector<double> c{0};
@@ -144,7 +154,7 @@ public:
     double* field_real_temp = 0;
     fftw_complex* field_comp_temp = 0;
     field_real_temp = (double*) fftw_alloc_real(grid_shape[0]*grid_shape[1]*2*(grid_shape[2]/2 + 1));
-    field_comp_temp = reinterpret_cast<fftw_complex*>( field_real_temp);
+    field_comp_temp = reinterpret_cast<fftw_complex*>(field_real_temp);
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], field_real_temp,field_comp_temp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], field_comp_temp, field_real_temp,  FFTW_MEASURE);
     _on_grid(field_real_temp, field_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, seed);
@@ -229,9 +239,6 @@ public:
    // return c;
   }
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
-
-  void draw_random_numbers(std::array<fftw_complex*, 3> c_fields, const std::array<int, 3> &grid_shape, const std::array<double, 3>  &grid_increment, const int seed);
-
 
   std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     throw NotImplementedException();

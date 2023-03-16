@@ -17,9 +17,8 @@ void ESRandomField::_on_grid(std::array<double*, 3> &freal,  std::array<fftw_com
 
       int grid_size = grid_shape[0]*grid_shape[1]*grid_shape[2];
       
-      draw_random_numbers(fcomp, grid_shape, grid_increment, seed);
-
       for (int i =0; i<3; ++i) {
+        draw_random_numbers(fcomp[i], grid_shape, grid_increment, seed);
         fftw_execute(comp_to_real[i]);
       }
 

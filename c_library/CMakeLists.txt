@@ -17,6 +17,7 @@ set(IM_PUBLIC_HEADERS
 "headers/Field.h"
 "headers/RegularField.h"
 "headers/RandomField.h"
+"headers/random.tpp"
 
 "headers/RegularJF12.h"
 "headers/Jaffe.h"
@@ -33,8 +34,8 @@ add_library(ImagineModels SHARED
     source/helix.cc
     source/jaffe.cc
     source/regularjf12.cc
-    source/randomscalar.cc
-    source/randomvector.cc
+#    source/randomscalar.cc
+#    source/randomvector.cc
     source/randomjf12.cc
     source/ensslinsteininger.cc
 #    source/ymw16.cc
