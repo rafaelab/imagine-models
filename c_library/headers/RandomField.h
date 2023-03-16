@@ -20,6 +20,7 @@
 template<typename POSTYPE, typename GRIDTYPE>
 class RandomField : public Field<POSTYPE, GRIDTYPE>  {
 protected:
+  bool memory_allocated = false;
 
 public:
   // Constructors
@@ -87,28 +88,38 @@ protected:
     bool recreate_fftw_plans;
     fftw_plan c2r;
     fftw_plan r2c;
-    fftw_complex* class_eval_comp = 0;
+    fftw_complex* grid_eval_comp = NULL;
     // constructors
     //RandomField() : Field<G, T>() {}
     // methods
 
-  void allocate_memory(bool not_empty, int arr_sz) {
-    if (not_empty) {
-    class_eval = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
-    class_eval_comp = reinterpret_cast<fftw_complex*>( class_eval);
-    r2c = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], class_eval, class_eval_comp, FFTW_MEASURE);
-    c2r = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], class_eval_comp, class_eval,  FFTW_MEASURE);
+  void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) {
+    if (do_allocation) {
+
+    grid_eval = (double*) fftw_alloc_real(shp[0]*shp[1]*2*(shp[2]/2 + 1));
+    grid_eval_comp = reinterpret_cast<fftw_complex*>( grid_eval);
+    if (call_from_init) {
+      r2c = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval, grid_eval_comp, FFTW_MEASURE);
+      c2r = fftw_plan_dft_c2r_3d(shp[0], shp[1], shp[2], grid_eval_comp, grid_eval,  FFTW_MEASURE);
+    }
+    else {
+      r2c = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval, grid_eval_comp, FFTW_ESTIMATE);
+      c2r = fftw_plan_dft_c2r_3d(shp[0], shp[1], shp[2], grid_eval_comp, grid_eval,  FFTW_ESTIMATE);
+    }
+
+    memory_allocated = true;
       }
     else {
-      class_eval = 0;
+      grid_eval = 0;
       };
     }
 
-  void free_memory(bool not_empty) {
-    if (not_empty) {
-      fftw_free(class_eval);
+  void free_memory(bool do_deallocation) {
+    if (do_deallocation) {
+      fftw_free(grid_eval);
       fftw_destroy_plan(c2r);
       fftw_destroy_plan(r2c);
+      memory_allocated = false; 
     };
   }
 
@@ -117,13 +128,11 @@ public:
     };
 
   RandomScalarField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField<double, double*>(shape, zeropoint, increment) {
-    size_t ar_sz = array_size();
-    allocate_memory(has_grid, ar_sz);
-
+    allocate_memory(shape, initialized_with_grid, true);
     };
 
   ~RandomScalarField() {
-    free_memory(has_grid);
+    free_memory(memory_allocated);
     #ifdef _OPENMP
           fftw_cleanup_threads();
     #else
@@ -134,8 +143,6 @@ public:
   // Fields
 
   const int ndim = 1;
-  // for destructor
-  bool clean_switch = false;
   // methods
 
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
@@ -147,31 +154,24 @@ public:
   }
 
   // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. This function as a empty default implementation, as otherwise this would make the binding to python unnecessarily complicated (Since the fftw_plan woould need to be wrapped).
-  virtual void _on_grid(double* rf, fftw_complex* cf, fftw_plan forward, fftw_plan backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
+  virtual void _on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
 
   double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
-    std::cout<< "Random Field on grid input" << std::endl;
-    double* field_real_temp = 0;
-    fftw_complex* field_comp_temp = 0;
-    field_real_temp = (double*) fftw_alloc_real(grid_shape[0]*grid_shape[1]*2*(grid_shape[2]/2 + 1));
-    field_comp_temp = reinterpret_cast<fftw_complex*>(field_real_temp);
-    fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], field_real_temp,field_comp_temp, FFTW_MEASURE);
-    fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], field_comp_temp, field_real_temp,  FFTW_MEASURE);
-    _on_grid(field_real_temp, field_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, seed);
-    return field_real_temp;
+    std::cout<< "Random Field external grid" << std::endl;
+    if (initialized_with_grid) 
+      throw GridException();
+    free_memory(memory_allocated);
+    allocate_memory(grid_shape, true, false);
+    _on_grid(grid_shape, grid_zeropoint, grid_increment, seed);
+    return grid_eval;
   }
 
   double* on_grid(const int seed) {
-    std::cout<< "Random Field on grid no input" << std::endl;
-    if (not has_grid) 
+    std::cout<< "Random Field initialized grid" << std::endl;
+    if (not initialized_with_grid) 
       throw GridException();
-    if (has_grid) {
-      _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, seed);
-      return class_eval;
-      }
-    else
-      return class_eval;
-
+    _on_grid(shape, zeropoint, increment, seed);
+    return grid_eval;
   }
 
 
@@ -185,31 +185,37 @@ protected:
 
     std::array<fftw_plan, 3> r2c;
     std::array<fftw_plan, 3> c2r;
-    std::array<fftw_complex*, 3> class_eval_comp;
+    std::array<fftw_complex*, 3> grid_eval_comp;
 
     // constructors
     //RandomField() : Field<G, T>() {}
     // methods
 
 
-  void allocate_memory(bool not_empty, int arr_sz) {
-    if (not_empty) {
+  void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) {
+    if (do_allocation) {
       for (int i=0; i < ndim; ++i) {
-        class_eval[i] = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
-        class_eval_comp[i] = reinterpret_cast<fftw_complex*>(class_eval[i]);
-        r2c[i] = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], class_eval[i], class_eval_comp[i], FFTW_MEASURE);
-        c2r[i] = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], class_eval_comp[i], class_eval[i],  FFTW_MEASURE);
-        } 
-      }
-    else {
-      class_eval = {0, 0, 0};
-      };
+        grid_eval[i] = (double*) fftw_alloc_real(shp[0]*shape[1]*2*(shape[2]/2 + 1));
+        grid_eval_comp[i] = reinterpret_cast<fftw_complex*>(grid_eval[i]);
+        if (call_from_init) {
+          r2c[i] = fftw_plan_dft_r2c_3d(shp[0], shape[1], shape[2], grid_eval[i], grid_eval_comp[i], FFTW_MEASURE);
+          c2r[i] = fftw_plan_dft_c2r_3d(shp[0], shape[1], shape[2], grid_eval_comp[i], grid_eval[i],  FFTW_MEASURE);
+        }
+        else {
+          r2c[i] = fftw_plan_dft_r2c_3d(shp[0], shape[1], shape[2], grid_eval[i], grid_eval_comp[i], FFTW_ESTIMATE);
+          c2r[i] = fftw_plan_dft_c2r_3d(shp[0], shape[1], shape[2], grid_eval_comp[i], grid_eval[i],  FFTW_ESTIMATE);
+        }
+      } 
     }
+    else {
+      grid_eval = {NULL, NULL, NULL};
+    };
+  }
 
-  void free_memory(bool not_empty) {
-    if (not_empty) {
+  void free_memory(bool do_deallocation) {
+    if (do_deallocation) {
       for (int i=0; i < ndim; ++i) { 
-        fftw_free(class_eval[i]);
+        fftw_free(grid_eval[i]);
         fftw_destroy_plan(c2r[i]);
         fftw_destroy_plan(r2c[i]);
       }
@@ -219,15 +225,13 @@ public:
 
 
   RandomVectorField() : RandomField() {
-    size_t ar_sz = array_size();
-    allocate_memory(has_grid, ar_sz);
+    allocate_memory(shape, false, true);
     };
   RandomVectorField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField(shape, zeropoint, increment) {
-    size_t ar_sz = array_size();
-    allocate_memory(has_grid, ar_sz);
+    allocate_memory(shape, true, true);
     };
   ~RandomVectorField() {
-    free_memory(has_grid);
+    free_memory(initialized_with_grid);
     };
 
   // fields
@@ -247,33 +251,25 @@ public:
   }
 
   std::array<double*, 3> on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, int nseed) {
-    std::array<fftw_plan, 3> r2c_temp;
-    std::array<fftw_plan, 3> c2r_temp;
-    std::array<fftw_complex*, 3> eval_comp_temp;
-    std::array<double*, 3> eval_temp;
-    for (int i=0; i < ndim; ++i) {
-      eval_temp[i] = (double*) fftw_alloc_real(grid_shape[0]*grid_shape[1]*2*(grid_shape[2]/2 + 1));
-      eval_comp_temp[i]= reinterpret_cast<fftw_complex*>( eval_temp[i]);
-      r2c_temp[i] = fftw_plan_dft_r2c_3d(grid_shape[0], grid_shape[1], grid_shape[2], eval_temp[i], eval_comp_temp[i], FFTW_MEASURE);
-      c2r_temp[i] = fftw_plan_dft_c2r_3d(grid_shape[0], grid_shape[1], grid_shape[2], eval_comp_temp[i], eval_temp[i],  FFTW_MEASURE);
-    } 
-    _on_grid(eval_temp, eval_comp_temp, r2c_temp, c2r_temp, grid_shape, grid_zeropoint, grid_increment, nseed);
-    for (int i=0; i < ndim; ++i) {
-      fftw_destroy_plan(c2r_temp[i]);
-      fftw_destroy_plan(r2c_temp[i]);
-    }
-    return eval_temp;
+    if (initialized_with_grid) 
+      throw GridException();
+    free_memory(memory_allocated);
+    allocate_memory(grid_shape, true, false);
+    _on_grid(grid_shape, grid_zeropoint, grid_increment, seed);
+    _on_grid(grid_shape, grid_zeropoint, grid_increment, nseed);
+    return grid_eval;
     
   }
 
   std::array<double*, 3> on_grid(int nseed) {
-    std::cout << "Random Vector on grid func" << std::endl;
-    _on_grid(class_eval, class_eval_comp, r2c, c2r, shape, zeropoint, increment, nseed);
-    return class_eval;
+    if (not initialized_with_grid) 
+      throw GridException();
+    _on_grid(shape, zeropoint, increment, nseed);
+    return grid_eval;
   }
   
   // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. This function as a empty default implementation, as otherwise this would imply problems for the binding to python (Since the fftw_plan woould need to be wrapped).
-  virtual void _on_grid(std::array<double*, 3> &freal, std::array<fftw_complex*, 3> &fcomp, std::array<fftw_plan, 3> &forward, std::array<fftw_plan, 3> &backward, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
+  virtual void _on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
   
 // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
 // original author: https://github.com/gioacchinowang

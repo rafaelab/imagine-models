@@ -19,30 +19,30 @@ protected:
   // -----FIELDS-----
   int ndim = 0;
 
-  GRIDTYPE class_eval;
+  GRIDTYPE grid_eval;
 
-  bool has_grid = false;
+  bool initialized_with_grid = false;
   bool regular_grid;
 
   // -----CONSTRUCTORS-----
 
   Field(std::array<int, 3> grid_shape, std::array<double, 3>  grid_zeropoint, std::array<double, 3>  grid_increment) : shape(grid_shape), zeropoint(grid_zeropoint), increment(grid_increment) {
-    has_grid = true;
+    initialized_with_grid = true;
     regular_grid = true;
   };
 
   Field(std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : grid_x(grid_x), grid_y(grid_y), grid_z(grid_z) {
-    has_grid = true;
+    initialized_with_grid = true;
     regular_grid = false;
     shape = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
   };
 
   Field() {
-    has_grid = false;
+    initialized_with_grid = false;
   };
   
-  virtual void allocate_memory(bool not_empty, int sz) = 0;
-  virtual void free_memory(bool not_empty) = 0;
+  virtual void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) = 0;
+  virtual void free_memory(bool do_deallocation) = 0;
 
 public:
 
@@ -59,7 +59,7 @@ public:
   // -----METHODS-----
 
   size_t array_size() {
-    if (has_grid) {
+    if (initialized_with_grid) {
       size_t arsz = 1;
       for (const int sh : shape) 
         arsz = arsz*sh;

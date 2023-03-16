@@ -18,39 +18,37 @@ protected:
 
     // RegularField() : Field<T>() {};
     // Methods
-void allocate_memory(bool not_empty, int arr_sz) {
-  if (not_empty) {
-    class_eval = new double[arr_sz];
+void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) {
+  if (do_allocation) {
+    size_t arr_sz = array_size();
+    grid_eval = new double[arr_sz];
     }
   else {
-    class_eval = 0;
+    grid_eval = 0;
     };
   }
 
-void free_memory(bool not_empty) {
-  if (not_empty) {
-    delete class_eval;
+void free_memory(bool do_deallocation) {
+  if (do_deallocation) {
+    delete grid_eval;
   };
 }
 
 public:
   // -----CONSTRUCTORS-----
 
-  ~RegularScalarField() {free_memory(has_grid);};
+  ~RegularScalarField() {free_memory(true);};
   
   RegularScalarField () : Field<double, double*>() {
-      size_t ar_sz = array_size();
-      allocate_memory(has_grid, ar_sz);
+      allocate_memory({0, 0, 0}, false, true);
       };
 
   RegularScalarField (std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : Field<double, double*>(shape, zeropoint, increment) {
-      size_t ar_sz = array_size();
-      allocate_memory(has_grid, ar_sz);
+      allocate_memory(shape, true, true);
       };
 
   RegularScalarField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<double, double*>(grid_x, grid_y, grid_z) {
-      size_t ar_sz = array_size();
-      allocate_memory(has_grid, ar_sz);
+      allocate_memory(shape, true, true);
       };
 
   // Fields
@@ -58,22 +56,17 @@ public:
   // Methods
 
   double* on_grid(int seed = 0) {
-    if (not has_grid) {
+    if (not initialized_with_grid) {
       throw GridException();
     }
-    if (has_grid) { 
-      if (regular_grid) {
-        evaluate_function_on_grid(class_eval, shape, zeropoint, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
-        return class_eval;
-      }
-      else {
-        evaluate_function_on_grid(class_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
-        return class_eval;
-      }
+    if (regular_grid) {
+      evaluate_function_on_grid(grid_eval, shape, zeropoint, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      return grid_eval;
     }
-    else
-      return class_eval;
-
+    else {
+      evaluate_function_on_grid(grid_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      return grid_eval;
+    }
   }
 
   double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, const int seed = 0) {
@@ -100,44 +93,42 @@ protected:
 
     // RegularField() : Field<T>() {};
     // Methods
-void allocate_memory(bool not_empty, int arr_sz) override {
-  if (not_empty) {
-    class_eval[0] = new double[arr_sz];
-    class_eval[1] = new double[arr_sz];
-    class_eval[2] = new double[arr_sz];
+void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) override {
+  if (do_allocation) {
+    size_t arr_sz = array_size();
+    grid_eval[0] = new double[arr_sz];
+    grid_eval[1] = new double[arr_sz];
+    grid_eval[2] = new double[arr_sz];
     }
   else {
-    class_eval = {0, 0, 0};
+    grid_eval = {0, 0, 0};
     };
   }
 
-void free_memory(bool not_empty) override {
-  if (not_empty) {
-    delete class_eval[0];
-    delete class_eval[1];
-    delete class_eval[2];
+void free_memory(bool do_deallocation) override {
+  if (do_deallocation) {
+    delete grid_eval[0];
+    delete grid_eval[1];
+    delete grid_eval[2];
   };
 }
 
 
 public:
 
-  ~RegularVectorField() {free_memory(has_grid);};
+  ~RegularVectorField() {free_memory(true);};
 
   // Constructors
   RegularVectorField () : Field<std::array<double, 3>, std::array<double*, 3>>() {
-      size_t ar_sz = array_size();
-      allocate_memory(has_grid, ar_sz);
+      allocate_memory({0, 0, 0}, false, true);
       };
 
   RegularVectorField (std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  grid_increment) : Field<std::array<double, 3>, std::array<double*, 3>>(shape, zeropoint, grid_increment) {
-      size_t ar_sz = array_size();
-      allocate_memory(has_grid, ar_sz);
+      allocate_memory(shape, true, true);
       };
 
   RegularVectorField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<std::array<double, 3>, std::array<double*, 3>>(grid_x, grid_y, grid_z) {
-      size_t ar_sz = array_size();
-      allocate_memory(has_grid, ar_sz);
+      allocate_memory(shape, true, true);
       };
 
 
@@ -147,21 +138,18 @@ public:
   // Methods
 
   std::array<double*, 3> on_grid(int seed = 0) {
-    if (not has_grid) {
+    if (not initialized_with_grid) {
       throw GridException();
     }
-    if (has_grid) { 
-      if (regular_grid) {
-        evaluate_function_on_grid(class_eval, shape, zeropoint, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
-        return class_eval;
-      }
-      else {
-        evaluate_function_on_grid(class_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
-        return class_eval;
-      }
+
+    if (regular_grid) {
+      evaluate_function_on_grid(grid_eval, shape, zeropoint, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      return grid_eval;
     }
-    else
-      return class_eval;
+    else {
+      evaluate_function_on_grid(grid_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      return grid_eval;
+    }
 
   }
 
@@ -170,10 +158,8 @@ public:
     for (int i = 0; i<3; ++i) {
       function_eval[i] = new double[grid_x.size()*grid_y.size()*grid_z.size()];
     }
-    std::cout << "The ref to b_grid when created 1 " << &function_eval << " \n\n";
     evaluate_function_on_grid(function_eval, grid_x, grid_y, grid_z,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
-    std::cout << "The ref to b_grid when created 2" << &function_eval << " \n\n";
     return function_eval;
   }
 

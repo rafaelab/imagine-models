@@ -17,7 +17,7 @@ class ESRandomField : public RandomVectorField {
     std::array<double, 3> observer{8.5, 0, 0};
 
 
-    void _on_grid(std::array<double*, 3> &freal,  std::array<fftw_complex*, 3> &fcomp,  std::array<fftw_plan, 3> &real_to_comp, std::array<fftw_plan, 3> &comp_to_real, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override;
+    void _on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override;
 
 
     double spatial_profile(const double &x, const double &y, const double &z) const; 

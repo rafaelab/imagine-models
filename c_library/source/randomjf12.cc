@@ -52,12 +52,12 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
 
 };
 
-void JF12RandomField::_on_grid(std::array<double*, 3> &freal,  std::array<fftw_complex*, 3> &fcomp,  std::array<fftw_plan, 3> &real_to_comp, std::array<fftw_plan, 3> &comp_to_real, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+void JF12RandomField::_on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
 
      int grid_size = grid_shape[0]*grid_shape[1]*grid_shape[2];
 
       for (int i =0; i<3; ++i) {
-        draw_random_numbers(fcomp[i], grid_shape, grid_increment, seed);
+        draw_random_numbers(grid_eval_comp[i], grid_shape, grid_increment, seed);
         fftw_execute(c2r[i]);
       }
 
@@ -68,25 +68,25 @@ void JF12RandomField::_on_grid(std::array<double*, 3> &freal,  std::array<fftw_c
           double sp = spatial_profile(xx, yy, zz);
           int idx = _nz + grid_shape[2]*(_ny + grid_shape[1]*_nx);
           std::array<double, 3> v = {
-            (freal[0])[idx]*sp, 
-            (freal[1])[idx]*sp, 
-            (freal[2])[idx]*sp
+            (grid_eval[0])[idx]*sp, 
+            (grid_eval[1])[idx]*sp, 
+            (grid_eval[2])[idx]*sp
             };
           return v;
         };
 
-      evaluate_function_on_grid(freal, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
+      evaluate_function_on_grid(grid_eval, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
 
       for (int i =0; i<3; ++i) {
         fftw_execute(r2c[i]);
       }
 
       
-      divergence_cleaner(fcomp[0], fcomp[1], fcomp[2], grid_shape, grid_increment);
+      divergence_cleaner(grid_eval_comp[0], grid_eval_comp[1], grid_eval_comp[2], grid_shape, grid_increment);
 
       for (int i =0; i<3; ++i) {
         fftw_execute(c2r[i]);
         for (int s = 0; s < grid_size; ++s)
-          (freal[i])[s] /= grid_size;  
+          (grid_eval[i])[s] /= grid_size;  
       }
 };

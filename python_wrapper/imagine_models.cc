@@ -244,9 +244,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
         .def("at_position", &HelixMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-  //      .def("dampx_grid", &HelixMagneticField::dampx_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-  //      .def("dampy_grid", &HelixMagneticField::dampy_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
-  //      .def("dampz_grid", &HelixMagneticField::dampz_grid, "grid_x"_a, "grid_y"_a, "grid_z"_a)
+
         .def_readwrite("ampx", &HelixMagneticField::ampx)
         .def_readwrite("ampy", &HelixMagneticField::ampy)
         .def_readwrite("ampz", &HelixMagneticField::ampz)
@@ -259,6 +257,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
         .def("at_position", &JaffeMagneticField::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        
         .def_readwrite("quadruple", &JaffeMagneticField::quadruple)
         .def_readwrite("bss", &JaffeMagneticField::bss)
 
