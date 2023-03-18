@@ -1,5 +1,5 @@
 template<typename POSTYPE, typename GRIDTYPE>
-void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed)  {
+void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed)  {
 
 
   bool debug_random =false;
@@ -18,7 +18,7 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(fftw_complex* vec,  con
   
   float nyqind_x = grid_shape[0]/2.;
   float nyqind_y = grid_shape[1]/2.;
-  float nyqind_z =  grid_shape[2]/2;
+  float nyqind_z = grid_shape[2]/2;
 
   for (int i = 0; i < grid_shape[0]; ++i) {
     double kx = (double)i / lx;
@@ -48,7 +48,8 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers(fftw_complex* vec,  con
         const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
         // TODO: make parameters below free
         double sigma = simple_spectrum(ks, 1., 1./(3*grid_shape[0]), 2.);
-        std::normal_distribution<double> nd{0, sigma};
+        //std::normal_distribution<double> nd{0, sigma};
+        std::normal_distribution<double> nd{0, 1.};
 
         const int idx = idx_lv2 + l;
 

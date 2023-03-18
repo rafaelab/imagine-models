@@ -23,7 +23,7 @@ void ESRandomField::_on_grid(std::array<double*, 3> grid_eval, const std::array<
       }
         
       for (int i =0; i<3; ++i) {
-        draw_random_numbers(grid_eval_comp[i], grid_shape, grid_increment, seed);
+        draw_random_numbers_complex(grid_eval_comp[i], grid_shape, grid_increment, seed);
         fftw_execute(c2r[i]);
       }
 

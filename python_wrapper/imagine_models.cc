@@ -55,8 +55,6 @@ inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size
   
   py::capsule capsule(data, [](void *f) {
     double *data = reinterpret_cast<double *>(f);
-    std::cerr << "Element [0] = " << data[0] << "\n";
-        std::cerr << "freeing memory @ " << f << "\n";
     delete[] data;
     });
 
@@ -346,6 +344,12 @@ py::class_<ESRandomField, RandomVectorField>(m, "ESRandomField")
 
         .def_readwrite("r0", &ESRandomField::r0)
         .def_readwrite("z0", &ESRandomField::z0);
+
+
+py::class_<GaussianScalarField, RandomScalarField>(m, "GaussianScalarField")
+        .def(py::init<>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
+
 /////////////////////////////Thermal Electron Field/////////////////////////////
 /*
     py::class_<YMW16, RegularField<py::array_t<double>, double>, PyYMW16>(m, "YMW16Component")

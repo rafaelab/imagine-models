@@ -46,7 +46,7 @@ public:
   
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  void draw_random_numbers(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed); 
+  void draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed); 
 
   GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z) {
     throw NotImplementedException();

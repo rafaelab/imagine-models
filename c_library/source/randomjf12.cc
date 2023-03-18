@@ -60,7 +60,7 @@ void JF12RandomField::_on_grid(std::array<double*, 3> grid_eval, const std::arra
         grid_eval_comp[i] = reinterpret_cast<fftw_complex*>(grid_eval[i]);
       }
       for (int i =0; i<3; ++i) {
-        draw_random_numbers(grid_eval_comp[i], grid_shape, grid_increment, seed);
+        draw_random_numbers_complex(grid_eval_comp[i], grid_shape, grid_increment, seed);
         fftw_execute(c2r[i]);
       }
       auto multiply_profile = [&](double xx, double yy, double zz) {
