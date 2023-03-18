@@ -19,8 +19,6 @@ protected:
   // -----FIELDS-----
   int ndim = 0;
 
-  GRIDTYPE grid_eval;
-
   bool initialized_with_grid = false;
   bool regular_grid;
 
@@ -41,8 +39,8 @@ protected:
     initialized_with_grid = false;
   };
   
-  virtual void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) = 0;
-  virtual void free_memory(bool do_deallocation) = 0;
+  virtual GRIDTYPE allocate_memory(std::array<int, 3> shp) = 0;
+  virtual void free_memory(GRIDTYPE grid_eval) = 0;
 
 public:
 
@@ -58,16 +56,13 @@ public:
 
   // -----METHODS-----
 
-  size_t array_size() {
-    if (initialized_with_grid) {
-      size_t arsz = 1;
-      for (const int sh : shape) 
-        arsz = arsz*sh;
-      return arsz;
-      }
-    else 
-      return 0;
+  size_t grid_size(std::array<int, 3> shp) {
+      size_t gsz = 1;
+      for (const int &sh : shp) {
+        gsz = gsz*sh;}
+      return gsz;
   }
+
   // -----Interface functions-----
 
   // Evaluate the model at Galactic position (x, y, z). 

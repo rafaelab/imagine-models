@@ -2,42 +2,68 @@ import ImagineModels as im
 import numpy as np
 
 
-# load model
-
-jf12 = im.JF12RegularField()
-jaffe = im.JaffeMagneticField()
-helix = im.HelixMagneticField()
-
-# define a position in cartesian Galactic coordinates (kpc)
-
 x, y, z = [1., -3., 0.1]
 
-# evaluate the models at the position
-
-b_at_pos_jf12 = jf12.at_position(x, y, z)
-b_at_pos_jaffe = jaffe.at_position(x, y, z)
-b_at_pos_helix = helix.at_position(x, y, z)
-
-# define grid axes in cartesian Galactic coordinates (kpc)
-
+# irregular
 grid_x = np.asarray([-3., 0., 1.])
 grid_y = np.asarray([-1., 1.5, 2.])
 grid_z = np.asarray([.1, 0., -1.])
 
+#regular
+
+shape = [4, 3, 2]
+increment = [2.1, 0.3, 1.]
+zeropoint = [-4., 0.1, -0.3]
+
+
+# load model
+
+# jf12regular = im.JF12RegularField()
+jf12random = im.JF12RandomField()
+# jf12random2 = im.JF12RandomField(shape, zeropoint, increment)
+# jaffe = im.JaffeMagneticField()
+# helix = im.HelixMagneticField()
+
+# define a position in cartesian Galactic coordinates (kpc)
+
+
+
+# evaluate the models at the position
+
+# b_at_pos_jf12 = jf12regular.at_position(x, y, z)
+# b_at_pos_jaffe = jaffe.at_position(x, y, z)
+# b_at_pos_helix = helix.at_position(x, y, z)
+
+# define grid axes in cartesian Galactic coordinates (kpc)
+
+
+
+# jf12random2 = im.JF12RandomField(shape, zeropoint, increment)
 # evaluate grid
-b_grid = jf12.on_grid(grid_x, grid_y, grid_z)
+# b_grid = jf12regular.on_grid(grid_x, grid_y, grid_z)
+
+
 
 
 # change a parameter
 
-# jf12.disk_amp = 24
+#jf12regular.w_disk = 24
+
+# print(jf12regular2.on_grid())
 
 # evaluate model at position with updated parameter
-b_at_pos = jf12.at_position(x, y, z)
+#b_at_pos = jf12regular.at_position(x, y, z)
 
-print(b_at_pos)
-for i in range(5):
+#print(jf12regular.on_grid(shape, zeropoint, increment))
+#print(jf12regular2.on_grid()) #TODO: this line leads to bad malloc
+# print(b_at_pos)
+for i in range(1):
     xx = np.random.uniform(-4, 4, i + 3)
     yy = np.random.uniform(-4, 4, 2*i + 2)
-    zz = np.random.uniform(-4, 4, 3*i)
-    print(jf12.on_grid(xx, yy, zz))
+    zz = np.random.uniform(-4, 4, 3*i + 1)
+ #   print(xx, yy, zz)
+    
+ #   print(jf12regular.on_grid(xx, yy, zz))
+    
+# print(jf12random2.on_grid(23))
+print(jf12random.on_grid(shape, zeropoint, increment, 23))

@@ -13,10 +13,15 @@ double ESRandomField::spatial_profile(const double &x, const double &y, const do
 };
 
 
-void ESRandomField::_on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+void ESRandomField::_on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
 
       int grid_size = grid_shape[0]*grid_shape[1]*grid_shape[2];
-      
+
+      std::array<fftw_complex*, 3> grid_eval_comp;
+      for (int i=0; i < ndim; ++i) { 
+        grid_eval_comp[i] = reinterpret_cast<fftw_complex*>(grid_eval[i]);
+      }
+        
       for (int i =0; i<3; ++i) {
         draw_random_numbers(grid_eval_comp[i], grid_shape, grid_increment, seed);
         fftw_execute(c2r[i]);

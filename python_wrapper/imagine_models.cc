@@ -38,26 +38,30 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
 inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z) {
   size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
   py::list li;
+
   for (int i = 0; i<3; ++i) {
-    py::capsule free_when_done(seq[i], [](void *f) {
+    py::capsule capsule(seq[i], [](void *f) {
+        std::cout << "capsule call " << std::endl;
         std::unique_ptr<double>(reinterpret_cast<double*>(f));
         });
-    py::array_t<double> arr = py::array(arr_size, seq[i], free_when_done);
+
+    py::array_t<double> arr = py::array(arr_size, seq[i], capsule);
     li.append(arr.reshape({arr_size_x, arr_size_y, arr_size_z}));
   }
   return li;
 }
 
 inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z) {
-    py::capsule free_when_done(data, [](void *f) {
-        double *data = reinterpret_cast<double *>(f);
-        std::cerr << "Element [0] = " << data[0] << "\n";
-            std::cerr << "freeing memory @ " << f << "\n";
-        delete[] data;
-        });
+  
+  py::capsule capsule(data, [](void *f) {
+    double *data = reinterpret_cast<double *>(f);
+    std::cerr << "Element [0] = " << data[0] << "\n";
+        std::cerr << "freeing memory @ " << f << "\n";
+    delete[] data;
+    });
 
   size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
-  py::array_t<double> arr = py::array(arr_size, data, free_when_done);
+  py::array_t<double> arr = py::array(arr_size, data, capsule);
   return arr.reshape({arr_size_x, arr_size_y, arr_size_z});
 }
 
@@ -117,7 +121,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sz = self.shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, py::return_value_policy::move);
+          return arr;}, py::return_value_policy::reference_internal);
         
 
 // Regular Scalar Base Class
@@ -134,7 +138,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
           arr.resize({sx, sy, sz});
           return arr;},
-          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::move)
+          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::take_ownership)
         
         .def("on_grid", [](RegularScalarField &self, std::array<int, 3>  grid_shape, std::array<double, 3>  grid_zeropoint, std::array<double, 3>  grid_increment)  {
           double* f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, 0);
@@ -143,7 +147,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sz = grid_shape[2];
           auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, py::return_value_policy::move)
+          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, py::return_value_policy::take_ownership)
 
 
         .def("on_grid", [](RegularScalarField &self)  {
@@ -152,7 +156,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
           auto arr = from_pointer_to_pyarray(f, sx, sy ,sz);
-          return arr;}, py::return_value_policy::move);
+          return arr;}, py::return_value_policy::take_ownership);
 
 /////////////////////////////////Random Fields/////////////////////////////////
 
@@ -182,7 +186,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sz = self.shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, "seed"_a, py::return_value_policy::move);
+          return arr;}, "seed"_a, py::return_value_policy::take_ownership);
 
 // Random Scalar Base Class
     py::class_<RandomScalarField, RandomField<double, double*>, PyRandomScalarField>(m, "RandomScalarField")
@@ -206,7 +210,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sz = self.shape[2];
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, "seed"_a, py::return_value_policy::move);
+          return arr;}, "seed"_a, py::return_value_policy::take_ownership);
       
 
 /////////////////////////////////Regular Fields/////////////////////////////////
@@ -257,7 +261,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
         .def("at_position", &JaffeMagneticField::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-        
+
         .def_readwrite("quadruple", &JaffeMagneticField::quadruple)
         .def_readwrite("bss", &JaffeMagneticField::bss)
 

@@ -27,9 +27,9 @@ public:
     double* on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
 
 
-    void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) override {PYBIND11_OVERRIDE_PURE(void, Field, allocate_memory, shp, do_allocation, call_from_init); }
+    double* allocate_memory(std::array<int, 3> shp) override {PYBIND11_OVERRIDE_PURE(double*, Field, allocate_memory, shp); }
     
-    void free_memory(bool do_deallocation) override {PYBIND11_OVERRIDE_PURE(void, Field, free_memory, do_deallocation); }
+    void free_memory(double* grid_eval) override {PYBIND11_OVERRIDE_PURE(void, Field, free_memory, grid_eval); }
     
 };
 
@@ -47,9 +47,9 @@ public:
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomField, spatial_profile, x, y, z); }
 
-    void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) override {PYBIND11_OVERRIDE_PURE(void, RandomField, allocate_memory, shp, do_allocation, call_from_init); }
+    double* allocate_memory(std::array<int, 3> shp) override {PYBIND11_OVERRIDE_PURE(double*, RandomField, allocate_memory, shp); }
     
-    void free_memory(bool do_deallocation) override {PYBIND11_OVERRIDE_PURE(void, RandomField, free_memory, do_deallocation); }
+    void free_memory(double* grid_eval) override {PYBIND11_OVERRIDE_PURE(void, RandomField, free_memory, grid_eval); }
     
 };
 
@@ -66,9 +66,9 @@ public:
     std::array<double*, 3> on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
 
 
-    void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) override {PYBIND11_OVERRIDE_PURE(void, Field, allocate_memory, shp, do_allocation, call_from_init); }
+    std::array<double*, 3> allocate_memory(std::array<int, 3> shp) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, allocate_memory, shp); }
     
-    void free_memory(bool do_deallocation) override {PYBIND11_OVERRIDE_PURE(void, Field, free_memory, do_deallocation); }
+    void free_memory(std::array<double*, 3> grid_eval) override {PYBIND11_OVERRIDE_PURE(void, Field, free_memory, grid_eval); }
     
 };
 
@@ -86,9 +86,9 @@ public:
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomField, spatial_profile, x, y, z); }
 
-    void allocate_memory(std::array<int, 3> shp, bool do_allocation, bool call_from_init) override {PYBIND11_OVERRIDE_PURE(void, RandomField, allocate_memory, shp, do_allocation, call_from_init); }
+    std::array<double*, 3> allocate_memory(std::array<int, 3> shp) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, RandomField, allocate_memory, shp); }
     
-    void free_memory(bool do_deallocation) override {PYBIND11_OVERRIDE_PURE(void, RandomField, free_memory, do_deallocation); }
+    void free_memory(std::array<double*, 3> grid_eval) override {PYBIND11_OVERRIDE_PURE(void, RandomField, free_memory, grid_eval); }
     
 };
 
@@ -128,7 +128,7 @@ public:
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomVectorField, spatial_profile, x, y, z); }
 
-    void _on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(void, RandomVectorField, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+    void _on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(void, RandomVectorField, on_grid, grid_eval, grid_shape, grid_zeropoint, grid_increment, seed); }
 
     std::array<double*, 3> on_grid(int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RandomVectorField, on_grid, seed); }
     
@@ -145,7 +145,7 @@ public:
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomScalarField, spatial_profile, x, y, z); }
 
-    void _on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(void, RandomScalarField, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+    void _on_grid(double* grid_eval, const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(void, RandomScalarField, on_grid,  grid_eval, grid_shape, grid_zeropoint, grid_increment, seed); }
 
     double* on_grid(int seed) override {PYBIND11_OVERRIDE(double*, RandomScalarField, on_grid, seed); }
     

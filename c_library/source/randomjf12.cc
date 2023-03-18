@@ -52,15 +52,17 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
 
 };
 
-void JF12RandomField::_on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
-
+void JF12RandomField::_on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
      int grid_size = grid_shape[0]*grid_shape[1]*grid_shape[2];
 
+     std::array<fftw_complex*, 3> grid_eval_comp;
+      for (int i=0; i < ndim; ++i) { 
+        grid_eval_comp[i] = reinterpret_cast<fftw_complex*>(grid_eval[i]);
+      }
       for (int i =0; i<3; ++i) {
         draw_random_numbers(grid_eval_comp[i], grid_shape, grid_increment, seed);
         fftw_execute(c2r[i]);
       }
-
       auto multiply_profile = [&](double xx, double yy, double zz) {
           int _nx = (int)((xx - grid_zeropoint[0])/grid_increment[0]); 
           int _ny = (int)((yy - grid_zeropoint[1])/grid_increment[1]);
@@ -76,14 +78,11 @@ void JF12RandomField::_on_grid(const std::array<int, 3> &grid_shape, const std::
         };
 
       evaluate_function_on_grid(grid_eval, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
-
       for (int i =0; i<3; ++i) {
         fftw_execute(r2c[i]);
       }
-
       
       divergence_cleaner(grid_eval_comp[0], grid_eval_comp[1], grid_eval_comp[2], grid_shape, grid_increment);
-
       for (int i =0; i<3; ++i) {
         fftw_execute(c2r[i]);
         for (int s = 0; s < grid_size; ++s)
