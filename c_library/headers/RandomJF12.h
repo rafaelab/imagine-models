@@ -33,8 +33,13 @@ class JF12RandomField : public RandomVectorField {
     double Rmax = 20.;
     double rho_GC = 1.;
 
+    double spectral_amplitude = 1.; 
+    double spectral_offset = 1.; 
+    double spectral_slope = 2.;
+
     void _on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed);
 
+    double calculate_fourier_sigma(const double &abs_k) const override;
 
     double spatial_profile(const double &x, const double &y, const double &z) const; 
 };

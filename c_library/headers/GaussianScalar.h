@@ -12,9 +12,16 @@ class GaussianScalarField : public RandomScalarField {
   public:
     using RandomScalarField :: RandomScalarField;
 
+    double mean = 0;
+    double spectral_amplitude = 1.;
+    double spectral_offset = 1.;
+    double spectral_slope = 2;
+
     void _on_grid(double* grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override;
 
-    double spatial_profile(const double &x, const double &y, const double &z) const {
+    double calculate_fourier_sigma(const double &abs_k) const override;
+
+    double spatial_profile(const double &x, const double &y, const double &z) const override {
         return 1.;
     }; 
 

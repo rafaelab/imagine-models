@@ -21,7 +21,7 @@ template<typename POSTYPE, typename GRIDTYPE>
 class RandomField : public Field<POSTYPE, GRIDTYPE>  {
 protected:
 
-    bool created_fftw_plans = false;
+  bool created_fftw_plans = false;
 
 public:
   // Constructors
@@ -29,14 +29,6 @@ public:
 
   // Fields
   int seed = 0;
-
-  // TODO: right now these parameters are not used (fixed spectrum in draw random numbers)
-  double rms = 1;
-  double k0 = 10; // 1/injection sale, 1/kpc
-  double k1= 0.1; //  inverse cascading cutoff, 1/kpc
-  double a0 = 1.7; // Kolmogorov
-  double a1 = 0; // inverse cascade
-  double rho = 0; // [0, inf[
 
   // methods
   POSTYPE at_position(const double &x, const double &y, const double &z) const {
@@ -46,18 +38,19 @@ public:
   
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  void draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_increment, const int seed); 
+  virtual double calculate_fourier_sigma(const double &abs_k) const = 0;
+
+  void draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &grid_increment, const int seed); 
 
   GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z) {
     throw NotImplementedException();
   }
 
-  double simple_spectrum(const double &abs_k, const double &rms, const double &k0, const double &s) const {
-      const double p0 = rms*rms;
+  double simple_spectrum(const double &abs_k, const double &A, const double &k0, const double &s) const {
       double pi = 3.141592653589793;
       const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
       const double P = 1 / std::pow((abs_k + k0), s);
-      return P * p0 * unit;
+      return P * A * unit;
       }
 
   // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
@@ -102,11 +95,12 @@ protected:
       fftw_free(grid_eval);
   }
 
-  void construct_plans(double* grid_eval, std::array<int, 3> shp) {
+  fftw_complex* construct_plans(double* grid_eval, std::array<int, 3> shp) {
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
     r2c = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval, grid_eval_comp, FFTW_ESTIMATE);
     c2r = fftw_plan_dft_c2r_3d(shp[0], shp[1], shp[2], grid_eval_comp, grid_eval,  FFTW_ESTIMATE);
     created_fftw_plans = true;
+    return grid_eval_comp;
   }
 
   void destroy_plans() {
@@ -125,8 +119,8 @@ public:
     //accumulate wisdom
     double* grid_eval = allocate_memory(shape);
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
-    fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], grid_eval, grid_eval_comp, FFTW_ESTIMATE);
-    fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], grid_eval_comp, grid_eval,  FFTW_ESTIMATE);
+    fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], grid_eval, grid_eval_comp, FFTW_MEASURE);
+    fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], grid_eval_comp, grid_eval,  FFTW_MEASURE);
     fftw_destroy_plan(c2r_temp);
     fftw_destroy_plan(r2c_temp); //delete plans, but wisdom will be kept!
     fftw_free(grid_eval);
@@ -156,14 +150,13 @@ public:
   }
 
   // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. 
-  virtual void _on_grid(double* grid_eval,  const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
+  virtual void _on_grid(double* grid_eval,  const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
 
-  double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+  double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
-    double* grid_eval = allocate_memory(grid_shape);
-    construct_plans(grid_eval, grid_shape);
-    _on_grid(grid_eval, grid_shape, grid_zeropoint, grid_increment, seed);
+    double* grid_eval = allocate_memory(shp);
+    _on_grid(grid_eval, shp, grid_zeropoint, grid_increment, seed);
     return grid_eval;
   }
 
@@ -171,8 +164,7 @@ public:
     if (not initialized_with_grid) 
       throw GridException();
     double* grid_eval = allocate_memory(shape);
-    construct_plans(grid_eval, shape);
-    _on_grid(grid_eval,  shape, zeropoint, increment, seed);
+    _on_grid(grid_eval, shape, zeropoint, increment, seed);
     return grid_eval;
   }
 
@@ -207,14 +199,16 @@ protected:
     }
   }
 
-  void construct_plans(std::array<double*, 3> grid_eval, std::array<int, 3> shp) {
-    std::array<fftw_complex*, 3> grid_eval_comp;
-      for (int i=0; i < ndim; ++i) {
-        grid_eval_comp[i] = reinterpret_cast<fftw_complex*>(grid_eval[i]);
-        r2c[i] = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval[i], grid_eval_comp[i], FFTW_ESTIMATE);
-        c2r[i] = fftw_plan_dft_c2r_3d(shp[0], shp[1], shp[2], grid_eval_comp[i], grid_eval[i],  FFTW_ESTIMATE);
-      }
+  std::array<fftw_complex*, 3> construct_plans(std::array<double*, 3> grid_eval, std::array<int, 3> shp) {
+
+  std::array<fftw_complex*, 3> grid_eval_comp;
+    for (int i=0; i < ndim; ++i) {
+      grid_eval_comp[i] = reinterpret_cast<fftw_complex*>(grid_eval[i]);
+      r2c[i] = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval[i], grid_eval_comp[i], FFTW_ESTIMATE);
+      c2r[i] = fftw_plan_dft_c2r_3d(shp[0], shp[1], shp[2], grid_eval_comp[i], grid_eval[i],  FFTW_ESTIMATE);
+    }
     created_fftw_plans = true;
+  return grid_eval_comp;
   }
 
   void destroy_plans() {
@@ -255,7 +249,7 @@ public:
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
   // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. 
-  virtual void _on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
+  virtual void _on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
 
   std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     throw NotImplementedException();
@@ -263,12 +257,11 @@ public:
     //return c;
   }
 
-  std::array<double*, 3> on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, int nseed) {
+  std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, int nseed) {
     if (initialized_with_grid) 
       throw GridException();
-    std::array<double*, 3> grid_eval = allocate_memory(grid_shape);
-    construct_plans(grid_eval, grid_shape);
-    _on_grid(grid_eval, grid_shape, grid_zeropoint, grid_increment, seed);
+    std::array<double*, 3> grid_eval = allocate_memory(shp);
+    _on_grid(grid_eval, shp, grid_zeropoint, grid_increment, seed);
     return grid_eval;
     
   }
@@ -277,8 +270,7 @@ public:
     if (not initialized_with_grid) 
       throw GridException();
     std::array<double*, 3> grid_eval = allocate_memory(shape);
-    construct_plans(grid_eval, shape);
-    _on_grid(grid_eval,  shape, zeropoint, increment, nseed);
+    _on_grid(grid_eval, shape, zeropoint, increment, nseed);
     return grid_eval;
   }
 

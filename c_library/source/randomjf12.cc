@@ -5,6 +5,11 @@
 #include "../headers/RandomJF12.h"
 
 
+double JF12RandomField::calculate_fourier_sigma(const double &abs_k) const {
+  double sigma = simple_spectrum(abs_k, spectral_amplitude, spectral_offset, spectral_slope);
+  return sigma;
+}
+
 double JF12RandomField::spatial_profile(const double &x, const double &y, const double &z) const {
 
       const double r{sqrt(x * x + y * y)};
@@ -52,15 +57,13 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
 
 };
 
-void JF12RandomField::_on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
      int grid_size = grid_shape[0]*grid_shape[1]*grid_shape[2];
 
-     std::array<fftw_complex*, 3> grid_eval_comp;
-      for (int i=0; i < ndim; ++i) { 
-        grid_eval_comp[i] = reinterpret_cast<fftw_complex*>(grid_eval[i]);
-      }
+      std::array<fftw_complex*, 3> val_comp = construct_plans(val, shape); 
+
       for (int i =0; i<3; ++i) {
-        draw_random_numbers_complex(grid_eval_comp[i], grid_shape, grid_increment, seed);
+        draw_random_numbers_complex(val_comp[i], grid_shape, grid_increment, seed);
         fftw_execute(c2r[i]);
       }
       auto multiply_profile = [&](double xx, double yy, double zz) {
@@ -70,22 +73,22 @@ void JF12RandomField::_on_grid(std::array<double*, 3> grid_eval, const std::arra
           double sp = spatial_profile(xx, yy, zz);
           int idx = _nz + grid_shape[2]*(_ny + grid_shape[1]*_nx);
           std::array<double, 3> v = {
-            (grid_eval[0])[idx]*sp, 
-            (grid_eval[1])[idx]*sp, 
-            (grid_eval[2])[idx]*sp
+            (val[0])[idx]*sp, 
+            (val[1])[idx]*sp, 
+            (val[2])[idx]*sp
             };
           return v;
         };
 
-      evaluate_function_on_grid(grid_eval, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
+      evaluate_function_on_grid(val, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
       for (int i =0; i<3; ++i) {
         fftw_execute(r2c[i]);
       }
       
-      divergence_cleaner(grid_eval_comp[0], grid_eval_comp[1], grid_eval_comp[2], grid_shape, grid_increment);
+      divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], grid_shape, grid_increment);
       for (int i =0; i<3; ++i) {
         fftw_execute(c2r[i]);
         for (int s = 0; s < grid_size; ++s)
-          (grid_eval[i])[s] /= grid_size;  
+          (val[i])[s] /= grid_size;  
       }
 };

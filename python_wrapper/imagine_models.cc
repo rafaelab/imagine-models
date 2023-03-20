@@ -167,7 +167,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, seed);
           std::cout << "on grid f size " << f.size() << std::endl;
           int si = 3;
-          size_t sx = grid_shape[0];
+          size_t sx = grid_shape[0] + 1; // catches fftw zeropad
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
@@ -179,7 +179,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           std::array<double*, 3> f = self.on_grid(seed);
           std::cout << "on grid f size " << f.size() << std::endl;
           int si = 3;
-          size_t sx = self.shape[0];
+          size_t sx = self.shape[0] + 1; // catches fftw zeropad
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
@@ -193,7 +193,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
       .def("on_grid", [](RandomScalarField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment, int seed)  {
           double* f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, seed);
-          size_t sx = grid_shape[0];
+          size_t sx = grid_shape[0] + 1; // catches fftw zeropad
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
@@ -203,7 +203,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
      .def("on_grid", [](RandomScalarField &self, int seed)  {
           double* f = self.on_grid(seed);
-          size_t sx = self.shape[0];
+          size_t sx = self.shape[0] + 1; // catches fftw zeropad
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
@@ -307,12 +307,9 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def_readwrite("rms", &JF12RandomField::rms)
-        .def_readwrite("k0", &JF12RandomField::k0)
-        .def_readwrite("k1", &JF12RandomField::k1)
-        .def_readwrite("a0", &JF12RandomField::a0)
-        .def_readwrite("a1", &JF12RandomField::a1)
-        .def_readwrite("rho", &JF12RandomField::rho)
+        .def_readwrite("spectral_amplitude", &JF12RandomField::spectral_amplitude)
+        .def_readwrite("spectral_offset", &JF12RandomField::spectral_offset)
+        .def_readwrite("spectral_slope", &JF12RandomField::spectral_slope)
 
         .def_readwrite("b0_1", &JF12RandomField::b0_1)
         .def_readwrite("b0_2", &JF12RandomField::b0_2)
@@ -335,12 +332,9 @@ py::class_<ESRandomField, RandomVectorField>(m, "ESRandomField")
         .def(py::init<>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def_readwrite("rms", &ESRandomField::rms)
-        .def_readwrite("k0", &ESRandomField::k0)
-        .def_readwrite("k1", &ESRandomField::k1)
-        .def_readwrite("a0", &ESRandomField::a0)
-        .def_readwrite("a1", &ESRandomField::a1)
-        .def_readwrite("rho", &ESRandomField::rho)
+        .def_readwrite("spectral_amplitude", &ESRandomField::spectral_amplitude)
+        .def_readwrite("spectral_offset", &ESRandomField::spectral_offset)
+        .def_readwrite("spectral_slope", &ESRandomField::spectral_slope)
 
         .def_readwrite("r0", &ESRandomField::r0)
         .def_readwrite("z0", &ESRandomField::z0);
@@ -348,7 +342,11 @@ py::class_<ESRandomField, RandomVectorField>(m, "ESRandomField")
 
 py::class_<GaussianScalarField, RandomScalarField>(m, "GaussianScalarField")
         .def(py::init<>())
-        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>());
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
+
+        .def_readwrite("spectral_amplitude", &GaussianScalarField::spectral_amplitude)
+        .def_readwrite("spectral_offset", &GaussianScalarField::spectral_offset)
+        .def_readwrite("spectral_slope", &GaussianScalarField::spectral_slope);
 
 /////////////////////////////Thermal Electron Field/////////////////////////////
 /*

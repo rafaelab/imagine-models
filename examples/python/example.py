@@ -11,7 +11,7 @@ grid_z = np.asarray([.1, 0., -1.])
 
 #regular
 
-shape = [4, 3, 2]
+shape = [2, 2, 2]
 increment = [2.1, 0.3, 1.]
 zeropoint = [-4., 0.1, -0.3]
 
@@ -20,6 +20,7 @@ zeropoint = [-4., 0.1, -0.3]
 
 # jf12regular = im.JF12RegularField()
 jf12random = im.JF12RandomField()
+GaussRandom = im.GaussianScalarField(shape, zeropoint, increment)
 # jf12random2 = im.JF12RandomField(shape, zeropoint, increment)
 # jaffe = im.JaffeMagneticField()
 # helix = im.HelixMagneticField()
@@ -66,4 +67,7 @@ for i in range(1):
  #   print(jf12regular.on_grid(xx, yy, zz))
     
 # print(jf12random2.on_grid(23))
-print(jf12random.on_grid(shape, zeropoint, increment, 23))
+# print(jf12random.on_grid(shape, zeropoint, increment, 23))
+gr = GaussRandom.on_grid(42)
+print(gr)
+print(gr.shape)
