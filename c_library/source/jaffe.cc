@@ -2,17 +2,17 @@
 #include <vector>
 #include <iostream>
 #include "../headers/hamunits.h"
-#include "../headers/MagneticField.h"
+#include "../headers/Jaffe.h"
 
-std::vector<double> JaffeMagneticField::evaluate_at_pos(const double &x, const double &y, const double &z) const {
+std::array<double, 3> JaffeMagneticField::at_position(const double &x, const double &y, const double &z) const {
     double inner_b{0};
     if (ring) {
       inner_b = ring_amp;}
     else if (bar) {
       inner_b = bar_amp;}
-    std::vector<double> bhat = orientation(x, y, z);
-    std::vector<double> btot{0., 0., 0.};
-    double scaling = radial_scaling(z) *
+    std::array<double, 3> bhat = orientation(x, y, z);
+    std::array<double, 3> btot{0., 0., 0.};
+    double scaling = radial_scaling(x, y) *
            (disk_amp * disk_scaling(z) +
             halo_amp * halo_scaling(z));
     for(int i=0;i<bhat.size();++i) {
@@ -38,14 +38,14 @@ std::vector<double> JaffeMagneticField::evaluate_at_pos(const double &x, const d
     return btot;
   }
 
-  std::vector<double> JaffeMagneticField::orientation(const double &x, const double &y, const double &z) const {
+  std::array<double, 3> JaffeMagneticField::orientation(const double &x, const double &y, const double &z) const {
     const double r{
         sqrt(x * x + y * y)}; // cylindrical frame
     const double r_lim = ring_r;
     const double bar_lim{bar_a + 0.5 * comp_d};
     const double cos_p = std::cos(arm_pitch);
     const double sin_p = std::sin(arm_pitch); // pitch angle
-    std::vector<double> tmp{0., 0., 0.};
+    std::array<double, 3> tmp{0., 0., 0.};
     double quadruple{1};
     if (r < 0.5) // forbiden region
       return tmp;
@@ -124,7 +124,7 @@ std::vector<double> JaffeMagneticField::evaluate_at_pos(const double &x, const d
                       comp_r};
     const double c0{1. / comp_c - 1.};
     std::vector<double> a0 = dist2arm(x, y);
-    const double r_scaling{radial_scaling(z)};
+    const double r_scaling{radial_scaling(x, y)};
     const double z_scaling{arm_scaling(z)};
     // for saving computing time
     const double d0_inv{(r_scaling * z_scaling) / comp_d};
@@ -148,7 +148,7 @@ std::vector<double> JaffeMagneticField::evaluate_at_pos(const double &x, const d
                       comp_r};
     const double c0{1. / comp_c - 1.};
     std::vector<double> a0 = dist2arm(x, y);
-    const double r_scaling{radial_scaling(z)};
+    const double r_scaling{radial_scaling(x, y)};
     const double z_scaling{arm_scaling(z)};
     // only difference from normal arm_compress
     const double d0_inv{(r_scaling) / comp_d};

@@ -9,6 +9,7 @@ test/cpp/test
 examples/cpp/example
 c_library/build
 python_wrapper/playground*
+YouriJF12
 *.out
 
 # Byte-compiled / optimized / DLL files
@@ -24,6 +25,11 @@ __pycache__/
 
 
 # Distribution / packaging
+**/.project
+**/.cproject
+.vscode
+.project
+.cproject
 .Python
 build/
 develop-eggs/
