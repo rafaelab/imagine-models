@@ -41,7 +41,6 @@ inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, s
 
   for (int i = 0; i<3; ++i) {
     py::capsule capsule(seq[i], [](void *f) {
-        std::cout << "capsule call " << std::endl;
         std::unique_ptr<double>(reinterpret_cast<double*>(f));
         });
 
@@ -171,9 +170,9 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
-          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, py::return_value_policy::take_ownership)
+          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, 
+          py::return_value_policy::take_ownership)
 
         .def("on_grid", [](RandomVectorField &self, int seed)  {
           std::array<double*, 3> f = self.on_grid(seed);
@@ -183,8 +182,9 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
-          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, "seed"_a, py::return_value_policy::take_ownership);
+          return arr;}, 
+          "seed"_a, 
+          py::return_value_policy::take_ownership);
 
 // Random Scalar Base Class
     py::class_<RandomScalarField, RandomField<double, double*>, PyRandomScalarField>(m, "RandomScalarField")
@@ -199,7 +199,8 @@ PYBIND11_MODULE(_ImagineModels, m) {
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, py::return_value_policy::take_ownership)
+          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, 
+          py::return_value_policy::take_ownership)
 
      .def("on_grid", [](RandomScalarField &self, int seed)  {
           double* f = self.on_grid(seed);
@@ -208,7 +209,9 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sz = self.shape[2];
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, "seed"_a, py::return_value_policy::take_ownership);
+          return arr;}, 
+          "seed"_a, 
+          py::return_value_policy::take_ownership);
       
 
 /////////////////////////////////Regular Fields/////////////////////////////////
