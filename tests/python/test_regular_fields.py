@@ -45,12 +45,26 @@ def test_grid():
         with pytest.raises(RuntimeError):
             mo_1.on_grid()
             
+        assert mo_1.on_grid(**regular_grid) == mo_2.on_grid()
+        assert mo_2.on_grid(**irregular_grid) == mo_3.on_grid()
+            
         
 def test_interface():
     raise NotImplementedError
             
 
 def test_parameter_update():
-    raise NotImplementedError
+    umf = img.UniformMagneticField()
+    assert umf.bx == 0.
+    assert umf.by == 0.
+    assert umf.bz == 0.
+    
+    assert umf.at_position(2.4, 2.1, -.2) == [0., 0., 0]
+    
+    umf.bx = -3.2 
+    
+    assert umf.bx == -3.2 
+    
+    assert umf.at_position(2.4, 2.1, -.2) == [-3.2, 0., 0]
 
         
