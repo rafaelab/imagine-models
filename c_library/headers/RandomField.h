@@ -99,7 +99,7 @@ protected:
   fftw_complex* construct_plans(double* grid_eval, std::array<int, 3> shp) {
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
     if (has_fftw_wisdom) {
-        const char *filename = "ImagineModelsRandomField";
+        const char *filename = "ImagineModelsRandomField"; // FIX this, currently overwrites
         int fftw_im_wisdom_to_filename(*filename);
     }
     r2c = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval, grid_eval_comp, FFTW_ESTIMATE);
@@ -188,9 +188,7 @@ protected:
   std::array<double*, 3> allocate_memory(std::array<int, 3> shp) {
     std::array<double*, 3> grid_eval;
     for (int i=0; i < ndim; ++i) {
-      std::cout << "allocate memory vf " << shp[0] << ", " << shp[1] << ", " << shp[2] << ", " << shp[0]*shp[1]*2*(shp[2]/2 + 1) << std::endl;
       grid_eval[i] = (double*) fftw_alloc_real(shp[0]*shp[1]*2*(shp[2]/2 + 1));
-      std::cout << "allocate memory vf at" << &grid_eval[i] << std::endl;
       }
     return grid_eval;  
   }  
@@ -225,7 +223,6 @@ protected:
 public:
 
   RandomVectorField() : RandomField() {
-    std::cout << "Random vector field constructor without grid" << std::endl;
     };
 
   RandomVectorField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField(shape, zeropoint, increment) {
@@ -233,6 +230,10 @@ public:
     fftw_complex* val_temp_comp = reinterpret_cast<fftw_complex*>(val_temp);
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], val_temp, val_temp_comp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], val_temp_comp, val_temp,  FFTW_MEASURE);
+    //save wisdom
+    const char *filename = "ImagineModelsRandomField";
+    int fftw_export_wisdom_to_filename(*filename);
+    has_fftw_wisdom = true;
     fftw_free(val_temp);
     fftw_destroy_plan(c2r_temp);
     fftw_destroy_plan(r2c_temp); // plans are destroyed but wisdom is saved!

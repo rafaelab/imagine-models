@@ -58,16 +58,11 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
 };
 
 void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
-  std::cout << "JF12 random vector field _on_grid call" << std::endl;
   std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
-  std::cout << "JF12 random vector field _on_grid plans constructed" << std::endl;
   for (int i =0; i<3; ++i) {
     draw_random_numbers_complex(val_comp[i], shp, inc, seed);
-    std::cout << "JF12 random vector field _on_grid random numbers " << i << " drawn" << std::endl;
     fftw_execute(c2r[i]);
-    std::cout << "JF12 random vector field _on_grid random numbers " << i << " fourier transformed" << std::endl;
   }
-  std::cout << "JF12 random vector field _on_grid all random numbers drawn" << std::endl;
   auto multiply_profile = [&](double xx, double yy, double zz) {
       int _nx = (int)((xx - zpt[0])/inc[0]); 
       int _ny = (int)((yy - zpt[1])/inc[1]);

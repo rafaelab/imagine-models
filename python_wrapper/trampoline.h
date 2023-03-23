@@ -8,6 +8,8 @@
 #include "../c_library/headers/Helix.h"
 #include "../c_library/headers/Jaffe.h"
 #include "../c_library/headers/GaussianScalar.h"
+#include "../c_library/headers/LogNormal.h"
+#include "../c_library/headers/Uniform.h"
 //#include "../c_library/headers/ThermalElectronField.h"
 #include <iostream>
 
