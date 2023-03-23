@@ -18,23 +18,23 @@ double ESRandomField::spatial_profile(const double &x, const double &y, const do
 };
 
 
-void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
 
-      int gs = grid_size(grid_shape);
+      int gs = grid_size(shp);
       
-      std::array<fftw_complex*, 3> val_comp = construct_plans(val, shape); 
+      std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
         
       for (int i =0; i<3; ++i) {
-        draw_random_numbers_complex(val_comp[i], grid_shape, grid_increment, seed);
+        draw_random_numbers_complex(val_comp[i], shp, inc, seed);
         fftw_execute(c2r[i]);
       }
 
       auto multiply_profile = [&](double xx, double yy, double zz) {
-          int _nx = (int)((xx - grid_zeropoint[0])/grid_increment[0]); 
-          int _ny = (int)((yy - grid_zeropoint[1])/grid_increment[1]);
-          int _nz = (int)((zz - grid_zeropoint[2])/grid_increment[2]);
+          int _nx = (int)((xx - zpt[0])/inc[0]); 
+          int _ny = (int)((yy - zpt[1])/inc[1]);
+          int _nz = (int)((zz - zpt[2])/inc[2]);
           double sp = spatial_profile(xx, yy, zz);
-          int idx = _nz + grid_shape[2]*(_ny + grid_shape[1]*_nx);
+          int idx = _nz + shp[2]*(_ny + shp[1]*_nx);
           std::array<double, 3> v = {
             (val[0])[idx]*sp, 
             (val[1])[idx]*sp, 
@@ -43,13 +43,13 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
           return v;
         };
 
-      evaluate_function_on_grid(val, grid_shape, grid_zeropoint, grid_increment, multiply_profile);
+      evaluate_function_on_grid(val, shp, zpt, inc, multiply_profile);
 
       for (int i =0; i<3; ++i) {
         fftw_execute(r2c[i]);
       }
       
-      divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], grid_shape, grid_increment);
+      divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], shp, inc);
 
       for (int i =0; i<3; ++i) {
         fftw_execute(c2r[i]);

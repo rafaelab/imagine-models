@@ -22,13 +22,11 @@ class RandomField : public Field<POSTYPE, GRIDTYPE>  {
 protected:
 
   bool created_fftw_plans = false;
+  bool has_fftw_wisdom = false;
 
 public:
   // Constructors
   using Field<POSTYPE, GRIDTYPE> :: Field;
-
-  // Fields
-  int seed = 0;
 
   // methods
   POSTYPE at_position(const double &x, const double &y, const double &z) const {
@@ -40,9 +38,12 @@ public:
 
   virtual double calculate_fourier_sigma(const double &abs_k) const = 0;
 
-  void draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &grid_increment, const int seed); 
+    // This function is the place where the global routine should be implemented, i.e. how the spatial profile modifies the random field, and if divergence cleaning needs to be performed. 
+  virtual void _on_grid(GRIDTYPE val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) = 0;
 
-  GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z) {
+  void draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed); 
+
+  GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z, const int seed) {
     throw NotImplementedException();
   }
 
@@ -97,6 +98,10 @@ protected:
 
   fftw_complex* construct_plans(double* grid_eval, std::array<int, 3> shp) {
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
+    if (has_fftw_wisdom) {
+        const char *filename = "ImagineModelsRandomField";
+        int fftw_im_wisdom_to_filename(*filename);
+    }
     r2c = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval, grid_eval_comp, FFTW_ESTIMATE);
     c2r = fftw_plan_dft_c2r_3d(shp[0], shp[1], shp[2], grid_eval_comp, grid_eval,  FFTW_ESTIMATE);
     created_fftw_plans = true;
@@ -120,7 +125,12 @@ public:
     double* grid_eval = allocate_memory(shape);
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], grid_eval, grid_eval_comp, FFTW_MEASURE);
-    fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], grid_eval_comp, grid_eval,  FFTW_MEASURE);
+    fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], grid_eval_comp, grid_eval, FFTW_MEASURE);
+    //save wisdom
+    const char *filename = "ImagineModelsRandomField";
+    int fftw_export_wisdom_to_filename(*filename);
+    //destroy wisdom
+    has_fftw_wisdom = true;
     fftw_destroy_plan(c2r_temp);
     fftw_destroy_plan(r2c_temp); //delete plans, but wisdom will be kept!
     fftw_free(grid_eval);
@@ -129,6 +139,7 @@ public:
   ~RandomScalarField() {
     //delete wisdom
     destroy_plans();
+    fftw_forget_wisdom();
     #ifdef _OPENMP
           fftw_cleanup_threads();
     #else
@@ -143,20 +154,12 @@ public:
 
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
-    throw NotImplementedException();
-    //std::vector<double> c{0};
-    //return c;
-  }
 
-  // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. 
-  virtual void _on_grid(double* grid_eval,  const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
-
-  double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) {
+  double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
     double* grid_eval = allocate_memory(shp);
-    _on_grid(grid_eval, shp, grid_zeropoint, grid_increment, seed);
+    _on_grid(grid_eval, shp, zpt, inc, seed);
     return grid_eval;
   }
 
@@ -164,6 +167,8 @@ public:
     if (not initialized_with_grid) 
       throw GridException();
     double* grid_eval = allocate_memory(shape);
+    const char *filename = "ImagineModelsRandomField";
+    int fftw_import_wisdom_from_filename(*filename);
     _on_grid(grid_eval, shape, zeropoint, increment, seed);
     return grid_eval;
   }
@@ -177,19 +182,16 @@ class RandomVectorField : public RandomField<std::array<double, 3>, std::array<d
 protected:
     // Fields
 
-    std::array<fftw_plan, 3> r2c;
-    std::array<fftw_plan, 3> c2r;
-
-    // constructors
-    //RandomField() : Field<G, T>() {}
-    // methods
-
+  std::array<fftw_plan, 3> r2c;
+  std::array<fftw_plan, 3> c2r;
 
   std::array<double*, 3> allocate_memory(std::array<int, 3> shp) {
     std::array<double*, 3> grid_eval;
-      for (int i=0; i < ndim; ++i) {
-        grid_eval[i] = (double*) fftw_alloc_real(shp[0]*shp[1]*2*(shp[2]/2 + 1));
-        }
+    for (int i=0; i < ndim; ++i) {
+      std::cout << "allocate memory vf " << shp[0] << ", " << shp[1] << ", " << shp[2] << ", " << shp[0]*shp[1]*2*(shp[2]/2 + 1) << std::endl;
+      grid_eval[i] = (double*) fftw_alloc_real(shp[0]*shp[1]*2*(shp[2]/2 + 1));
+      std::cout << "allocate memory vf at" << &grid_eval[i] << std::endl;
+      }
     return grid_eval;  
   }  
 
@@ -222,20 +224,29 @@ protected:
 
 public:
 
-
   RandomVectorField() : RandomField() {
+    std::cout << "Random vector field constructor without grid" << std::endl;
     };
+
   RandomVectorField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField(shape, zeropoint, increment) {
-    double* grid_eval = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
-    fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
-    fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], grid_eval, grid_eval_comp, FFTW_MEASURE);
-    fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], grid_eval_comp, grid_eval,  FFTW_MEASURE);
-    fftw_free(grid_eval);
+    double* val_temp = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
+    fftw_complex* val_temp_comp = reinterpret_cast<fftw_complex*>(val_temp);
+    fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], val_temp, val_temp_comp, FFTW_MEASURE);
+    fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], val_temp_comp, val_temp,  FFTW_MEASURE);
+    fftw_free(val_temp);
     fftw_destroy_plan(c2r_temp);
-    fftw_destroy_plan(r2c_temp); // plains are destroyd but wisdom is saved!
+    fftw_destroy_plan(r2c_temp); // plans are destroyed but wisdom is saved!
     };
+
   ~RandomVectorField() {
+    //delete wisdom
     destroy_plans();
+    fftw_forget_wisdom();
+    #ifdef _OPENMP
+          fftw_cleanup_threads();
+    #else
+          fftw_cleanup();
+    #endif
     };
 
   // fields
@@ -248,29 +259,21 @@ public:
   }
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  // This function is the place where the global routine should be implemented, i.e. how the spatial  profile is connected to the random number, and if divergence cleaning needs to be performed. 
-  virtual void _on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) = 0;
 
-  std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
-    throw NotImplementedException();
-    //std::vector<double> c{0};
-    //return c;
-  }
-
-  std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, int nseed) {
+  std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
     std::array<double*, 3> grid_eval = allocate_memory(shp);
-    _on_grid(grid_eval, shp, grid_zeropoint, grid_increment, seed);
+    _on_grid(grid_eval, shp, zpt, inc, seed);
     return grid_eval;
     
   }
 
-  std::array<double*, 3> on_grid(int nseed) {
+  std::array<double*, 3> on_grid(const int seed) {
     if (not initialized_with_grid) 
       throw GridException();
     std::array<double*, 3> grid_eval = allocate_memory(shape);
-    _on_grid(grid_eval, shape, zeropoint, increment, nseed);
+    _on_grid(grid_eval, shape, zeropoint, increment, seed);
     return grid_eval;
   }
 

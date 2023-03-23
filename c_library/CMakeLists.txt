@@ -23,6 +23,7 @@ set(IM_PUBLIC_HEADERS
 "headers/Jaffe.h"
 "headers/Helix.h"
 
+"headers/GaussianScalar.h"
 "headers/RandomJF12.h"
 "headers/EnsslinSteininger.h"
 
@@ -34,7 +35,7 @@ add_library(ImagineModels SHARED
     source/helix.cc
     source/jaffe.cc
     source/regularjf12.cc
-#    source/randomscalar.cc
+    source/gaussianscalar.cc
 #    source/randomvector.cc
     source/randomjf12.cc
     source/ensslinsteininger.cc

@@ -22,10 +22,10 @@ class ESRandomField : public RandomVectorField {
     double spectral_slope = 2.;
 
 
-    void _on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override;
+    void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) override;
 
     double calculate_fourier_sigma(const double &abs_k) const override;
 
-    double spatial_profile(const double &x, const double &y, const double &z) const; 
+    double spatial_profile(const double &x, const double &y, const double &z) const override; 
 
 };
