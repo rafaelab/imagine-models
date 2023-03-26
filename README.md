@@ -1,11 +1,16 @@
 # Imagine Models
-A model library usable for Galactic inference engines.
-The library is (mostly) written C++, but can be accessed via python.
-Some (non-essential) elements are written in pure python, which presently cannot be accessed in the c-library.
+A model library usable for Galactic inference engines. 
+The library is (mostly) written C++, but can be accessed via both C++ and Python.
+Some (non-essential) elements are written in pure Python, which presently cannot be accessed in the C++ version of the library.
+
+
+**TODO: Add model reference at bottom and link it here** 
 
 ## Installation (Python)
 
 #### Requirements
+
+**TODO: check fftw3 dependence, make it optional** 
 
 Requires:
 
@@ -24,21 +29,18 @@ Note that pybind is included in the current repository, so in the current state 
 This may change in the future.  
 
 
-
-
-
 #### Installation procedure
 
 Easiest via
 
     pip3 install --user git+https://github.com/IMAGINE-Consortium/imagine-models.git
 
-If you install the library in a virtual environment, remove the --user tag.
+If you install the library in a virtual environment, remove the --user tag
 
 
 If you want to specify a branch, you can do so by adding @branch-name to the above command.
 
-If you want to add your own model you need to clone the repository via
+Alternatively, (e.g. if you want to add your own model) you need to clone the repository via
 
     git clone -b branch_name --recursive https://github.com/IMAGINE-Consortium/imagine-models.git
 
@@ -51,8 +53,20 @@ The package can then be installed with
 
 ## Installation (C++)
 
-TBD
+From 
+
+
+Note that we build within the 
 
 ## Examples
 
-TBD
+#### Including the pipeline
+
+Example scripts demonstrating how to include both the python and C++ version are located in the ./examples folder. 
+The python
+ 
+#### Adding new models
+
+Defining your own models is easy in both Python and C++, if you want to 
+
+**TODO: model templates** 
