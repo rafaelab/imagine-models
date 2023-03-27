@@ -69,8 +69,8 @@ class AxiSymmetricSpiral(RegularVectorField):
         # This will not work, still need to wrap "evaluate_function_on_grid"
         return self._evaluate_grid(grid_x, grid_y, grid_z, self.at_position)
 
-    def at_position(self, pos):
-        rho, z, phi = cyl2cart(pos)
+    def at_position(self, x, y, z):
+        rho, z, phi = cyl2cart([x, y, z])
         b_amp = self.b0_of_r(rho, z)
         ### Tilt angle
         xi_z = self.xi_0 * np.tanh(z / self.z0)
@@ -83,6 +83,7 @@ class AxiSymmetricSpiral(RegularVectorField):
         return [b_rho, b_z, b_phi]
 
     def b0_of_r(self, rho, z):
+
         """
         Internal function
             Intended to modulate the magnetic field amplitude by a function
@@ -120,6 +121,7 @@ class AxiSymmetricSpiral(RegularVectorField):
         elif self.b_amp_type == 'sph':
             b_amp = (self.b_0 * np.exp(-((rho ** 2 + z ** 2) ** .5 - self.rho_0) / self.b_amp_param))
         else:
+            print(self.b_amp_type)
             raise ValueError('''
             Bad entry for optional argument 'B_amp_type'.
             Key must be one either: 'cst', 'sph' or 'cyl' ''')
