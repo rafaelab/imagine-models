@@ -1,10 +1,9 @@
-# Imagine Models
+# IMAGINE Model Library
+
 A model library usable for Galactic inference engines. 
 The library is (mostly) written C++, but can be accessed via both C++ and Python.
 Some (non-essential) elements are written in pure Python, which presently cannot be accessed in the C++ version of the library.
-
-
-**TODO: Add model reference at bottom and link it here** 
+A full list of implemented models can be found [here](#list-of-models).
 
 ## Installation (Python)
 
@@ -53,20 +52,43 @@ The package can then be installed with
 
 ## Installation (C++)
 
-From 
+To install the C++ library (Debian only until now)
+ 
+```
+cd ./c_library  #important
+mkdir build
+cd build 
+cmake ..
+sudo make install 
+```
 
+Other systems have not been tested yet.
 
-Note that we build within the 
+Note that we build within the `c_library` directory to avoid with the build of the Python package, which is 
 
 ## Examples
 
-#### Including the pipeline
+### Including the pipeline
 
-Example scripts demonstrating how to include both the python and C++ version are located in the ./examples folder. 
-The python
+Example scripts demonstrating how to include both the python and C++ version are located in the ./demo folder. 
+In the python case, we also include a Jupyter notebook. 
  
-#### Adding new models
+### Adding new models **TBD** 
 
-Defining your own models is easy in both Python and C++, if you want to 
+Defining your own models is easy in both Python and C++. 
+For that you can start with the model templates provided in the `\templates` folder. 
+Binding a C++ model to Python is a bit more involved. For the simplest case, a template exists as well. 
 
-**TODO: model templates** 
+
+## List of Models
+
+| MODEL NAME  | PYTHON      | C++         | reference   | notes       |
+| ----------- | ----------- | ----------- | ----------- | ----------- |
+| **Regular models** |           |             |             |             |
+| Uniform | U+2713 | U+2713 |             |             |
+| Helix | U+2713 | U+2713 |             |             |
+| Axissymetric spiral | U+2713 | U+2717 |              |             |
+| Jaffe | U+2713 | U+2713 |             |             |
+| Jansson Farrar | U+2713 | U+2713 |             |             |
+| **Random models** |             |             |             |             |
+| Jansson Farrar | U+2713 | U+2713 |             |             |
