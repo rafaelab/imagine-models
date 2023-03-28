@@ -114,7 +114,6 @@ void print_ev_grid_irreg(std::map <std::string, std::shared_ptr<RegularVectorFie
   while (model_iter != md.end()) {
     std::cout << "The model " << model_iter->first << " is evaluated: \n\n";
     std::array<double*, 3> b_grid = (*(model_iter->second)).on_grid(grid_x, grid_y, grid_z);
-    std::cout << "The ref to b_grid in example.cc" << &b_grid << " \n\n";
     std::cout<< "b_grid: "  <<std::endl;
     int sx = grid_x.size();
     int sy = grid_y.size();
@@ -187,12 +186,17 @@ int main() {
 
   std::map <std::string, std::shared_ptr<RandomVectorField>> rand_mods;
 
-  rand_mods["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField());
-  rand_mods["Ensslin Steininger"] = std::shared_ptr<ESRandomField> (new ESRandomField());
+  //rand_mods["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField());
+  //rand_mods["Ensslin Steininger"] = std::shared_ptr<ESRandomField> (new ESRandomField());
 
 
   std::map <std::string, std::shared_ptr<RandomVectorField>> rand_mods_w_reg_grid;
+  std::map <std::string, std::shared_ptr<RandomScalarField>> rand_mods_w_reg_grid_scalar;
 
+  std::cout << "Random scalar fields" << std::endl;
+  rand_mods_w_reg_grid_scalar["Gauss"] = std::shared_ptr<GaussianScalarField> (new GaussianScalarField());
+
+  std::cout << "Random vector fields" << std::endl;
   rand_mods_w_reg_grid["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField(shape, zeropoint, increment));
   rand_mods_w_reg_grid["Ensslin Steininger"] = std::shared_ptr<ESRandomField> (new ESRandomField(shape, zeropoint, increment));
 
@@ -203,6 +207,13 @@ int main() {
 
   //print_ev_grid_no_grid(reg_mods_w_irreg_grid, {5, 5, 5});
 
+
+
+
+  rand_mods["Jansson Farrar random"] = std::shared_ptr<JF12RandomField> (new JF12RandomField());
+  rand_mods["Ensslin Steininger"] = std::shared_ptr<ESRandomField> (new ESRandomField());
+
+  print_ev_grid_reg(rand_mods, shape, zeropoint, increment);
   print_ev_grid_no_grid(rand_mods_w_reg_grid, {4, 3, 2});
 
   //print_ev_grid_irreg(reg_mods, grid_x, grid_y, grid_z);

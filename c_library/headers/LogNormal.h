@@ -6,13 +6,13 @@
 #include "Field.h"
 #include "RandomField.h"
 
-class GaussianScalarField : public RandomScalarField {
+class LogNormalScalarField : public RandomScalarField {
   protected:
     bool DEBUG = false;
   public:
     using RandomScalarField :: RandomScalarField;
 
-    double mean = 0;
+    double log_mean = 0;
     double spectral_amplitude = 1.;
     double spectral_offset = 1.;
     double spectral_slope = 2.;

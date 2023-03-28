@@ -5,6 +5,9 @@
 #include "../headers/Jaffe.h"
 
 std::array<double, 3> JaffeMagneticField::at_position(const double &x, const double &y, const double &z) const {
+    if (x == 0. && y == 0. && z == 0.) {
+        return std::array<double, 3>{0., 0., 0.};
+      }
     double inner_b{0};
     if (ring) {
       inner_b = ring_amp;}

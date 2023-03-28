@@ -12,9 +12,6 @@ class JF12RandomField : public RandomVectorField {
   public:
     using RandomVectorField :: RandomVectorField;
 
-    JF12RandomField() : RandomVectorField() {};
-    ~JF12RandomField() {};
-
     double b0_1 = 10.81; // uG
     double b0_2 = 6.96; // uG
     double b0_3 = 9.59; // uG
@@ -37,9 +34,9 @@ class JF12RandomField : public RandomVectorField {
     double spectral_offset = 1.; 
     double spectral_slope = 2.;
 
-    void _on_grid(std::array<double*, 3> grid_eval, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed);
+    void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) override;
 
     double calculate_fourier_sigma(const double &abs_k) const override;
 
-    double spatial_profile(const double &x, const double &y, const double &z) const; 
+    double spatial_profile(const double &x, const double &y, const double &z) const override; 
 };

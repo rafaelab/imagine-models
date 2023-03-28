@@ -41,7 +41,6 @@ inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, s
 
   for (int i = 0; i<3; ++i) {
     py::capsule capsule(seq[i], [](void *f) {
-        std::cout << "capsule call " << std::endl;
         std::unique_ptr<double>(reinterpret_cast<double*>(f));
         });
 
@@ -87,8 +86,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
         .def("on_grid", [](RegularVectorField &self, std::vector<double> &grid_x,  std::vector<double>  &grid_y, std::vector<double>  &grid_z)  {
             std::array<double*, 3> f = self.on_grid(grid_x, grid_y, grid_z);
-            std::cout << "on grid f size " << f.size() << std::endl;
-            int si = 3;
             size_t sx = grid_x.size();
             size_t sy = grid_y.size();
             size_t sz = grid_z.size();
@@ -101,7 +98,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def("on_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment)  {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment);
           std::cout << "on grid f size " << f.size() << std::endl;
-          int si = 3;
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
@@ -113,7 +109,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def("on_grid", [](RegularVectorField &self)  {
           std::array<double*, 3> f = self.on_grid();
           std::cout << "on grid f size " << f.size() << std::endl;
-          int si = 3;
           size_t sx = self.shape[0];
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
@@ -165,26 +160,23 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
       .def("on_grid", [](RandomVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment, int seed)  {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, seed);
-          std::cout << "on grid f size " << f.size() << std::endl;
-          int si = 3;
           size_t sx = grid_shape[0] + 1; // catches fftw zeropad
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
-          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, py::return_value_policy::take_ownership)
+          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, 
+          py::return_value_policy::take_ownership)
 
         .def("on_grid", [](RandomVectorField &self, int seed)  {
           std::array<double*, 3> f = self.on_grid(seed);
-          std::cout << "on grid f size " << f.size() << std::endl;
-          int si = 3;
           size_t sx = self.shape[0] + 1; // catches fftw zeropad
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
-          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, "seed"_a, py::return_value_policy::take_ownership);
+          return arr;}, 
+          "seed"_a, 
+          py::return_value_policy::take_ownership);
 
 // Random Scalar Base Class
     py::class_<RandomScalarField, RandomField<double, double*>, PyRandomScalarField>(m, "RandomScalarField")
@@ -199,7 +191,8 @@ PYBIND11_MODULE(_ImagineModels, m) {
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, py::return_value_policy::take_ownership)
+          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, 
+          py::return_value_policy::take_ownership)
 
      .def("on_grid", [](RandomScalarField &self, int seed)  {
           double* f = self.on_grid(seed);
@@ -208,7 +201,9 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sz = self.shape[2];
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, "seed"_a, py::return_value_policy::take_ownership);
+          return arr;}, 
+          "seed"_a, 
+          py::return_value_policy::take_ownership);
       
 
 /////////////////////////////////Regular Fields/////////////////////////////////
@@ -252,6 +247,18 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("ampz", &HelixMagneticField::ampz)
         .def_readwrite("rmin", &HelixMagneticField::rmin)
         .def_readwrite("rmax", &HelixMagneticField::rmax);
+
+
+    py::class_<UniformMagneticField, RegularVectorField>(m, "UniformMagneticField")
+        .def(py::init<>())
+        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
+
+        .def("at_position", &UniformMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+
+        .def_readwrite("bx", &UniformMagneticField::bx)
+        .def_readwrite("by", &UniformMagneticField::by)
+        .def_readwrite("bz", &UniformMagneticField::bz);
 
     py::class_<JaffeMagneticField, RegularVectorField>(m, "JaffeMagneticField")
         .def(py::init<>())
@@ -344,9 +351,20 @@ py::class_<GaussianScalarField, RandomScalarField>(m, "GaussianScalarField")
         .def(py::init<>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
+        .def_readwrite("mean", &GaussianScalarField::mean)
         .def_readwrite("spectral_amplitude", &GaussianScalarField::spectral_amplitude)
         .def_readwrite("spectral_offset", &GaussianScalarField::spectral_offset)
         .def_readwrite("spectral_slope", &GaussianScalarField::spectral_slope);
+
+
+py::class_<LogNormalScalarField, RandomScalarField>(m, "LogNormalScalarField")
+        .def(py::init<>())
+        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
+
+        .def_readwrite("log_mean", &LogNormalScalarField::log_mean)
+        .def_readwrite("spectral_amplitude", &LogNormalScalarField::spectral_amplitude)
+        .def_readwrite("spectral_offset", &LogNormalScalarField::spectral_offset)
+        .def_readwrite("spectral_slope", &LogNormalScalarField::spectral_slope);
 
 /////////////////////////////Thermal Electron Field/////////////////////////////
 /*

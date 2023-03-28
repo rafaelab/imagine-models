@@ -1,7 +1,6 @@
 import ImagineModels as im
 import numpy as np
 
-
 x, y, z = [1., -3., 0.1]
 
 # irregular
@@ -18,11 +17,11 @@ zeropoint = [-4., 0.1, -0.3]
 
 # load model
 
-# jf12regular = im.JF12RegularField()
+jf12regular = im.JF12RegularField(grid_x, grid_y, grid_z)
 jf12random = im.JF12RandomField()
 GaussRandom = im.GaussianScalarField(shape, zeropoint, increment)
 # jf12random2 = im.JF12RandomField(shape, zeropoint, increment)
-# jaffe = im.JaffeMagneticField()
+jaffe = im.JaffeMagneticField(grid_x, grid_y, grid_z)
 # helix = im.HelixMagneticField()
 
 # define a position in cartesian Galactic coordinates (kpc)
@@ -71,3 +70,5 @@ for i in range(1):
 gr = GaussRandom.on_grid(42)
 print(gr)
 print(gr.shape)
+print(jaffe.on_grid())
+print(jf12regular.on_grid())

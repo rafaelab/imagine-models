@@ -24,7 +24,7 @@ protected:
 
   // -----CONSTRUCTORS-----
 
-  Field(std::array<int, 3> grid_shape, std::array<double, 3>  grid_zeropoint, std::array<double, 3>  grid_increment) : shape(grid_shape), zeropoint(grid_zeropoint), increment(grid_increment) {
+  Field(std::array<int, 3> shp, std::array<double, 3>  zpt, std::array<double, 3>  inc) : shape(shp), zeropoint(zpt), increment(inc) {
     initialized_with_grid = true;
     regular_grid = true;
   };
@@ -76,7 +76,7 @@ public:
 
   virtual GRIDTYPE on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, const int seed = 0) = 0;
 
-  virtual GRIDTYPE on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed = 0) = 0;
+  virtual GRIDTYPE on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed = 0) = 0;
 
   // This is the interface function to CRPRopa
   POSTYPE getField(const std::array<double, 3> &pos_arr) const {
