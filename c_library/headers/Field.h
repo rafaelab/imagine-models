@@ -100,7 +100,7 @@ public:
     }
 
   // Evaluate scalar valued functions on regular grids
-  void evaluate_function_on_grid(double *fval, const std::array<int, 3> &size, const std::array<double, 3> &zp, const std::array<double, 3> &inc, std::function<double(double, double, double)> eval) {
+  void evaluate_function_on_grid(double *fval, const std::array<int, 3> &size,  const std::array<double, 3> &inc, const std::array<double, 3> &zp, std::function<double(double, double, double)> eval) {
      for (int i=0; i < size[0]; i++) {
          int m = i*size[0];
          for (int j=0; j < size[1]; j++) {
@@ -130,7 +130,7 @@ public:
 
   // Evaluate vector valued functions on regular grids
   void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::array<int, 3> &size,
-                                  const std::array<double, 3> &zp, const std::array<double, 3> &inc,
+                                   const std::array<double, 3> &inc, const std::array<double, 3> &zp,
                                   std::function<std::array<double, 3>(double, double, double)> eval) {
       for (int i=0; i < size[0]; i++) {
           int m = i*size[1]*size[2];

@@ -95,7 +95,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
             "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::take_ownership)
 
 
-        .def("on_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment)  {
+        .def("on_regular_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment)  {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment);
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
