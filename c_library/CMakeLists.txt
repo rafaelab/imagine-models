@@ -23,6 +23,7 @@ set(IM_PUBLIC_HEADERS
 "headers/RegularJF12.h"
 "headers/Jaffe.h"
 "headers/Helix.h"
+"headers/YMW.h"
 
 "headers/GaussianScalar.h"
 "headers/LogNormal.h"
@@ -32,8 +33,6 @@ set(IM_PUBLIC_HEADERS
     )
 
 add_library(ImagineModels SHARED
-#    source/component.cc
-#    source/disc.cc
     source/helix.cc
     source/jaffe.cc
     source/regularjf12.cc
@@ -42,7 +41,7 @@ add_library(ImagineModels SHARED
 #    source/randomvector.cc
     source/randomjf12.cc
     source/ensslinsteininger.cc
-#    source/ymw16.cc
+    source/ymw16.cc
 #    source/regular.cc
 )
 target_include_directories(ImagineModels PRIVATE .)

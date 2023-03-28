@@ -10,7 +10,7 @@
 #include "../c_library/headers/GaussianScalar.h"
 #include "../c_library/headers/LogNormal.h"
 #include "../c_library/headers/Uniform.h"
-//#include "../c_library/headers/ThermalElectronField.h"
+#include "../c_library/headers/YMW.h"
 #include <iostream>
 
 using Array3Type = std::array<double, 3>;

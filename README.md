@@ -5,9 +5,9 @@ The library is (mostly) written C++, but can be accessed via both C++ and Python
 Some (non-essential) elements are written in pure Python, which presently cannot be accessed in the C++ version of the library.
 A full list of implemented models can be found [here](#list-of-models).
 
-## Installation (Python)
+## <ins>Installation (Python)</ins>
 
-#### Requirements
+### Requirements
 
 **TODO: check fftw3 dependence, make it optional** 
 
@@ -68,11 +68,14 @@ Note that we build within the `c_library` directory to avoid with the build of t
 
 ## Examples
 
-### Including the pipeline
+### Including the library
 
 Example scripts demonstrating how to include both the python and C++ version are located in the ./demo folder. 
 In the python case, we also include a Jupyter notebook. 
- 
+A couple of conventions shall be mentioned already here: 
+
+
+
 ### Adding new models **TBD** 
 
 Defining your own models is easy in both Python and C++. 
@@ -82,13 +85,27 @@ Binding a C++ model to Python is a bit more involved. For the simplest case, a t
 
 ## List of Models
 
-| MODEL NAME  | PYTHON      | C++         | reference   | notes       |
-| ----------- | ----------- | ----------- | ----------- | ----------- |
-| **Regular models** |           |             |             |             |
-| Uniform | &#x2714; | &#x2714; |             |             |
-| Helix | &#x2714;| &#x2714; |             |             |
-| Axissymetric spiral | &#x2714; | &#x2718; |              |             |
-| Jaffe |&#x2714; | &#x2714;|             |             |
-| Jansson Farrar | &#x2714;| &#x2714;|             |             |
-| **Random models** |             |             |             |             |
-| Jansson Farrar | &#x2714;|&#x2714; |             |             |
+### Magnetic/Vector Fields
+
+| MODEL NAME          | PYTHON      | C++         | reference    | notes               | original implementation |
+| -----------         | ----------- | ----------- | -----------  | -----------         | -----------             | 
+| **Regular models**  |             |             |              |                     |                         |
+| Uniform             | &#x2714;    | &#x2714;    |              | used for unit tests |                         |
+| Helix               | &#x2714;    | &#x2714;    |              |                     |                         |
+| Axissymetric spiral | &#x2714;    | &#x2718;    | Pelgrims, V. |                     |  Pelgrims, V.           |
+| Jaffe               | &#x2714;    | &#x2714;    | [Jaffe et al. (2010)](https://ui.adsabs.harvard.edu/abs/2010MNRAS.401.1013J/abstract)        |             | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)  |
+| Jansson Farrar      | &#x2714;    | &#x2714;    | [Jansson & Farrar (2012)](https://ui.adsabs.harvard.edu/abs/2012ApJ...757...14J/abstract)        |             | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)   |
+| **Random models**   |             |             |              |                     |                         |
+| Jansson Farrar      | &#x2714;    |&#x2714;     | [Jansson & Farrar (2012)](https://ui.adsabs.harvard.edu/abs/2012ApJ...761L..11J/abstract)        | depends on the JF12 regular model   |[Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)    |
+| Ensslin Steininger  | &#x2714;    |&#x2714;     |              |                      | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)             |
+
+
+### Thermal electron/Scalar Fields
+
+| MODEL NAME  | PYTHON      | C++         | reference   | notes       |  original implementation |
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| **Regular models**        |             |             |             |             |             |
+| YMW16       | &#x2714;    | &#x2714;    | [Yao et al. (2016)](https://ui.adsabs.harvard.edu/abs/2017ApJ...835...29Y/abstract)     |             |       [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)         |
+| **Random models** |             |             |             |             |             |
+| GaussianScalar | &#x2714;|&#x2714; |             |      used for random number unit testing (TBD!)       |             |
+| LogNormalScalar | &#x2714;|&#x2714; |             |             |             |

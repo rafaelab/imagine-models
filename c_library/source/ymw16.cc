@@ -1,12 +1,81 @@
 #include <cassert>
 
 #include "../headers/hamunits.h"
-#include "../headers/ThermalElectronField.h"
+#include "../headers/YMW.h"
 
-double YMW16ThermalElectronField::evaluate_at_pos
+double YMW16::at_position(const double &x, const double &y, const double &z) const  { 
+  // YMW16 using a different Cartesian frame from our default one
+  std::vector<double> gc_pos{y, -x, z};
+  // cylindrical r
+  double r_cyl{std::sqrt(gc_pos[0] * gc_pos[0] + gc_pos[1] * gc_pos[1])};
+  // warp
+  if (r_cyl >= r_warp) {
+    double theta_warp{std::atan2(gc_pos[1], gc_pos[0])};
+    gc_pos[2] -= t0_gamma_w *
+                 (r_cyl - r_warp) * std::cos(theta_warp);
+  }
+  double vec_length = std::sqrt(std::pow(gc_pos[0], 2) + std::pow(gc_pos[1], 2)+ std::pow(gc_pos[2], 2)); 
+  if (vec_length > 25 ) {
+    return 0.;
+  } else {
+    double ne{0.};
+    double ne_comp[8]{0.};
+    double weight_localbubble{0.};
+    double weight_gum{0.};
+    double weight_loop{0.};
+    // longitude, in deg
+    const double ec_l{
+        std::atan2(gc_pos[0], r0 - gc_pos[1]) / cgs::rad};
+    // call structure functions
+    // since in YMW16, Fermi Bubble is not actually contributing, we ignore FB
+    // for thick disk
+    ne_comp[1] = thick(gc_pos[2], r_cyl);
+    ne_comp[2] = thin(gc_pos[2], r_cyl);
+    ne_comp[3] = spiral(gc_pos[0], gc_pos[1], gc_pos[2], r_cyl);
+    ne_comp[4] = galcen(gc_pos[0], gc_pos[1], gc_pos[2]);
+    ne_comp[5] = gum(gc_pos[0], gc_pos[1], gc_pos[2]);
+    // localbubble boundary
+    const double localbubble_boundary{110. * 0.001};
+    ne_comp[6] = localbubble(gc_pos[0], gc_pos[1], gc_pos[2], ec_l,
+                             localbubble_boundary);
+    ne_comp[7] = nps(gc_pos[0], gc_pos[1], gc_pos[2]);
+    // adding up rules
+    ne_comp[0] = ne_comp[1] + std::max(ne_comp[2], ne_comp[3]);
+    // distance to local bubble
+    const double rlb{std::sqrt(
+        std::pow(((gc_pos[1] - 8.34 ) * 0.94 - 0.34 * gc_pos[2]), 2) +
+        gc_pos[0] * gc_pos[0])};
+    if (rlb < localbubble_boundary) { // inside local bubble
+      ne_comp[0] = rlb * ne_comp[1] +
+                   std::max(ne_comp[2], ne_comp[3]);
+      if (ne_comp[6] > ne_comp[0]) {
+        weight_localbubble = 1;
+      }
+    } else { // outside local bubble
+      if (ne_comp[6] > ne_comp[0] and ne_comp[6] > ne_comp[5]) {
+        weight_localbubble = 1;
+      }
+    }
+    if (ne_comp[7] > ne_comp[0]) {
+      weight_loop = 1;
+    }
+    if (ne_comp[5] > ne_comp[0]) {
+      weight_gum = 1;
+    }
+    // final density
+    ne =
+        (1 - weight_localbubble) *
+            ((1 - weight_gum) * ((1 - weight_loop) * (ne_comp[0] + ne_comp[4]) +
+                                 weight_loop * ne_comp[7]) +
+             weight_gum * ne_comp[5]) +
+        (weight_localbubble) * (ne_comp[6]);
+    assert(std::isfinite(ne));
+    return ne;
+  }
+}
 
 // thick disk
-double YMW16ThermalElectronField::thick(const double &zz, const double &rr) const {
+double YMW16::thick(const double &zz, const double &rr) const {
   if (zz > 10. * t1_h1)
     return 0.; // timesaving
   double gd{1.};
@@ -20,7 +89,7 @@ double YMW16ThermalElectronField::thick(const double &zz, const double &rr) cons
 }
 
 // thin disk
-double YMW16ThermalElectronField::thin(const double &zz, const double &rr) const {
+double YMW16::thin(const double &zz, const double &rr) const {
   // z scaling, K_2*h0 in ref
   double h0{t2_k2 *
                (32 * 0.001 + 1.6e-3 * rr + (4.e-7 / 0.001) * rr * rr)};
@@ -40,8 +109,8 @@ double YMW16ThermalElectronField::thin(const double &zz, const double &rr) const
 }
 
 // spiral arms
-double YMW16ThermalElectronField::spiral(const double &xx, const double &yy,
-                              const double &zz, const double &rr) const {
+double YMW16::spiral(const double &xx, const double &yy,
+                     const double &zz, const double &rr) const {
   // structure scaling
   double scaling{1.};
   if (rr > t1_bd) {
@@ -132,7 +201,7 @@ double YMW16ThermalElectronField::spiral(const double &xx, const double &yy,
 }
 
 // galactic center
-double YMW16ThermalElectronField::galcen(const double &xx, const double &yy,
+double YMW16::galcen(const double &xx, const double &yy,
                               const double &zz) const {
   // pos of center
   const double Xgc{50. * 0.001};
@@ -151,7 +220,7 @@ double YMW16ThermalElectronField::galcen(const double &xx, const double &yy,
 }
 
 // gum nebula
-double YMW16ThermalElectronField::gum(const double &xx, const double &yy,
+double YMW16::gum(const double &xx, const double &yy,
   const double &zz) const {
   if (yy < 0 or xx > 0)
     return 0.; // timesaving
@@ -192,7 +261,7 @@ double YMW16ThermalElectronField::gum(const double &xx, const double &yy,
 }
 
 // local bubble
-double YMW16ThermalElectronField::localbubble(const double &xx, const double &yy,
+double YMW16::localbubble(const double &xx, const double &yy,
                                    const double &zz, const double &ll,
                                    const double &Rlb) const {
   if (yy < 0)
@@ -227,8 +296,8 @@ double YMW16ThermalElectronField::localbubble(const double &xx, const double &yy
   return nel;
 }
 
-// north spur
-double YMW16ThermalElectronField::nps(const double &xx, const double &yy,
+// north polar spur
+double YMW16::nps(const double &xx, const double &yy,
                            const double &zz) const {
   if (yy < 0)
     return 0.; // timesaving
