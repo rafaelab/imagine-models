@@ -6,7 +6,7 @@ env_imagine_develop
 runs
 Playground/
 test/cpp/test
-examples/cpp/example
+demos/cpp/example
 c_library/build
 python_wrapper/playground*
 YouriJF12
