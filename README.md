@@ -85,10 +85,10 @@ Binding a C++ model to Python is a bit more involved. For the simplest case, a t
 | MODEL NAME  | PYTHON      | C++         | reference   | notes       |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
 | **Regular models** |           |             |             |             |
-| Uniform | U+2713 | U+2713 |             |             |
-| Helix | U+2713 | U+2713 |             |             |
-| Axissymetric spiral | U+2713 | U+2717 |              |             |
-| Jaffe | U+2713 | U+2713 |             |             |
-| Jansson Farrar | U+2713 | U+2713 |             |             |
+| Uniform | &#x2714; | &#x2714; |             |             |
+| Helix | &#x2714;| &#x2714; |             |             |
+| Axissymetric spiral | &#x2714; | &#x2718; |              |             |
+| Jaffe |&#x2714; | &#x2714;|             |             |
+| Jansson Farrar | &#x2714;| &#x2714;|             |             |
 | **Random models** |             |             |             |             |
-| Jansson Farrar | U+2713 | U+2713 |             |             |
+| Jansson Farrar | &#x2714;|&#x2714; |             |             |
