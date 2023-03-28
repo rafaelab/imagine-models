@@ -114,7 +114,6 @@ public:
   // Evaluate vector valued functions on irregular grids (replace with template for ndim?)
   void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<std::array<double, 3>(double, double, double)> eval) {
     std::vector<int> size{(int)ggx.size(), (int)ggy.size(), (int)ggz.size()};
-    std::cout << "The ref to b_grid when filled " << &fval << " \n\n";
      for (int i=0; i < size[0]; i++) {
          int m = i*size[1]*size[2];
          for (int j=0; j < size[1]; j++) {

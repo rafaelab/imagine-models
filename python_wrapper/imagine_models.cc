@@ -97,7 +97,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
         .def("on_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment)  {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment);
-          std::cout << "on grid f size " << f.size() << std::endl;
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
@@ -108,7 +107,6 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
         .def("on_grid", [](RegularVectorField &self)  {
           std::array<double*, 3> f = self.on_grid();
-          std::cout << "on grid f size " << f.size() << std::endl;
           size_t sx = self.shape[0];
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
