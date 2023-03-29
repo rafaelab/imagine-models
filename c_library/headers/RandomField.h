@@ -39,7 +39,7 @@ public:
   virtual double calculate_fourier_sigma(const double &abs_k) const = 0;
 
     // This function is the place where the global routine should be implemented, i.e. how the spatial profile modifies the random field, and if divergence cleaning needs to be performed. 
-  virtual void _on_grid(GRIDTYPE val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) = 0;
+  virtual void _on_grid(GRIDTYPE val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) = 0;
 
   void draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed); 
 
@@ -120,7 +120,7 @@ public:
   RandomScalarField() : RandomField<double, double*>() {
     };
 
-  RandomScalarField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField<double, double*>(shape, zeropoint, increment) {
+  RandomScalarField(std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  increment) : RandomField<double, double*>(shape, reference_point, increment) {
     //accumulate wisdom
     double* grid_eval = allocate_memory(shape);
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
@@ -155,11 +155,11 @@ public:
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
 
-  double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
+  double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
     double* grid_eval = allocate_memory(shp);
-    _on_grid(grid_eval, shp, zpt, inc, seed);
+    _on_grid(grid_eval, shp, rpt, inc, seed);
     return grid_eval;
   }
 
@@ -169,7 +169,7 @@ public:
     double* grid_eval = allocate_memory(shape);
     const char *filename = "ImagineModelsRandomField";
     int fftw_import_wisdom_from_filename(*filename);
-    _on_grid(grid_eval, shape, zeropoint, increment, seed);
+    _on_grid(grid_eval, shape, reference_point, increment, seed);
     return grid_eval;
   }
 
@@ -225,7 +225,7 @@ public:
   RandomVectorField() : RandomField() {
     };
 
-  RandomVectorField(std::array<int, 3>  shape, std::array<double, 3>  zeropoint, std::array<double, 3>  increment) : RandomField(shape, zeropoint, increment) {
+  RandomVectorField(std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  increment) : RandomField(shape, reference_point, increment) {
     double* val_temp = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
     fftw_complex* val_temp_comp = reinterpret_cast<fftw_complex*>(val_temp);
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], val_temp, val_temp_comp, FFTW_MEASURE);
@@ -261,11 +261,12 @@ public:
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
 
-  std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
+  std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
+    std::cout<<"on_grid external call" << std::endl; 
     std::array<double*, 3> grid_eval = allocate_memory(shp);
-    _on_grid(grid_eval, shp, zpt, inc, seed);
+    _on_grid(grid_eval, shp, rpt, inc, seed);
     return grid_eval;
     
   }
@@ -274,7 +275,7 @@ public:
     if (not initialized_with_grid) 
       throw GridException();
     std::array<double*, 3> grid_eval = allocate_memory(shape);
-    _on_grid(grid_eval, shape, zeropoint, increment, seed);
+    _on_grid(grid_eval, shape, reference_point, increment, seed);
     return grid_eval;
   }
 

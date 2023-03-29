@@ -24,7 +24,7 @@ protected:
 
   // -----CONSTRUCTORS-----
 
-  Field(std::array<int, 3> shp, std::array<double, 3>  zpt, std::array<double, 3>  inc) : shape(shp), zeropoint(zpt), increment(inc) {
+  Field(std::array<int, 3> shp, std::array<double, 3>  rpt, std::array<double, 3>  inc) : shape(shp), reference_point(rpt), increment(inc) {
     initialized_with_grid = true;
     regular_grid = true;
   };
@@ -48,7 +48,7 @@ public:
   // -----FIELDS-----
 
   std::array<int, 3> shape;
-  std::array<double, 3> zeropoint;
+  std::array<double, 3> reference_point;
   std::array<double, 3> increment;
   std::vector<double> grid_x;
   std::vector<double> grid_y;
@@ -76,7 +76,7 @@ public:
 
   virtual GRIDTYPE on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, const int seed = 0) = 0;
 
-  virtual GRIDTYPE on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed = 0) = 0;
+  virtual GRIDTYPE on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed = 0) = 0;
 
   // This is the interface function to CRPRopa
   POSTYPE getField(const std::array<double, 3> &pos_arr) const {
@@ -100,13 +100,13 @@ public:
     }
 
   // Evaluate scalar valued functions on regular grids
-  void evaluate_function_on_grid(double *fval, const std::array<int, 3> &size,  const std::array<double, 3> &inc, const std::array<double, 3> &zp, std::function<double(double, double, double)> eval) {
+  void evaluate_function_on_grid(double *fval, const std::array<int, 3> &size, const std::array<double, 3> &rpt,  const std::array<double, 3> &inc, std::function<double(double, double, double)> eval) {
      for (int i=0; i < size[0]; i++) {
          int m = i*size[0];
          for (int j=0; j < size[1]; j++) {
              int n = j*size[1];
              for (int k=0; k < size[2]; k++) {
-                 fval[m + n + k] = eval(zp[0] + i*inc[0], zp[1] + j*inc[1], zp[2] + k*inc[2]);
+                 fval[m + n + k] = eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
          }   }   }
     }
 
@@ -126,18 +126,18 @@ public:
               }
           }   
       }   
-   }
+  }
 
   // Evaluate vector valued functions on regular grids
   void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::array<int, 3> &size,
-                                   const std::array<double, 3> &inc, const std::array<double, 3> &zp,
-                                  std::function<std::array<double, 3>(double, double, double)> eval) {
+                                 const std::array<double, 3> &rpt, const std::array<double, 3> &inc,
+                                 std::function<std::array<double, 3>(double, double, double)> eval) {
       for (int i=0; i < size[0]; i++) {
           int m = i*size[1]*size[2];
           for (int j=0; j < size[1]; j++) {
               int n = j*size[2];
               for (int k=0; k < size[2]; k++) {
-                  std::array<double, 3> v = eval(zp[0] + i*inc[0], zp[1] + j*inc[1], zp[2] + k*inc[2]);
+                  std::array<double, 3> v = eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
                   fval[0][m + n + k] = v[0];
                   fval[1][m + n + k] = v[1];
                   fval[2][m + n + k] = v[2];

@@ -1,3 +1,7 @@
+#ifndef RANDOMJF12_H
+#define RANDOMJF12_H
+
+
 #include <functional>
 #include <cmath>
 #include <cassert>
@@ -5,6 +9,7 @@
 
 #include "Field.h"
 #include "RandomField.h"
+#include "RegularJF12.h"
 
 class JF12RandomField : public RandomVectorField {
   protected:
@@ -34,9 +39,15 @@ class JF12RandomField : public RandomVectorField {
     double spectral_offset = 1.; 
     double spectral_slope = 2.;
 
-    void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) override;
+    double anisotropy_rho = 1.;
+
+    JF12MagneticField regular_base = JF12MagneticField();
+
+    void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) override;
 
     double calculate_fourier_sigma(const double &abs_k) const override;
 
     double spatial_profile(const double &x, const double &y, const double &z) const override; 
 };
+
+#endif

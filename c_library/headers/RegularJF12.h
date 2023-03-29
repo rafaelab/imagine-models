@@ -1,3 +1,6 @@
+#ifndef REGULARJF12_H
+#define REGULARJF12_H
+
 #include <functional>
 #include <cmath>
 #include <cassert>
@@ -41,6 +44,8 @@ class JF12MagneticField : public RegularVectorField {
 
     std::array<double, 3> at_position(const double &x, const double &y, const double &z) const;
 };
+
+#endif
     
     /*
      {

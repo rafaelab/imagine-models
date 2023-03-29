@@ -10,7 +10,7 @@
 //PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
 
 #include "trampoline.h"
-// #include "thermal_trampoline.h"
+#include "../c_library/headers/pointer_wrapper.h" 
 
 
 namespace py = pybind11;
@@ -84,35 +84,38 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def("on_grid", [](RegularVectorField &self, std::vector<double> &grid_x,  std::vector<double>  &grid_y, std::vector<double>  &grid_z)  {
-            std::array<double*, 3> f = self.on_grid(grid_x, grid_y, grid_z);
+        .def("on_grid", [](RegularVectorField &self, py::array_t<double> &grid_x,  py::array_t<double>  &grid_y, py::array_t<double>  &grid_z)  {
             size_t sx = grid_x.size();
             size_t sy = grid_y.size();
             size_t sz = grid_z.size();
+            std::vector<double> grid_x_vec{grid_x.data(), grid_x.data() + sx}; 
+            std::vector<double> grid_y_vec{grid_y.data(), grid_y.data() + sy}; 
+            std::vector<double> grid_z_vec{grid_z.data(), grid_z.data() + sz}; 
+            std::array<double*, 3> f = self.on_grid(grid_x_vec, grid_y_vec, grid_z_vec);
             auto li = from_pointer_array_to_list_pyarray(f, sx, sy, sz);
             //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
             return li;},
-            "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::take_ownership)
+            py::arg("grid_x").noconvert(), py::arg("grid_y").noconvert(), py::arg("grid_z").noconvert(), py::return_value_policy::take_ownership)
 
 
-        .def("on_regular_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment)  {
-          std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment);
+        .def("on_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_reference_point, std::array<double, 3>  &grid_increment)  {
+          std::array<double*, 3> f = self.on_grid(grid_shape, grid_reference_point, grid_increment);
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
+          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, py::return_value_policy::take_ownership)
+          return arr;}, 
+          py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), py::return_value_policy::take_ownership)
 
         .def("on_grid", [](RegularVectorField &self)  {
           std::array<double*, 3> f = self.on_grid();
           size_t sx = self.shape[0];
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
+          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, py::return_value_policy::reference_internal);
+          return arr;}, py::return_value_policy::take_ownership);
         
 
 // Regular Scalar Base Class
@@ -121,24 +124,28 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def("on_grid", [](RegularScalarField &self, std::vector<double> &grid_x,  std::vector<double>  &grid_y, std::vector<double>  &grid_z)  {
-          double* f = self.on_grid(grid_x, grid_y, grid_z, 0);
+        .def("on_grid", [](RegularScalarField &self, py::array_t<double> &grid_x,  py::array_t<double>  &grid_y, py::array_t<double>  &grid_z)  {
           size_t sx = grid_x.size();
           size_t sy = grid_y.size();
           size_t sz = grid_z.size();
+          std::vector<double> grid_x_vec{grid_x.data(), grid_x.data() + sx}; 
+          std::vector<double> grid_y_vec{grid_y.data(), grid_y.data() + sy}; 
+          std::vector<double> grid_z_vec{grid_z.data(), grid_z.data() + sz}; 
+          double* f = self.on_grid(grid_x_vec, grid_y_vec, grid_z_vec);
           auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
           arr.resize({sx, sy, sz});
           return arr;},
-          "grid_x"_a, "grid_y"_a, "grid_z"_a, py::return_value_policy::take_ownership)
+          py::arg("grid_x").noconvert(), py::arg("grid_y").noconvert(), py::arg("grid_z").noconvert(), py::return_value_policy::take_ownership)
         
-        .def("on_grid", [](RegularScalarField &self, std::array<int, 3>  grid_shape, std::array<double, 3>  grid_zeropoint, std::array<double, 3>  grid_increment)  {
-          double* f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, 0);
+        .def("on_grid", [](RegularScalarField &self, std::array<int, 3>  grid_shape, std::array<double, 3>  grid_reference_point, std::array<double, 3>  grid_increment)  {
+          double* f = self.on_grid(grid_shape, grid_reference_point, grid_increment, 0);
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
           auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, py::return_value_policy::take_ownership)
+          py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), 
+          py::return_value_policy::take_ownership)
 
 
         .def("on_grid", [](RegularScalarField &self)  {
@@ -156,14 +163,14 @@ PYBIND11_MODULE(_ImagineModels, m) {
       .def(py::init<>())
       .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-      .def("on_grid", [](RandomVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment, int seed)  {
-          std::array<double*, 3> f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, seed);
+      .def("on_grid", [](RandomVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_reference_point, std::array<double, 3>  &grid_increment, int seed)  {
+          std::array<double*, 3> f = self.on_grid(grid_shape, grid_reference_point, grid_increment, seed);
           size_t sx = grid_shape[0] + 1; // catches fftw zeropad
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
           auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, 
+          py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"),  "seed"_a, 
           py::return_value_policy::take_ownership)
 
         .def("on_grid", [](RandomVectorField &self, int seed)  {
@@ -181,15 +188,15 @@ PYBIND11_MODULE(_ImagineModels, m) {
       .def(py::init<>())
       .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-      .def("on_grid", [](RandomScalarField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_zeropoint, std::array<double, 3>  &grid_increment, int seed)  {
-          double* f = self.on_grid(grid_shape, grid_zeropoint, grid_increment, seed);
+      .def("on_grid", [](RandomScalarField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_reference_point, std::array<double, 3>  &grid_increment, int seed)  {
+          double* f = self.on_grid(grid_shape, grid_reference_point, grid_increment, seed);
           size_t sx = grid_shape[0] + 1; // catches fftw zeropad
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;},
-          "grid_shape"_a, "grid_zeropoint"_a, "grid_increment"_a, "seed"_a, 
+          py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"),  "seed"_a, 
           py::return_value_policy::take_ownership)
 
      .def("on_grid", [](RandomScalarField &self, int seed)  {
@@ -312,6 +319,8 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def(py::init<>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
+        .def_readonly("regular_base", &JF12RandomField::regular_base)
+
         .def_readwrite("spectral_amplitude", &JF12RandomField::spectral_amplitude)
         .def_readwrite("spectral_offset", &JF12RandomField::spectral_offset)
         .def_readwrite("spectral_slope", &JF12RandomField::spectral_slope)
@@ -330,7 +339,8 @@ PYBIND11_MODULE(_ImagineModels, m) {
         .def_readwrite("z0_halo", &JF12RandomField::z0_halo)
         .def_readwrite("z0_spiral", &JF12RandomField::z0_spiral)
         .def_readwrite("rho_GC", &JF12RandomField::rho_GC)
-        .def_readwrite("Rmax", &JF12RandomField::Rmax);
+        .def_readwrite("Rmax", &JF12RandomField::Rmax)
+        .def_readwrite("anisotropy_rho", &JF12RandomField::anisotropy_rho);
 
 
 py::class_<ESRandomField, RandomVectorField>(m, "ESRandomField")
