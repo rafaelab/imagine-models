@@ -34,32 +34,37 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
   return py::array(size, data, capsule);
 }
 
+inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z, bool fftw) {
+  
+  py::capsule capsule(data, [](void *f) {
+      std::unique_ptr<double>(reinterpret_cast<double*>(f));
+      });
 
-inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z) {
+  size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
+  py::array_t<double> arr = py::array(arr_size, data, capsule);
+  /*if (fftw) {
+    if (arr_size_z & 2) { //uneven
+      arr.resize({arr_size_x, arr_size_y, arr_size_z - 1});
+    }
+    else { //even
+      arr.resize({arr_size_x, arr_size_y, arr_size_z - 2});
+    }
+  }
+  */
+  return arr.reshape({arr_size_x, arr_size_y, arr_size_z});
+}
+
+
+inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z, bool fftw) {
   size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
   py::list li;
 
   for (int i = 0; i<3; ++i) {
-    py::capsule capsule(seq[i], [](void *f) {
-        std::unique_ptr<double>(reinterpret_cast<double*>(f));
-        });
+    py::array_t<double> arr = from_pointer_to_pyarray(std::move(seq[i]), arr_size_x, arr_size_y, arr_size_z, fftw);
 
-    py::array_t<double> arr = py::array(arr_size, seq[i], capsule);
-    li.append(arr.reshape({arr_size_x, arr_size_y, arr_size_z}));
+    li.append(arr);
   }
   return li;
-}
-
-inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z) {
-  
-  py::capsule capsule(data, [](void *f) {
-    double *data = reinterpret_cast<double *>(f);
-    delete[] data;
-    });
-
-  size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
-  py::array_t<double> arr = py::array(arr_size, data, capsule);
-  return arr.reshape({arr_size_x, arr_size_y, arr_size_z});
 }
 
 
@@ -92,7 +97,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
             std::vector<double> grid_y_vec{grid_y.data(), grid_y.data() + sy}; 
             std::vector<double> grid_z_vec{grid_z.data(), grid_z.data() + sz}; 
             std::array<double*, 3> f = self.on_grid(grid_x_vec, grid_y_vec, grid_z_vec);
-            auto li = from_pointer_array_to_list_pyarray(f, sx, sy, sz);
+            auto li = from_pointer_array_to_list_pyarray(f, sx, sy, sz, false);
             //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
             return li;},
             py::arg("grid_x").noconvert(), py::arg("grid_y").noconvert(), py::arg("grid_z").noconvert(), py::return_value_policy::take_ownership)
@@ -103,7 +108,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz);
+          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz, false);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;}, 
           py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), py::return_value_policy::take_ownership)
@@ -113,7 +118,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sx = self.shape[0];
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz);
+          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz, false);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;}, py::return_value_policy::take_ownership);
         
@@ -132,7 +137,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           std::vector<double> grid_y_vec{grid_y.data(), grid_y.data() + sy}; 
           std::vector<double> grid_z_vec{grid_z.data(), grid_z.data() + sz}; 
           double* f = self.on_grid(grid_x_vec, grid_y_vec, grid_z_vec);
-          auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
+          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, false);
           arr.resize({sx, sy, sz});
           return arr;},
           py::arg("grid_x").noconvert(), py::arg("grid_y").noconvert(), py::arg("grid_z").noconvert(), py::return_value_policy::take_ownership)
@@ -142,7 +147,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
           size_t sz = grid_shape[2];
-          auto arr = from_pointer_to_pyarray(f, sx, sy, sz);
+          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, false);
           return arr;},
           py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), 
           py::return_value_policy::take_ownership)
@@ -153,7 +158,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
           size_t sx = self.shape[0];
           size_t sy = self.shape[1];
           size_t sz = self.shape[2];
-          auto arr = from_pointer_to_pyarray(f, sx, sy ,sz);
+          auto arr = from_pointer_to_pyarray(f, sx, sy, sz, false);
           return arr;}, py::return_value_policy::take_ownership);
 
 /////////////////////////////////Random Fields/////////////////////////////////
@@ -165,20 +170,26 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
       .def("on_grid", [](RandomVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_reference_point, std::array<double, 3>  &grid_increment, int seed)  {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_reference_point, grid_increment, seed);
-          size_t sx = grid_shape[0] + 1; // catches fftw zeropad
+          size_t sx = grid_shape[0]; 
           size_t sy = grid_shape[1];
-          size_t sz = grid_shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
-          return arr;},
+          size_t sz = grid_shape[2] + 1; // catches fftw zeropad (uneven)
+          if (sz & 2) {
+            sz += 1; // catches fftw zeropad (even)
+          }
+          auto lis = from_pointer_array_to_list_pyarray(f, sx, sy, sz, true);
+          return lis;},
           py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"),  "seed"_a, 
           py::return_value_policy::take_ownership)
 
         .def("on_grid", [](RandomVectorField &self, int seed)  {
           std::array<double*, 3> f = self.on_grid(seed);
-          size_t sx = self.shape[0] + 1; // catches fftw zeropad
+          size_t sx = self.shape[0];
           size_t sy = self.shape[1];
-          size_t sz = self.shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(std::move(f), sx, sy, sz);
+          size_t sz = self.shape[2] + 1; // catches fftw zeropad (uneven)
+          if (sz & 2) {
+            sz += 1; // catches fftw zeropad (even)
+          }
+          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz, true);
           return arr;}, 
           "seed"_a, 
           py::return_value_policy::take_ownership);
@@ -190,10 +201,14 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
       .def("on_grid", [](RandomScalarField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_reference_point, std::array<double, 3>  &grid_increment, int seed)  {
           double* f = self.on_grid(grid_shape, grid_reference_point, grid_increment, seed);
-          size_t sx = grid_shape[0] + 1; // catches fftw zeropad
+          size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
-          size_t sz = grid_shape[2];
-          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
+          size_t sz = grid_shape[2] + 1; // catches fftw zeropad (uneven)
+          if (sz & 2) {
+            sz += 1; // catches fftw zeropad (even)
+          }
+          std::cout<< "sz: " << sz << std::endl;
+          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, true);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;},
           py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"),  "seed"_a, 
@@ -201,10 +216,13 @@ PYBIND11_MODULE(_ImagineModels, m) {
 
      .def("on_grid", [](RandomScalarField &self, int seed)  {
           double* f = self.on_grid(seed);
-          size_t sx = self.shape[0] + 1; // catches fftw zeropad
+          size_t sx = self.shape[0];
           size_t sy = self.shape[1];
-          size_t sz = self.shape[2];
-          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
+          size_t sz = self.shape[2] + 1; // catches fftw zeropad (uneven)
+          if (sz & 2) {
+            sz += 1; // catches fftw zeropad (even)
+          }
+          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, true);
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;}, 
           "seed"_a, 

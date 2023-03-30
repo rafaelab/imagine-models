@@ -11,9 +11,8 @@ double ESRandomField::calculate_fourier_sigma(const double &abs_k) const {
 };
 
 double ESRandomField::spatial_profile(const double &x, const double &y, const double &z) const {
-      const double r_cyl{std::sqrt(x * x + y * y) -
-                        std::fabs(observer[0])};
-      const double zz{std::fabs(z) - std::fabs(observer[2])};
+      const double r_cyl{std::sqrt(x * x + y * y)};
+      const double zz{std::fabs(z)};
   return std::exp(-r_cyl / r0) * std::exp(-zz / z0);
 };
 
@@ -23,9 +22,12 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
       int gs = grid_size(shp);
       
       std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
+      auto gen_int = std::mt19937(seed);
+      std::uniform_int_distribution<int> uni(0, 100000000000);
         
       for (int i =0; i<3; ++i) {
-        draw_random_numbers_complex(val_comp[i], shp, inc, seed);
+        int sub_seed = uni(gen_int); 
+        draw_random_numbers_complex(val_comp[i], shp, inc, sub_seed);
         fftw_execute(c2r[i]);
       }
 
@@ -42,8 +44,9 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
             };
           return v;
         };
-
-      evaluate_function_on_grid(val, shp, zpt, inc, multiply_profile);
+      std::array<int, 3> padded_shape = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
+      int padded_size = padded_shape[0]*padded_shape[1]*padded_shape[2];
+      evaluate_function_on_grid(val, padded_shape, zpt, inc, multiply_profile);
 
       for (int i =0; i<3; ++i) {
         fftw_execute(r2c[i]);
@@ -53,7 +56,7 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
 
       for (int i =0; i<3; ++i) {
         fftw_execute(c2r[i]);
-        for (int s = 0; s < gs; ++s)
+        for (int s = 0; s < padded_size; ++s)
           (val[i])[s] /= gs;  
       }
 

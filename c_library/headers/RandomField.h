@@ -88,7 +88,14 @@ protected:
     // methods
 
   double* allocate_memory(std::array<int, 3> shp) {
-    double* grid_eval = (double*) fftw_alloc_real(shp[0]*shp[1]*2*(shp[2]/2 + 1));
+    int newshp2;
+    if (shp[2] % 2) {
+      newshp2 = shp[2] + 1;
+    }
+    else {
+      newshp2 = shp[2] + 2;
+    }
+    double* grid_eval = (double*) fftw_alloc_real(shp[0]*shp[1]*newshp2);
     return grid_eval;  
   }  
 
@@ -99,7 +106,7 @@ protected:
   fftw_complex* construct_plans(double* grid_eval, std::array<int, 3> shp) {
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
     if (has_fftw_wisdom) {
-        const char *filename = "ImagineModelsRandomField"; // FIX this, currently overwrites
+        const char *filename = "ImagineModelsRandomFieldScalar"; // FIX this, currently overwrites
         int fftw_im_wisdom_to_filename(*filename);
     }
     r2c = fftw_plan_dft_r2c_3d(shp[0], shp[1], shp[2], grid_eval, grid_eval_comp, FFTW_ESTIMATE);
@@ -127,7 +134,7 @@ public:
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], grid_eval, grid_eval_comp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], grid_eval_comp, grid_eval, FFTW_MEASURE);
     //save wisdom
-    const char *filename = "ImagineModelsRandomField";
+    const char *filename = "ImagineModelsRandomFieldVector";
     int fftw_export_wisdom_to_filename(*filename);
     //destroy wisdom
     has_fftw_wisdom = true;
@@ -187,8 +194,15 @@ protected:
 
   std::array<double*, 3> allocate_memory(std::array<int, 3> shp) {
     std::array<double*, 3> grid_eval;
+    int newshp2;
+    if (shp[2] % 2) {
+      newshp2 = shp[2] + 1;
+    }
+    else {
+      newshp2 = shp[2] + 2;
+    }
     for (int i=0; i < ndim; ++i) {
-      grid_eval[i] = (double*) fftw_alloc_real(shp[0]*shp[1]*2*(shp[2]/2 + 1));
+      grid_eval[i] = (double*) fftw_alloc_real(shp[0]*shp[1]*newshp2);
       }
     return grid_eval;  
   }  
@@ -226,7 +240,14 @@ public:
     };
 
   RandomVectorField(std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  increment) : RandomField(shape, reference_point, increment) {
-    double* val_temp = (double*) fftw_alloc_real(shape[0]*shape[1]*2*(shape[2]/2 + 1));
+    int newshp2;
+    if (shape[2] % 2) {
+      newshp2 = shape[2] + 1;
+    }
+    else {
+      newshp2 = shape[2] + 2;
+    }
+    double* val_temp = (double*) fftw_alloc_real(shape[0]*shape[1]*newshp2);
     fftw_complex* val_temp_comp = reinterpret_cast<fftw_complex*>(val_temp);
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], val_temp, val_temp_comp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], val_temp_comp, val_temp,  FFTW_MEASURE);

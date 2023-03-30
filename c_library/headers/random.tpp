@@ -39,7 +39,7 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* v
         // at first we deal with the monopoles and nyqist terms in 3d, in order to ensure a real field
         if (l == 0 and j == 0 and i == 0) {
           // Full Monopole is set to zero, dealt with seperately in the outer scope
-          vec[0][0] = 1.;
+          vec[0][0] = 0.;
           vec[0][1] = 0.;
           if (debug_random) {
           std::cout << "Type: Monopole" << std::endl;
@@ -51,8 +51,8 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* v
 
         double kz = (double)l / lz;
         const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
-        // TODO: make parameters below free
-        double sigma = calculate_fourier_sigma(ks);
+        //double sigma = calculate_fourier_sigma(ks);
+        double sigma = 1.;
         std::normal_distribution<double> nd{0, sigma};
 
         bool is_nyquist = (l == 0 and j == 0 and i == nyqind_x) or
