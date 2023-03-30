@@ -16,6 +16,7 @@ target_link_libraries(_ImagineModels PUBLIC "${CMAKE_SOURCE_DIR}/c_library/sourc
                                             "${CMAKE_SOURCE_DIR}/c_library/source/gaussianscalar.cc"
                                             "${CMAKE_SOURCE_DIR}/c_library/source/lognormal.cc"
                                             "${CMAKE_SOURCE_DIR}/c_library/source/ymw16.cc"
+                                            "${CMAKE_SOURCE_DIR}/c_library/source/sun.cc"
  )
 
 

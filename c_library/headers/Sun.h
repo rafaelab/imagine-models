@@ -11,21 +11,19 @@ class Sun2008MagneticField : public RegularVectorField  {
         bool DEBUG = false;
     public:
         using RegularVectorField :: RegularVectorField;
-        double b_B0;
-        // Note, redundant with SunPosition. However
-        // might want to tune it independently anyways.
-        double b_Rsun; 
-        double b_R0;
-        double b_z0;
-        double b_Rc;
-        double b_Bc;
-        double b_pitch_deg;
+        double b_B0 = 2.;
+        double b_Rsun = 8.5; 
+        double b_R0 = 10.;
+        double b_z0 = 1.;
+        double b_Rc = 5.;
+        double b_Bc = 2.;
+        double b_pitch_deg = -12.;
         
-        double bH_B0;
-        double bH_z0;
-        double bH_z1a;
-        double bH_z1b;
-        double bH_R0;
+        double bH_B0 = 2.;
+        double bH_z0 = 1.5;
+        double bH_z1a = 0.2;
+        double bH_z1b = 0.4;
+        double bH_R0 = 4.;
 
         std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const;
  };
