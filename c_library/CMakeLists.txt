@@ -2,50 +2,76 @@ cmake_minimum_required(VERSION 3.4...3.18)
 
 project(ImagineModels VERSION 0.0.1 DESCRIPTION "A library for Galactic models")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/findFFTW")
 include(GNUInstallDirs)
+
+FIND_PACKAGE(FFTW)
+FIND_PACKAGE(autodiff)
+
+
 set(INCLUDE_INSTALL_DIR
 "${CMAKE_INSTALL_INCLUDEDIR}/ImagineModels"
 # CACHE PATH "The directory relative to CMAKE_INSTALL_PREFIX where ImagineModel header files are installed"
 )
 
-set(IM_PUBLIC_HEADERS
-"headers/RegularModels.h"
-"headers/RandomModels.h"
+if (FFTW_FOUND)
+    set(IM_PUBLIC_HEADERS
+        "headers/RegularModels.h"
+        "headers/RandomModels.h"
 
-"headers/exceptions.h"
+        "headers/exceptions.h"
 
-"headers/Field.h"
-"headers/RegularField.h"
-"headers/RandomField.h"
-"headers/random.tpp"
+        "headers/Field.h"
+        "headers/RegularField.h"
+        "headers/RandomField.h"
+        "headers/random.tpp"
 
-"headers/Uniform.h"
-"headers/RegularJF12.h"
-"headers/Jaffe.h"
-"headers/Helix.h"
-"headers/YMW.h"
-"headers/Sun.h"
+        "headers/Uniform.h"
+        "headers/RegularJF12.h"
+        "headers/Jaffe.h"
+        "headers/Helix.h"
+        "headers/YMW.h"
+        "headers/Sun.h"
 
-"headers/GaussianScalar.h"
-"headers/LogNormal.h"
-"headers/RandomJF12.h"
-"headers/EnsslinSteininger.h"
-
+        "headers/GaussianScalar.h"
+        "headers/LogNormal.h"
+        "headers/RandomJF12.h"
+        "headers/EnsslinSteininger.h"
     )
+    add_library(ImagineModels SHARED
+        source/helix.cc
+        source/jaffe.cc
+        source/regularjf12.cc
+        source/gaussianscalar.cc
+        source/lognormal.cc
+        source/randomjf12.cc
+        source/ensslinsteininger.cc
+        source/ymw16.cc
+        source/sun.cc
+    )
+else()
+    set(IM_PUBLIC_HEADERS
+        "headers/RegularModels.h"
+        "headers/exceptions.h"
+        "headers/Field.h"
+        "headers/RegularField.h"
 
-add_library(ImagineModels SHARED
+        "headers/Uniform.h"
+        "headers/RegularJF12.h"
+        "headers/Jaffe.h"
+        "headers/Helix.h"
+        "headers/YMW.h"
+        "headers/Sun.h"
+    )
+    add_library(ImagineModels SHARED
     source/helix.cc
     source/jaffe.cc
     source/regularjf12.cc
-    source/gaussianscalar.cc
-    source/lognormal.cc
-#    source/randomvector.cc
-    source/randomjf12.cc
-    source/ensslinsteininger.cc
     source/ymw16.cc
     source/sun.cc
-#    source/regular.cc
-)
+    )
+endif()
+
 target_include_directories(ImagineModels PRIVATE .)
 
 message(PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
@@ -53,6 +79,7 @@ message(IM_PUBLIC_HEADERS="${IM_PUBLIC_HEADERS}")
 message(CMAKE_INSTALL_LIBDIR="${CMAKE_INSTALL_LIBDIR}")
 message(CMAKE_INSTALL_INCLUDEDIR="${CMAKE_INSTALL_INCLUDEDIR}")
 message(CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+message(CMAKE_MODULE_PATH="${CMAKE_MODULE_PATH}")
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set_target_properties(ImagineModels PROPERTIES

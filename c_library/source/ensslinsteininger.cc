@@ -23,7 +23,7 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
       
       std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
       auto gen_int = std::mt19937(seed);
-      std::uniform_int_distribution<int> uni(0, 100000000000);
+      std::uniform_int_distribution<int> uni(0, 1215752192);
         
       for (int i =0; i<3; ++i) {
         int sub_seed = uni(gen_int); 

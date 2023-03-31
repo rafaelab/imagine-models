@@ -26,186 +26,33 @@ if (HAVE_FFTW) {
 }
 
 
-
-
-
-
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+void FieldBases(py::module_ &);
+void RegularFieldBases(py::module_ &);
 
-// helper functions to avoid making a copy when returning a py::array_t
-// based on
-// author: https://github.com/YannickJadoul
-// source: https://github.com/pybind/pybind11/issues/1042#issuecomment-642215028
-template <typename Sequence>
-inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence &&seq) {
-  auto size = seq.size();
-  auto data = seq.data();
-  std::unique_ptr<Sequence> seq_ptr =
-      std::make_unique<Sequence>(std::move(seq));
-  auto capsule = py::capsule(seq_ptr.get(), [](void *p) {
-    std::unique_ptr<Sequence>(reinterpret_cast<Sequence *>(p));
-  });
-  seq_ptr.release();
-  return py::array(size, data, capsule);
-}
-
-inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z, bool fftw) {
-  
-  py::capsule capsule(data, [](void *f) {
-      std::unique_ptr<double>(reinterpret_cast<double*>(f));
-      });
-
-  size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
-  py::array_t<double> arr = py::array(arr_size, data, capsule);
-  /*if (fftw) {
-    if (arr_size_z & 2) { //uneven
-      arr.resize({arr_size_x, arr_size_y, arr_size_z - 1});
-    }
-    else { //even
-      arr.resize({arr_size_x, arr_size_y, arr_size_z - 2});
-    }
-  }
-  */
-  return arr.reshape({arr_size_x, arr_size_y, arr_size_z});
-}
-
-
-inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z, bool fftw) {
-  size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
-  py::list li;
-
-  for (int i = 0; i<3; ++i) {
-    py::array_t<double> arr = from_pointer_to_pyarray(std::move(seq[i]), arr_size_x, arr_size_y, arr_size_z, fftw);
-
-    li.append(arr);
-  }
-  return li;
-}
+void RegularJF12(py::module_ &);
+void Helix(py::module_ &);
+void Uniform(py::module_ &);
+void Jaffe(py::module_ &);
+void Sun2008(py::module_ &);
 
 
 PYBIND11_MODULE(_ImagineModels, m) {
     m.doc() = "IMAGINE Model Library";
 
-////////////////////////////////Field Bases/////////////////////////////////
+    FieldBases(m);
+    RegularFieldBases(m);
+    RegularJF12(m);
+    Jaffe(m);
+    Uniform(m);
+    Sun2008(m);
+    Helix(m);
 
-    py::class_<Field<std::array<double, 3>, std::array<double*, 3>>,  PyVectorFieldBase>(m, "VectorFieldBase");
-
-    py::class_<Field<double, double*>,  PyScalarFieldBase>(m, "ScalarFieldBase");
-
-    py::class_<RandomField<std::array<double, 3>, std::array<double*, 3>>,  PyVectorRandomFieldBase>(m, "VectorRandomFieldBase");
-
-    py::class_<RandomField<double, double*>,  PyScalarRandomFieldBase>(m, "ScalarRandomFieldBase");
-
-/////////////////////////////////Regular Field Bases/////////////////////////////////
-
-// Regular Vector Base Class
-    py::class_<RegularVectorField, Field<std::array<double, 3>, std::array<double*, 3>>, PyRegularVectorField>(m, "RegularVectorField")
-        .def(py::init<>())
-        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
-        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
-
-        .def("on_grid", [](RegularVectorField &self, py::array_t<double> &grid_x,  py::array_t<double>  &grid_y, py::array_t<double>  &grid_z)  {
-            size_t sx = grid_x.size();
-            size_t sy = grid_y.size();
-            size_t sz = grid_z.size();
-            std::vector<double> grid_x_vec{grid_x.data(), grid_x.data() + sx}; 
-            std::vector<double> grid_y_vec{grid_y.data(), grid_y.data() + sy}; 
-            std::vector<double> grid_z_vec{grid_z.data(), grid_z.data() + sz}; 
-            std::array<double*, 3> f = self.on_grid(grid_x_vec, grid_y_vec, grid_z_vec);
-            auto li = from_pointer_array_to_list_pyarray(f, sx, sy, sz, false);
-            //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-            return li;},
-            py::arg("grid_x").noconvert(), py::arg("grid_y").noconvert(), py::arg("grid_z").noconvert(), py::return_value_policy::take_ownership)
-
-
-        .def("on_grid", [](RegularVectorField &self, std::array<int, 3> &grid_shape,  std::array<double, 3>  &grid_reference_point, std::array<double, 3>  &grid_increment)  {
-          std::array<double*, 3> f = self.on_grid(grid_shape, grid_reference_point, grid_increment);
-          size_t sx = grid_shape[0];
-          size_t sy = grid_shape[1];
-          size_t sz = grid_shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz, false);
-          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, 
-          py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), py::return_value_policy::take_ownership)
-
-        .def("on_grid", [](RegularVectorField &self)  {
-          std::array<double*, 3> f = self.on_grid();
-          size_t sx = self.shape[0];
-          size_t sy = self.shape[1];
-          size_t sz = self.shape[2];
-          auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz, false);
-          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
-          return arr;}, py::return_value_policy::take_ownership);
-        
-
-// Regular Scalar Base Class
-    py::class_<RegularScalarField, Field<double, double*>, PyRegularScalarField>(m, "RegularScalarField")
-        .def(py::init<>())
-        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
-        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
-
-        .def("on_grid", [](RegularScalarField &self, py::array_t<double> &grid_x,  py::array_t<double>  &grid_y, py::array_t<double>  &grid_z)  {
-          size_t sx = grid_x.size();
-          size_t sy = grid_y.size();
-          size_t sz = grid_z.size();
-          std::vector<double> grid_x_vec{grid_x.data(), grid_x.data() + sx}; 
-          std::vector<double> grid_y_vec{grid_y.data(), grid_y.data() + sy}; 
-          std::vector<double> grid_z_vec{grid_z.data(), grid_z.data() + sz}; 
-          double* f = self.on_grid(grid_x_vec, grid_y_vec, grid_z_vec);
-          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, false);
-          arr.resize({sx, sy, sz});
-          return arr;},
-          py::arg("grid_x").noconvert(), py::arg("grid_y").noconvert(), py::arg("grid_z").noconvert(), py::return_value_policy::take_ownership)
-        
-        .def("on_grid", [](RegularScalarField &self, std::array<int, 3>  grid_shape, std::array<double, 3>  grid_reference_point, std::array<double, 3>  grid_increment)  {
-          double* f = self.on_grid(grid_shape, grid_reference_point, grid_increment, 0);
-          size_t sx = grid_shape[0];
-          size_t sy = grid_shape[1];
-          size_t sz = grid_shape[2];
-          auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, false);
-          return arr;},
-          py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), 
-          py::return_value_policy::take_ownership)
-
-
-        .def("on_grid", [](RegularScalarField &self)  {
-          double* f = self.on_grid(0);
-          size_t sx = self.shape[0];
-          size_t sy = self.shape[1];
-          size_t sz = self.shape[2];
-          auto arr = from_pointer_to_pyarray(f, sx, sy, sz, false);
-          return arr;}, py::return_value_policy::take_ownership);
 
 /////////////////////////////////Regular Fields/////////////////////////////////
 
-    py::class_<JF12MagneticField, RegularVectorField>(m, "JF12RegularField")
-        .def(py::init<>())
-        .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
-        .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
-
-        .def("at_position", &JF12MagneticField::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-        .def_readwrite("b_arm_1", &JF12MagneticField::b_arm_1)
-        .def_readwrite("b_arm_2", &JF12MagneticField::b_arm_2)
-        .def_readwrite("b_arm_3", &JF12MagneticField::b_arm_3)
-        .def_readwrite("b_arm_4", &JF12MagneticField::b_arm_4)
-        .def_readwrite("b_arm_5", &JF12MagneticField::b_arm_5)
-        .def_readwrite("b_arm_6", &JF12MagneticField::b_arm_6)
-        .def_readwrite("b_arm_7", &JF12MagneticField::b_arm_7)
-        .def_readwrite("b_ring", &JF12MagneticField::b_ring)
-        .def_readwrite("h_disk", &JF12MagneticField::h_disk)
-        .def_readwrite("w_disk", &JF12MagneticField::w_disk)
-        .def_readwrite("Bn", &JF12MagneticField::Bn)
-        .def_readwrite("Bs", &JF12MagneticField::Bs)
-        .def_readwrite("rn", &JF12MagneticField::rn)
-        .def_readwrite("rs", &JF12MagneticField::rs)
-        .def_readwrite("wh", &JF12MagneticField::wh)
-        .def_readwrite("z0", &JF12MagneticField::z0)
-        .def_readwrite("B0_X", &JF12MagneticField::B0_X)
-        .def_readwrite("Xtheta_const", &JF12MagneticField::Xtheta_const)
-        .def_readwrite("rpc_X", &JF12MagneticField::rpc_X)
-        .def_readwrite("r0_X", &JF12MagneticField::r0_X);
 
     py::class_<HelixMagneticField, RegularVectorField>(m, "HelixMagneticField")
         .def(py::init<>())

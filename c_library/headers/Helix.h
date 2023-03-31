@@ -4,6 +4,7 @@
 #include "Field.h"
 #include "RegularField.h"
 
+
 class HelixMagneticField : public RegularVectorField  {
     protected:
         bool DEBUG = false;
