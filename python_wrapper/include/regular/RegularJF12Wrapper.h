@@ -1,6 +1,12 @@
-#include "../c_library/headers/RegularJF12.h"
 
-void RegularJF12(py::module_ &) {
+#include <pybind11/pybind11.h>
+
+#include "../../../c_library/headers/RegularJF12.h"
+
+namespace py = pybind11;
+using namespace pybind11::literals;
+
+void RegularJF12(py::module_ &m) {
     py::class_<JF12MagneticField, RegularVectorField>(m, "JF12RegularField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())

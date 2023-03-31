@@ -74,6 +74,7 @@ endif()
 
 target_include_directories(ImagineModels PRIVATE .)
 
+message(FFTW_FOUND="${FFTW_FOUND}")
 message(PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 message(IM_PUBLIC_HEADERS="${IM_PUBLIC_HEADERS}")
 message(CMAKE_INSTALL_LIBDIR="${CMAKE_INSTALL_LIBDIR}")

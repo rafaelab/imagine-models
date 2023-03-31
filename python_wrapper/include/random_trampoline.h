@@ -1,7 +1,10 @@
-#include "../c_library/headers/hamunits.h"
-#include "../c_library/headers/Field.h"
+#ifndef RANDOM_TRAMPOLINE_H
+#define RANDOM_TRAMPOLINE_H
 
-#include "../c_library/headers/RandomField.h"
+#include "../../c_library/headers/hamunits.h"
+#include "../../c_library/headers/Field.h"
+
+#include "../../c_library/headers/RandomField.h"
 
 
 #include <iostream>
@@ -90,4 +93,6 @@ public:
     double* on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, const int seed) override {PYBIND11_OVERRIDE(double*, RandomScalarField, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
 
 };
+
+#endif
 

@@ -1,4 +1,15 @@
-void RegularFieldBases(py::module_ &) {
+#ifndef REGULARFIELDBASES_H
+#define REGULARFIELDBASES_H
+
+#include <pybind11/pybind11.h>
+
+#include "../regular_trampoline.h"
+#include "../array_converters.h"
+
+namespace py = pybind11;
+using namespace pybind11::literals;
+
+void RegularFieldBases(py::module_ &m) {
         py::class_<RegularVectorField, Field<std::array<double, 3>, std::array<double*, 3>>, PyRegularVectorField>(m, "RegularVectorField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
@@ -76,3 +87,4 @@ void RegularFieldBases(py::module_ &) {
           auto arr = from_pointer_to_pyarray(f, sx, sy, sz, false);
           return arr;}, py::return_value_policy::take_ownership);
 }
+#endif

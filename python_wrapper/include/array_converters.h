@@ -1,3 +1,7 @@
+#ifndef ARRAY_CONVERTERS_H
+#define ARRAY_CONVERTERS_H
+
+
 namespace py = pybind11;
 using namespace pybind11::literals;
 
@@ -51,3 +55,5 @@ inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, s
   }
   return li;
 }
+
+#endif

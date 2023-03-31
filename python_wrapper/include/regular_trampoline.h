@@ -1,7 +1,10 @@
-#include "../c_library/headers/hamunits.h"
-#include "../c_library/headers/Field.h"
+#ifndef REGULAR_TRAMPOLINE_H
+#define REGULAR_TRAMPOLINE_H
 
-#include "../c_library/headers/RegularField.h"
+#include "../../c_library/headers/hamunits.h"
+#include "../../c_library/headers/Field.h"
+
+#include "../../c_library/headers/RegularField.h"
 
 #include <iostream>
 
@@ -76,3 +79,4 @@ public:
 };
 
 
+#endif
