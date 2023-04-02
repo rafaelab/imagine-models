@@ -42,6 +42,7 @@ void Uniform(py::module_ &);
 void Jaffe(py::module_ &);
 void Sun2008(py::module_ &);
 void TinyakovTkachev(py::module_ &);
+void HarariMollerachRoulet(py::module_ &);
 
 void YMW(py::module_ &);
 
@@ -65,6 +66,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
     Sun2008(m);
     Helix(m);
     TinyakovTkachev(m);
+    HarariMollerachRoulet(m);
     YMW(m);
 
     #ifdef FFTW_FOUND

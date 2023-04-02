@@ -95,11 +95,12 @@ Binding a C++ model to Python is a bit more involved. For the simplest case, a t
 | Axissymetric spiral | &#x2714;    | &#x2718;    | Pelgrims, V. |                     |  Pelgrims, V.           |
 | Jaffe               | &#x2714;    | &#x2714;    | [Jaffe et al. (2010)](https://ui.adsabs.harvard.edu/abs/2010MNRAS.401.1013J/abstract)        |             | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)  |
 | Sun2008               | &#x2714;    | &#x2714;    | [Sun et al. (2008)](https://www.aanda.org/articles/aa/abs/2008/02/aa8671-07/aa8671-07.html)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/)  |
+| HMR              | &#x2714;    | &#x2714;    | [Harari et al. (1999)](https://arxiv.org/abs/astro-ph/9906309)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/) and [Kachelrieß (2007)](https://arxiv.org/pdf/astro-ph/0510444.pdf )  |
+| TT              | &#x2714;    | &#x2714;    | [Tinyakov and Tkachev (2001)](https://arxiv.org/abs/astro-ph/0102101)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/) and [Kachelrieß (2007)](https://arxiv.org/pdf/astro-ph/0510444.pdf )  |
 | Jansson Farrar      | &#x2714;    | &#x2714;    | [Jansson & Farrar (2012)](https://ui.adsabs.harvard.edu/abs/2012ApJ...757...14J/abstract)        |             | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)   |
 | **Random models**   |             |             |              |                     |                         |
 | Jansson Farrar      | &#x2714;    |&#x2714;     | [Jansson & Farrar (2012)](https://ui.adsabs.harvard.edu/abs/2012ApJ...761L..11J/abstract)        | depends on the JF12 regular model   |[Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)    |
 | Ensslin Steininger  | &#x2714;    |&#x2714;     |              |                      | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)             |
-
 
 ### Thermal electron/Scalar Fields
 

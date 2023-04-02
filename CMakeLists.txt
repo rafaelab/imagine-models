@@ -26,6 +26,9 @@ target_link_libraries(_ImagineModels PUBLIC "${CMAKE_SOURCE_DIR}/c_library/sourc
                                              "${CMAKE_SOURCE_DIR}/c_library/source/helix.cc"
                                              "${CMAKE_SOURCE_DIR}/c_library/source/ymw16.cc"
                                              "${CMAKE_SOURCE_DIR}/c_library/source/sun.cc"
+                                             "${CMAKE_SOURCE_DIR}/c_library/source/tinyakovtkachev.cc"
+                                             "${CMAKE_SOURCE_DIR}/c_library/source/hararimollerachroulet.cc"
+                                             
                     )
 
 if (FFTW_FOUND) 

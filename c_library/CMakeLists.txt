@@ -26,12 +26,15 @@ if (FFTW_FOUND)
         "headers/RandomField.h"
         "headers/random.tpp"
 
+        "headers/helpers.h"
         "headers/Uniform.h"
         "headers/RegularJF12.h"
         "headers/Jaffe.h"
         "headers/Helix.h"
         "headers/YMW.h"
         "headers/Sun.h"
+        "headers/TinyakovTkachev.h"
+        "headers/HarariMollerachRoulet.h"
 
         "headers/GaussianScalar.h"
         "headers/LogNormal.h"
@@ -47,7 +50,10 @@ if (FFTW_FOUND)
         source/randomjf12.cc
         source/ensslinsteininger.cc
         source/ymw16.cc
+        source/tinyakovtkachev.cc
+        source/hararimollerachroulet.cc
         source/sun.cc
+
     )
 else()
     set(IM_PUBLIC_HEADERS
@@ -56,12 +62,15 @@ else()
         "headers/Field.h"
         "headers/RegularField.h"
 
+        "headers/helpers.h"
         "headers/Uniform.h"
         "headers/RegularJF12.h"
         "headers/Jaffe.h"
         "headers/Helix.h"
         "headers/YMW.h"
+        "headers/TinyakovTkachev.h"
         "headers/Sun.h"
+        "headers/HarariMollerachRoulet.h"
     )
     add_library(ImagineModels SHARED
     source/helix.cc
@@ -69,6 +78,8 @@ else()
     source/regularjf12.cc
     source/ymw16.cc
     source/sun.cc
+    source/tinyakovtkachev.cc
+    source/hararimollerachroulet.cc
     )
 endif()
 
