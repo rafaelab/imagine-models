@@ -30,6 +30,7 @@ target_link_libraries(_ImagineModels PUBLIC "${CMAKE_SOURCE_DIR}/c_library/sourc
                                              "${CMAKE_SOURCE_DIR}/c_library/source/hararimollerachroulet.cc"
                                              "${CMAKE_SOURCE_DIR}/c_library/source/stanevbss.cc"
                                              "${CMAKE_SOURCE_DIR}/c_library/source/wmap.cc"
+                                             "${CMAKE_SOURCE_DIR}/c_library/source/fauvet.cc"
                                              
                     )
 

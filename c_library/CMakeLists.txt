@@ -35,6 +35,7 @@ if (FFTW_FOUND)
         "headers/WMAP.h"
         "headers/StanevBSS.h"
         "headers/Sun.h"
+        "headers/Fauvet.h"
         "headers/TinyakovTkachev.h"
         "headers/HarariMollerachRoulet.h"
 
@@ -54,6 +55,7 @@ if (FFTW_FOUND)
         source/ensslinsteininger.cc
         source/ymw16.cc
         source/wmap.cc
+        source/fauvet.cc
         source/tinyakovtkachev.cc
         source/hararimollerachroulet.cc
         source/sun.cc
@@ -75,6 +77,7 @@ else()
         "headers/TinyakovTkachev.h"
         "headers/Sun.h"
         "headers/StanevBSS.h"
+        "headers/Fauvet.h"
         "headers/WMAP.h"
         "headers/HarariMollerachRoulet.h"
     )
@@ -86,6 +89,7 @@ else()
     source/sun.cc
     source/wmap.cc
     source/stanevbss.cc
+    source/fauvet.cc
     source/tinyakovtkachev.cc
     source/hararimollerachroulet.cc
     )

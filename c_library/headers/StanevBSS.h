@@ -19,7 +19,7 @@ class StanevBSSMagneticField : public RegularVectorField  {
         double b_z0 = 1.; // kpc
         double b_r0 = 10.55; // kpc
         double b_Rsun = 8.5; // kpc
-        double b_b0 = 6.; // kpc
+        double b_b0 = 6.; // muG
         double b_phi0 = M_PI; // ??
 
 
