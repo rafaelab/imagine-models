@@ -70,6 +70,7 @@ else()
         "headers/YMW.h"
         "headers/TinyakovTkachev.h"
         "headers/Sun.h"
+        "headers/StanevBSS.h"
         "headers/HarariMollerachRoulet.h"
     )
     add_library(ImagineModels SHARED
@@ -78,6 +79,7 @@ else()
     source/regularjf12.cc
     source/ymw16.cc
     source/sun.cc
+    source/stanevbss.cc
     source/tinyakovtkachev.cc
     source/hararimollerachroulet.cc
     )

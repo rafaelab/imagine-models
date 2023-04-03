@@ -15,6 +15,8 @@
 
 #include "include/regular/RegularFieldBases.h"
 #include "include/regular/SunWrapper.h"
+#include "include/regular/StanevBSSWrapper.h"
+#include "include/regular/HarariMollerachRouletWrapper.h"
 #include "include/regular/UniformWrapper.h"
 #include "include/regular/YMW16Wrapper.h"
 #include "include/regular/HelixWrapper.h"
@@ -41,6 +43,7 @@ void Helix(py::module_ &);
 void Uniform(py::module_ &);
 void Jaffe(py::module_ &);
 void Sun2008(py::module_ &);
+void StanevBSS(py::module_ &);
 void TinyakovTkachev(py::module_ &);
 void HarariMollerachRoulet(py::module_ &);
 
@@ -64,6 +67,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
     Jaffe(m);
     Uniform(m);
     Sun2008(m);
+    StanevBSS(m);
     Helix(m);
     TinyakovTkachev(m);
     HarariMollerachRoulet(m);

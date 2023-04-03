@@ -6,6 +6,7 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 void HarariMollerachRoulet(py::module_ &m) {
+    py::class_<HMRMagneticField, RegularVectorField>(m, "HMRMagneticField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
