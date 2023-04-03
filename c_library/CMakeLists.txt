@@ -32,6 +32,8 @@ if (FFTW_FOUND)
         "headers/Jaffe.h"
         "headers/Helix.h"
         "headers/YMW.h"
+        "headers/WMAP.h"
+        "headers/StanevBSS.h"
         "headers/Sun.h"
         "headers/TinyakovTkachev.h"
         "headers/HarariMollerachRoulet.h"
@@ -45,11 +47,13 @@ if (FFTW_FOUND)
         source/helix.cc
         source/jaffe.cc
         source/regularjf12.cc
+        source/stanevbss.cc
         source/gaussianscalar.cc
         source/lognormal.cc
         source/randomjf12.cc
         source/ensslinsteininger.cc
         source/ymw16.cc
+        source/wmap.cc
         source/tinyakovtkachev.cc
         source/hararimollerachroulet.cc
         source/sun.cc
@@ -71,6 +75,7 @@ else()
         "headers/TinyakovTkachev.h"
         "headers/Sun.h"
         "headers/StanevBSS.h"
+        "headers/WMAP.h"
         "headers/HarariMollerachRoulet.h"
     )
     add_library(ImagineModels SHARED
@@ -79,6 +84,7 @@ else()
     source/regularjf12.cc
     source/ymw16.cc
     source/sun.cc
+    source/wmap.cc
     source/stanevbss.cc
     source/tinyakovtkachev.cc
     source/hararimollerachroulet.cc

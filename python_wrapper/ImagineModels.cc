@@ -46,6 +46,7 @@ void Sun2008(py::module_ &);
 void StanevBSS(py::module_ &);
 void TinyakovTkachev(py::module_ &);
 void HarariMollerachRoulet(py::module_ &);
+void WMAP(py::module_ &);
 
 void YMW(py::module_ &);
 
@@ -72,6 +73,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
     TinyakovTkachev(m);
     HarariMollerachRoulet(m);
     YMW(m);
+    WMAP(m);
 
     #ifdef FFTW_FOUND
       RandomFieldBases(m);    
