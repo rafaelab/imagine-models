@@ -19,7 +19,6 @@ void WMAP(py::module_ &m) {
         .def_readwrite("b_r_min", &WMAPMagneticField::b_r_min)
         .def_readwrite("b_Rsun", &WMAPMagneticField::b_Rsun)
         .def_readwrite("b_z0", &WMAPMagneticField::b_z0)
-        .def_readwrite("b_p", &WMAPMagneticField::b_p)
         
         .def_readwrite("b_psi0", &WMAPMagneticField::b_psi0)
         .def_readwrite("b_psi1", &WMAPMagneticField::b_psi1)

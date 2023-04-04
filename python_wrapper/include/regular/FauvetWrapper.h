@@ -22,10 +22,10 @@ void Fauvet(py::module_ &m) {
         .def_readwrite("b_p", &FauvetMagneticField::b_p)
         .def_readwrite("b_chi0", &FauvetMagneticField::b_chi0)
         
-        .def_readwrite("h_b0", &WMAPMagneticField::h_b0)
-        .def_readwrite("h_r0", &WMAPMagneticField::h_r0)
-        .def_readwrite("h_z0", &WMAPMagneticField::h_z0)
-        .def_readwrite("h_z1a", &WMAPMagneticField::h_z1a)
-        .def_readwrite("h_z1b", &WMAPMagneticField::h_z1b);
+        .def_readwrite("h_b0", &FauvetMagneticField::h_b0)
+        .def_readwrite("h_r0", &FauvetMagneticField::h_r0)
+        .def_readwrite("h_z0", &FauvetMagneticField::h_z0)
+        .def_readwrite("h_z1a", &FauvetMagneticField::h_z1a)
+        .def_readwrite("h_z1b", &FauvetMagneticField::h_z1b);
     
 }

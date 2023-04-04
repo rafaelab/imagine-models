@@ -6,7 +6,6 @@
 
 #include "Field.h"
 #include "RegularField.h"
-#include "hamunits.h"
 
 class YMW16 : public RegularScalarField {
 protected:

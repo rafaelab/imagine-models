@@ -15,7 +15,10 @@
 
 #include "include/regular/RegularFieldBases.h"
 #include "include/regular/SunWrapper.h"
+#include "include/regular/WMAPWrapper.h"
 #include "include/regular/StanevBSSWrapper.h"
+#include "include/regular/FauvetWrapper.h"
+#include "include/regular/TinyakovTkachevWrapper.h"
 #include "include/regular/HarariMollerachRouletWrapper.h"
 #include "include/regular/UniformWrapper.h"
 #include "include/regular/YMW16Wrapper.h"

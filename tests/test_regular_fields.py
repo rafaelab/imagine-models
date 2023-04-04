@@ -108,5 +108,3 @@ def test_parameter_update():
     assert umf.bx == -3.2 
     
     assert umf.at_position(2.4, 2.1, -.2) == [-3.2, 0., 0]
-
-        
