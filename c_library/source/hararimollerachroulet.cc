@@ -25,9 +25,12 @@ std::array<double, 3>  HMRMagneticField::at_position(const double &x, const doub
                               B_r_phi * std::cos(b_p) * f_z , 
                               0.};
 
-  std::array<double, 3> B_vec3{0, 0, 0};
+  std::array<double, 3> B_vec3;
   if (r <= b_r_max) {
-    Cyl2Cart(phi, B_cyl, B_vec3);
+    B_vec3 = Cyl2Cart(phi, B_cyl);
+  }
+  else {
+    B_vec3 = {0, 0, 0};
   }
   
   return B_vec3;

@@ -7,8 +7,8 @@
 //Sun et al. A&A V.477 2008 ASS+RING model magnetic field
 std::array<double, 3>  Sun2008MagneticField::at_position(const double &x, const double &y, const double &z) const {
 
-double r = std::sqrt(x*x + y*y);
-double phi = std::atan2(y, z);
+double r = sqrt(x*x + y*y);
+double phi = atan2(y, z);
   
   // first we set D2
   // ------------------------------------------------------------
@@ -55,12 +55,14 @@ double phi = std::atan2(y, z);
   double halo_field;
 
   // [ORIGINAL HAMMURABI COMMENT]  for better overview
-  double b3H_z1_actual;
+  double bH_z1;
   if (std::abs(z) < bH_z0) {
-    b3H_z1_actual = bH_z1a;
+    bH_z1 = bH_z1a; 
     }
-  else{b3H_z1_actual=bH_z1b;}
-  double hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (std::abs(z) - bH_z0) * (std::abs(z) - bH_z0));
+  else { 
+    bH_z1 = bH_z1b;
+  }
+  double hf_piece1 = (bH_z1 * bH_z1) / (bH_z1 * bH_z1 + (std::abs(z) - bH_z0) * (std::abs(z) - bH_z0));
   double hf_piece2 = exp(-(r-bH_R0) / (bH_R0));
 
   halo_field = bH_B0 * hf_piece1 * (r / bH_R0) * hf_piece2;
@@ -74,9 +76,9 @@ double phi = std::atan2(y, z);
 
   B_cyl[1] += halo_field;
 
-  std::array<double, 3> B_vec3{0, 0, 0};
+  std::array<double, 3> B_vec3;
 
-  Cyl2Cart(phi, B_cyl, B_vec3);
+  B_vec3 = Cyl2Cart(phi, B_cyl);
 
   return B_vec3; 
 };

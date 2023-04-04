@@ -68,14 +68,4 @@ class JaffeMagneticField : public RegularVectorField {
     double disk_scaling(const double &z) const;
 
     double halo_scaling(const double &z) const;
-/*
-      std::vector<double> orientation(const double &x, const double &y,  const double &z) const;
-      double radial_scaling(const double &x, const double &y) const;
-      double arm_scaling(const double &z) const;
-      double disk_scaling(const double &z) const;
-      double halo_scaling(const double &z) const;
-      std::vector<double> arm_compress(const double &x, const double &y,  const double &z) const;
-      std::vector<double> arm_compress_dust(const double &x, const double &y,  const double &z) const;
-      std::vector<double> dist2arm(const double &x, const double &y) const;
-*/
 };

@@ -9,14 +9,12 @@
 
 std::array<double, 3>  WMAPMagneticField::at_position(const double &x, const double &y, const double &z) const { 
     
-    std::array<double, 3>  B_vec3{0, 0, 0};
+    std::array<double, 3>  B_vec3;
     double r = sqrt(x*x + y*y);
 
     if (r > b_r_max || r < b_r_min) { 
-        return B_vec3;
+        return {0, 0, 0};
     }
-
-        
 
 	double phi = atan2(y, x);
 
@@ -27,7 +25,7 @@ std::array<double, 3>  WMAPMagneticField::at_position(const double &x, const dou
                                    b_b0 * cos(psi_r) * cos(xsi_z), 
                                    b_b0 * sin(xsi_z) };
 
-    Cyl2Cart(phi, B_cyl, B_vec3);
+    B_vec3 = Cyl2Cart(phi, B_cyl);
     
 
 

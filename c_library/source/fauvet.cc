@@ -9,11 +9,11 @@
 
 std::array<double, 3>  FauvetMagneticField::at_position(const double &x, const double &y, const double &z) const { 
     
-    std::array<double, 3>  B_vec3{0, 0, 0};
+    std::array<double, 3>  B_vec3;
     double r = sqrt(x*x + y*y);
 
     if (r > b_r_max || r < b_r_min) { 
-        return B_vec3;
+        return {0, 0, 0};
     }
 
 	double phi = atan2(y, x);
@@ -41,7 +41,7 @@ std::array<double, 3>  FauvetMagneticField::at_position(const double &x, const d
     double halo_field = h_b0 * hf_piece1 * (r / b_r0) * hf_piece2;
     B_cyl[1] += halo_field;
 
-    Cyl2Cart(phi, B_cyl, B_vec3);
+    B_vec3 = Cyl2Cart(phi, B_cyl);
     return B_vec3;
 };
 
