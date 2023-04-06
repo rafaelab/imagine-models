@@ -46,7 +46,7 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
         };
       std::array<int, 3> padded_shape = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
       int padded_size = padded_shape[0]*padded_shape[1]*padded_shape[2];
-      evaluate_function_on_grid(val, padded_shape, zpt, inc, multiply_profile);
+      evaluate_function_on_grid<std::array<double, 3>>(val, padded_shape, zpt, inc, multiply_profile);
 
       for (int i =0; i<3; ++i) {
         fftw_execute(r2c[i]);

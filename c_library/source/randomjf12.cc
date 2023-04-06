@@ -100,7 +100,7 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
   std::cout << "before apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   std::array<int, 3> padded_shape = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
   int padded_size = padded_shape[0]*padded_shape[1]*padded_shape[2];
-  evaluate_function_on_grid(val, padded_shape, rpt, inc, apply_profile);
+  evaluate_function_on_grid<std::array<double, 3>>(val, padded_shape, rpt, inc, apply_profile);
   std::cout << "after apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   std::cout << "grid_size " << grid_size << std::endl;
   for (int i =0; i<3; ++i) {

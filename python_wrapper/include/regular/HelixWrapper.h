@@ -2,7 +2,7 @@
 #include <autodiff/forward/real.hpp>
 
 #include "../../../c_library/headers/Helix.h"
-#include "../auodiff_wrapper.h"
+#include "../autodiff_wrapper.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
