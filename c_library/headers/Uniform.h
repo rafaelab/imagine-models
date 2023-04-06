@@ -18,12 +18,15 @@ struct UniformParams : Params {
 class UniformMagneticField : public RegularVectorField  {
     protected:
         bool DEBUG = false;
+        std::array<double, 3>  _at_position (const double &x, const double &y, const double &z, const UniformParams &p) const {
+            return std::array<double, 3> {p.bx, p.by, p.bz};
+        }
     public:
         using RegularVectorField :: RegularVectorField;
 
         UniformParams param;
 
-        std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const {
-            return std::array<double, 3> {param.bx, param.by, param.bz};
+        std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+            return _at_position(x, y, z, this->param);
         }
  };

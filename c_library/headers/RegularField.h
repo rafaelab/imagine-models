@@ -124,7 +124,7 @@ public:
   RegularVectorField () : Field<std::array<double, 3>, std::array<double*, 3>>() {
       };
 
-  RegularVectorField (std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  grid_increment) : Field<std::array<double, 3>, std::array<double*, 3>>(shape, reference_point, grid_increment) {
+  RegularVectorField (std::array<int, 3>  shape, std::array<double, 3> reference_point, std::array<double, 3>  grid_increment) : Field<std::array<double, 3>, std::array<double*, 3>>(shape, reference_point, grid_increment) {
       };
 
   RegularVectorField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<std::array<double, 3>, std::array<double*, 3>>(grid_x, grid_y, grid_z) {

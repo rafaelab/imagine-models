@@ -5,7 +5,7 @@
 #include "../headers/helpers.h"
 
 //Sun et al. A&A V.477 2008 ASS+RING model magnetic field
-std::array<double, 3>  SunMagneticField::at_position(const double &x, const double &y, const double &z) const {
+std::array<double, 3>  SunMagneticField::_at_position(const double &x, const double &y, const double &z, const SunParams &p) const {
 
 double r = std::sqrt(x*x + y*y);
 double phi = std::atan2(y, z);
@@ -35,18 +35,18 @@ double phi = std::atan2(y, z);
   // now we set D1
   // ------------------------------------------------------------
   double D1;
-  if(r >  param.b_Rc)
+  if(r >  p.b_Rc)
     {
-      D1 =  param.b_B0 * exp(-((r -  param.b_Rsun) /  param.b_R0) - (abs(z) /  param.b_z0));
+      D1 =  p.b_B0 * exp(-((r -  p.b_Rsun) /  p.b_R0) - (abs(z) /  p.b_z0));
     }
-  else if(r <=  param.b_Rc)
+  else if(r <=  p.b_Rc)
     {
-      D1 =  param.b_Bc;
+      D1 =  p.b_Bc;
     }
   else {std::cerr << " Error! r in Sun field is:" << r << "kpc " << std::endl; exit(1);}
   // ------------------------------------------------------------
   
-  double p_ang = param.b_pitch_deg * M_PI / 180.;
+  double p_ang = p.b_pitch_deg * M_PI / 180.;
   std::array<double, 3>  B_cyl{ D1 * D2 * sin(p_ang),
 		                           -D1 * D2 * cos(p_ang),
 		                            0.
@@ -57,14 +57,14 @@ double phi = std::atan2(y, z);
 
   // [ORIGINAL HAMMURABI COMMENT]  for better overview
   double b3H_z1_actual;
-  if (abs(z) <  param.bH_z0) {
-    b3H_z1_actual =  param.bH_z1a;
+  if (abs(z) <  p.bH_z0) {
+    b3H_z1_actual =  p.bH_z1a;
     }
-  else{b3H_z1_actual = param.bH_z1b;}
-  double hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (abs(z) - param.bH_z0) * (abs(z) - param.bH_z0));
-  double hf_piece2 = exp(-(r - param.bH_R0) / (param.bH_R0));
+  else{b3H_z1_actual = p.bH_z1b;}
+  double hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (abs(z) - p.bH_z0) * (abs(z) - p.bH_z0));
+  double hf_piece2 = exp(-(r - p.bH_R0) / (p.bH_R0));
 
-  halo_field = param.bH_B0 * hf_piece1 * (r / param.bH_R0) * hf_piece2;
+  halo_field = p.bH_B0 * hf_piece1 * (r / p.bH_R0) * hf_piece2;
 
   // [ORIGINAL HAMMURABI COMMENT] Flip north.  Not sure how Sun did this.  This is his code with no
   // flip though the paper says it's flipped, but without this mod,

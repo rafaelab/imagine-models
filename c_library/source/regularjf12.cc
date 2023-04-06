@@ -4,20 +4,15 @@
 #include "../headers/hamunits.h"
 #include "../headers/RegularJF12.h"
 
-// This line is needed to avoid linker errors due to templates
-//template class JF12MagneticField<std::vector<double>>;
-
-std::array<double, 3> JF12MagneticField::at_position(const double &x, const double &y, const double &z) const {
+std::array<double, 3> JF12MagneticField::_at_position(const double &x, const double &y, const double &z, const JF12RegularParams &p) const {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
 
       // fixed disk parameters
       const double inc = 11.5; // inclination, in degrees
-      const double rmin =
-          5.; // outer boundary of the molecular ring region
-      const double rcent =
-          3. ; // inner boundary of the molecular ring region (field is
+      const double rmin = 5.; // outer boundary of the molecular ring region
+      const double rcent = 3. ; // inner boundary of the molecular ring region (field is
                          // zero within this region)
       const double f[8] = {
           0.130, 0.165, 0.094, 0.122,
@@ -46,7 +41,7 @@ std::array<double, 3> JF12MagneticField::at_position(const double &x, const doub
       // the logistic equation, to be multiplied to the toroidal halo field and
       // (1-zprofile) multiplied to the disk:
       const double zprofile{1. /
-                               (1 + exp(-2. / param.w_disk * (abs(z) - param.h_disk)))};
+                               (1 + exp(-2. / p.w_disk * (abs(z) - p.h_disk)))};
 
       // printf("%g, %g \n", z, zprofile);
       double B_cyl_disk[3] = {0, 0,
@@ -55,12 +50,12 @@ std::array<double, 3> JF12MagneticField::at_position(const double &x, const doub
       if ((r > rcent)) // disk field zero elsewhere
       {
         if (r < rmin) { // circular field in molecular ring
-          B_cyl_disk[1] = B0 * param.b_ring * (1 - zprofile);
+          B_cyl_disk[1] = B0 * p.b_ring * (1 - zprofile);
         } else {
           // use flux conservation to calculate the field strength in the 8th spiral
           // arm
-          double bv_B[8] = {param.b_arm_1, param.b_arm_2, param.b_arm_3, param.b_arm_4,
-                            param.b_arm_5, param.b_arm_6, param.b_arm_7, 0.};
+          double bv_B[8] = {p.b_arm_1, p.b_arm_2, p.b_arm_3, p.b_arm_4,
+                            p.b_arm_5, p.b_arm_6, p.b_arm_7, 0.};
           double b8 = 0.;
 
           for (int i = 0; i < 7; i++) {
@@ -98,15 +93,15 @@ std::array<double, 3> JF12MagneticField::at_position(const double &x, const doub
       double B_h = 0.;
 
       if (z >= 0) { // North
-        b1 = param.Bn;
-        rh = param.rn; // transition radius between inner-outer region
+        b1 = p.Bn;
+        rh = p.rn; // transition radius between inner-outer region
       } else {   // South
-        b1 = param.Bs;
-        rh = param.rs;
+        b1 = p.Bs;
+        rh = p.rs;
       }
 
-      B_h = b1 * (1. - 1. / (1. + exp(-2. / param.wh * (r - rh)))) *
-            exp(-(abs(z)) / (param.z0)); // vertical exponential fall-off
+      B_h = b1 * (1. - 1. / (1. + exp(-2. / p.wh * (r - rh)))) *
+            exp(-(abs(z)) / (p.z0)); // vertical exponential fall-off
       const double B_cyl_h[3] = {0., B_h * zprofile, 0.};
 
       //------------------------------------------------------------------------
@@ -123,11 +118,11 @@ std::array<double, 3> JF12MagneticField::at_position(const double &x, const doub
 
       // dividing line between region with constant elevation angle, and the
       // interior:
-      double rc_X = param.rpc_X + abs(z) / tan(param.Xtheta_const);
+      double rc_X = p.rpc_X + abs(z) / tan(p.Xtheta_const);
 
       if (r < rc_X) { // interior region, with varying elevation angle
-        rp_X = r * param.rpc_X / rc_X;
-        B_X = param.B0_X * pow(param.rpc_X / rc_X, 2.) * exp(-rp_X / param.r0_X);
+        rp_X = r * p.rpc_X / rc_X;
+        B_X = p.B0_X * pow(p.rpc_X / rc_X, 2.) * exp(-rp_X / p.r0_X);
         Xtheta = atan(abs(z) /
                       (r - rp_X)); // modified elevation angle in interior region
         // printf("Xtheta %g at z %g , r %g , rc_X %g \n",Xtheta, z,r,rc_X);
@@ -135,9 +130,9 @@ std::array<double, 3> JF12MagneticField::at_position(const double &x, const doub
           Xtheta = M_PI / 2.;
         }      // to avoid some NaN
       } else { // exterior region with constant elevation angle
-        Xtheta = param.Xtheta_const;
+        Xtheta = p.Xtheta_const;
         rp_X = r - abs(z) / tan(Xtheta);
-        B_X = param.B0_X * rp_X / r * exp(-rp_X / param.r0_X);
+        B_X = p.B0_X * rp_X / r * exp(-rp_X / p.r0_X);
       }
 
       // X-field in cylindrical coordinates

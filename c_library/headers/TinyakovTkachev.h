@@ -23,10 +23,13 @@ struct TTParams : Params {
 class TTMagneticField : public RegularVectorField  {
     protected:
         bool DEBUG = false;
+        std::array<double, 3> _at_position(const double &x, const double &y, const double &z, const TTParams &p) const;
     public:
         using RegularVectorField :: RegularVectorField;
 
         TTParams param;
 
-        std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const;
+        std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+            return _at_position(x, y, z, this->param);
+        }
  };

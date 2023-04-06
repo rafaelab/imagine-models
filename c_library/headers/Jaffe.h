@@ -51,30 +51,27 @@ struct JaffeParams : Params {
 
 class JaffeMagneticField : public RegularVectorField {
     protected:
+    
       bool DEBUG = false;
+      std::array<double, 3> _at_position(const double &x, const double &y, const double &z, const JaffeParams &p) const;
+
     public:
 
     JaffeParams param;
 
     using RegularVectorField :: RegularVectorField;
 
+    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+        return _at_position(x, y, z, this->param);
+    }
 
-    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const;
-
-    std::array<double, 3> orientation(const double &x, const double &y, const double &z) const;
-
-    double radial_scaling(const double &x, const double &y) const;
-
-    std::vector<double> arm_compress(const double &x, const double &y,  const double &z) const;
-
-    std::vector<double> arm_compress_dust(const double &x, const double &y, const double &z) const;
-
-    std::vector<double> dist2arm(const double &x, const double &y) const;
-
-    double arm_scaling(const double &z) const;
-
-    double disk_scaling(const double &z) const;
-
-    double halo_scaling(const double &z) const;
+    std::array<double, 3> orientation(const double &x, const double &y, const double &z, const JaffeParams &p) const;
+    std::vector<double> arm_compress(const double &x, const double &y,  const double &z, const JaffeParams &p) const;
+    std::vector<double> arm_compress_dust(const double &x, const double &y, const double &z, const JaffeParams &p) const;
+    std::vector<double> dist2arm(const double &x, const double &y, const JaffeParams &p) const;
+    double radial_scaling(const double &x, const double &y, const JaffeParams &p) const;
+    double arm_scaling(const double &z, const JaffeParams &p) const;
+    double disk_scaling(const double &z, const JaffeParams &p) const;
+    double halo_scaling(const double &z, const JaffeParams &p) const;
 
 };

@@ -44,10 +44,6 @@ using namespace pybind11::literals;
   #include "include/random/LogNormalWrapper.h"
 #endif
 
-
-namespace py = pybind11;
-using namespace pybind11::literals;
-
 void FieldBases(py::module_ &);
 void RegularFieldBases(py::module_ &);
 
