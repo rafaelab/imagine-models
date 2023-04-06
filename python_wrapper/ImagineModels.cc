@@ -1,15 +1,18 @@
+//#include <eigen3/Eigen/Core>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/eigen.h>
+
 #include <iostream>
 
 //PYBIND11_MAKE_OPAQUE(std::vector<double>);
 //PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
 //PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
 
-#include "../c_library/include/config/fftw.hh"
+#include "../c_library/headers/fftw.hh"
 
 #include "include/FieldBases.h"
 
@@ -19,6 +22,8 @@
 #include "include/regular/YMW16Wrapper.h"
 #include "include/regular/HelixWrapper.h"
 #include "include/regular/JaffeWrapper.h"
+#include "include/regular/HarariMollerachRouletWrapper.h"
+#include "include/regular/TinyakovTkachevWrapper.h"
 #include "include/regular/RegularJF12Wrapper.h"
 
 #ifdef FFTW_FOUND
