@@ -1,11 +1,16 @@
-#include <pybind11/pybind11.h>
-
 #include "../../../c_library/headers/TinyakovTkachev.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
-
 void TinyakovTkachev(py::module_ &m) {
+    py::class_<TTParams>(m, "TTParams")
+        .def(py::init<>())
+        .def_readwrite("b_b0", &TTParams::b_b0)
+        .def_readwrite("b_Rsun", &TTParams::b_Rsun)
+        .def_readwrite("b_r_max", &TTParams::b_r_max)
+        .def_readwrite("b_r_min", &TTParams::b_r_min)
+        .def_readwrite("b_d", &TTParams::b_d)
+        .def_readwrite("b_z0", &TTParams::b_z0)
+        .def_readwrite("b_p", &TTParams::b_p);
+
     py::class_<TTMagneticField, RegularVectorField>(m, "TTMagneticField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
@@ -13,12 +18,6 @@ void TinyakovTkachev(py::module_ &m) {
 
         .def("at_position", &TTMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
 
-        .def_readwrite("b_b0", &TTMagneticField::b_b0)
-        .def_readwrite("b_Rsun", &TTMagneticField::b_Rsun)
-        .def_readwrite("b_r_max", &TTMagneticField::b_r_max)
-        .def_readwrite("b_r_min", &TTMagneticField::b_r_min)
-        .def_readwrite("b_d", &TTMagneticField::b_d)
-        .def_readwrite("b_z0", &TTMagneticField::b_z0)
-        .def_readwrite("b_p", &TTMagneticField::b_p);
-    
+        .def_readwrite("param", &TTMagneticField::param);
+
 }
