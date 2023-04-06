@@ -1,4 +1,5 @@
-//#include <eigen3/Eigen/Core>
+#include <iostream>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
@@ -6,11 +7,20 @@
 #include <pybind11/stl_bind.h>
 #include <pybind11/eigen.h>
 
-#include <iostream>
+namespace py = pybind11;
+using namespace pybind11::literals;
+
 
 //PYBIND11_MAKE_OPAQUE(std::vector<double>);
 //PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
 //PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
+
+#include "../c_library/headers/autodiff.hh"
+#ifdef autodiff_FOUND
+  #include "include/autodiff_wrapper.h"
+  namespace ad = autodiff;
+#endif
+
 
 #include "../c_library/headers/fftw.hh"
 

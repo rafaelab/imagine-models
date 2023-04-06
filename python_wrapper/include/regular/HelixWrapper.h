@@ -1,14 +1,4 @@
-#include <pybind11/pybind11.h>
-#include <autodiff/forward/real.hpp>
-
 #include "../../../c_library/headers/Helix.h"
-#include "../autodiff_wrapper.h"
-
-namespace py = pybind11;
-using namespace pybind11::literals;
-namespace ad = autodiff;
-
-
 
 
 void Helix(py::module_ &m) {
