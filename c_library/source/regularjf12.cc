@@ -4,7 +4,7 @@
 #include "../headers/hamunits.h"
 #include "../headers/RegularJF12.h"
 
-std::array<double, 3> JF12MagneticField::_at_position(const double &x, const double &y, const double &z, const JF12RegularParams &p) const {
+vector JF12MagneticField::_at_position(const double &x, const double &y, const double &z, const JF12RegularParams &p) const {
   // define fixed parameters
       const double Rmax = 20;   // outer boundary of GMF
       const double rho_GC = 1.; // interior boundary of GMF
@@ -30,7 +30,7 @@ std::array<double, 3> JF12MagneticField::_at_position(const double &x, const dou
 
       // define boundaries for where magnetic field is zero (outside of galaxy)
       if (r > Rmax || rho < rho_GC) {
-        return std::array<double, 3>{0., 0., 0.};
+        return vector{{0., 0., 0.}};
       }
 
       //------------------------------------------------------------------------------
@@ -44,8 +44,7 @@ std::array<double, 3> JF12MagneticField::_at_position(const double &x, const dou
                                (1 + exp(-2. / p.w_disk * (abs(z) - p.h_disk)))};
 
       // printf("%g, %g \n", z, zprofile);
-      double B_cyl_disk[3] = {0, 0,
-                                 0}; // the disk field in cylindrical coordinates
+      double B_cyl_disk[3] = {0, 0, 0}; // the disk field in cylindrical coordinates
 
       if ((r > rcent)) // disk field zero elsewhere
       {
@@ -164,13 +163,13 @@ std::array<double, 3> JF12MagneticField::_at_position(const double &x, const dou
 
 
       // add fields together
-      std::array<double, 3> B_cyl{0.0, 0.0, 0.0};
+      vector B_cyl{{0.0, 0.0, 0.0}};
       B_cyl[0] = B_cyl_disk[0] + B_cyl_h[0] + B_cyl_X[0];
       B_cyl[1] = B_cyl_disk[1] + B_cyl_h[1] + B_cyl_X[1];
       B_cyl[2] = B_cyl_disk[2] + B_cyl_h[2] + B_cyl_X[2];
 
       // convert field to cartesian coordinates
-      std::array<double, 3> B_cart{0.0, 0.0, 0.0};
+      vector B_cart{{0.0, 0.0, 0.0}};
       B_cart[0] = B_cyl[0] * cos(phi) - B_cyl[1] * sin(phi);
       B_cart[1] = B_cyl[0] * sin(phi) + B_cyl[1] * cos(phi);
       B_cart[2] = B_cyl[2];

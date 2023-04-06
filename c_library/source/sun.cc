@@ -5,10 +5,10 @@
 #include "../headers/helpers.h"
 
 //Sun et al. A&A V.477 2008 ASS+RING model magnetic field
-std::array<double, 3>  SunMagneticField::_at_position(const double &x, const double &y, const double &z, const SunParams &p) const {
+vector SunMagneticField::_at_position(const double &x, const double &y, const double &z, const SunParams &p) const {
 
-double r = std::sqrt(x*x + y*y);
-double phi = std::atan2(y, z);
+double r = sqrt(x*x + y*y);
+double phi = atan2(y, z);
   
   // first we set D2
   // ------------------------------------------------------------
@@ -47,10 +47,9 @@ double phi = std::atan2(y, z);
   // ------------------------------------------------------------
   
   double p_ang = p.b_pitch_deg * M_PI / 180.;
-  std::array<double, 3>  B_cyl{ D1 * D2 * sin(p_ang),
-		                           -D1 * D2 * cos(p_ang),
-		                            0.
-                              };
+  vector B_cyl{{ D1 * D2 * sin(p_ang), 
+                -D1 * D2 * cos(p_ang), 
+                 0. }};
 
   // [ORIGINAL HAMMURABI COMMENT]  Taking into account the halo field
   double halo_field;
@@ -75,7 +74,7 @@ double phi = std::atan2(y, z);
 
   B_cyl[1] += halo_field;
 
-  std::array<double, 3> B_vec3{0, 0, 0};
+  vector B_vec3{{0, 0, 0}};
 
   Cyl2Cart(phi, B_cyl, B_vec3);
 

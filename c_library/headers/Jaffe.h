@@ -53,7 +53,7 @@ class JaffeMagneticField : public RegularVectorField {
     protected:
     
       bool DEBUG = false;
-      std::array<double, 3> _at_position(const double &x, const double &y, const double &z, const JaffeParams &p) const;
+      vector _at_position(const double &x, const double &y, const double &z, const JaffeParams &p) const;
 
     public:
 
@@ -61,7 +61,7 @@ class JaffeMagneticField : public RegularVectorField {
 
     using RegularVectorField :: RegularVectorField;
 
-    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+    vector at_position(const double &x, const double &y, const double &z) const {
         return _at_position(x, y, z, this->param);
     }
 

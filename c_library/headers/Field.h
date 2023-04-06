@@ -144,9 +144,9 @@ public:
               int n = j*size[2];
               for (int k=0; k < size[2]; k++) {
                   FRTYPE v = eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
-                  fval[0][m + n + k] = v[0];
-                  fval[1][m + n + k] = v[1];
-                  fval[2][m + n + k] = v[2];
+                  fval[0][m + n + k] = static_cast<double>(v[0]);
+                  fval[1][m + n + k] = static_cast<double>(v[1]);
+                  fval[2][m + n + k] = static_cast<double>(v[2]);
                   
           }   }   }
     }

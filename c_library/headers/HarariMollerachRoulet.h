@@ -24,14 +24,14 @@ struct HMRParams : Params {
 class HMRMagneticField : public RegularVectorField  {
     protected:
         bool DEBUG = false;
-        std::array<double, 3>  _at_position (const double &x, const double &y, const double &z, const HMRParams &p) const;
+        vector  _at_position (const double &x, const double &y, const double &z, const HMRParams &p) const;
     
     public:
         using RegularVectorField :: RegularVectorField;
 
         HMRParams param;
 
-        std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+        vector at_position(const double &x, const double &y, const double &z) const {
             return _at_position(x, y, z, this->param);
         }
 

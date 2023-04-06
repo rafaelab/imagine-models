@@ -4,9 +4,9 @@
 #include "../headers/hamunits.h"
 #include "../headers/Jaffe.h"
 
-std::array<double, 3> JaffeMagneticField::_at_position(const double &x, const double &y, const double &z, const JaffeParams &p) const {
+vector JaffeMagneticField::_at_position(const double &x, const double &y, const double &z, const JaffeParams &p) const {
     if (x == 0. && y == 0. && z == 0.) {
-        return std::array<double, 3>{0., 0., 0.};
+        return vector{{0., 0., 0.}};
       }
     double inner_b{0};
     if (p.ring) {
@@ -15,7 +15,7 @@ std::array<double, 3> JaffeMagneticField::_at_position(const double &x, const do
       inner_b = p.bar_amp;}
 
     std::array<double, 3> bhat = orientation(x, y, z, p);
-    std::array<double, 3> btot{0., 0., 0.};
+    vector btot{{0., 0., 0.}};
 
     double scaling = radial_scaling(x, y, p) *
            (p.disk_amp * disk_scaling(z, p) +

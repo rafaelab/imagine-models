@@ -41,14 +41,14 @@ class JF12MagneticField : public RegularVectorField {
   protected:
     bool DEBUG = false;
 
-    std::array<double, 3> _at_position(const double &x, const double &y, const double &z, const JF12RegularParams &p) const;
+    vector _at_position(const double &x, const double &y, const double &z, const JF12RegularParams &p) const;
   
   public:
     using RegularVectorField :: RegularVectorField;
 
     JF12RegularParams param;
 
-    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+    vector at_position(const double &x, const double &y, const double &z) const {
         return _at_position(x, y, z, this->param);
   }
 

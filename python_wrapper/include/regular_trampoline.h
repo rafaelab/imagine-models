@@ -6,9 +6,24 @@
 
 #include "../../c_library/headers/RegularField.h"
 
+#include "../../c_library/headers/autodiff.hh"
+
+#if defined autodiff_FOUND
+    #include <autodiff/forward/real.hpp>
+    #include <autodiff/forward/dual.hpp>
+    #include <autodiff/forward/real/eigen.hpp>
+    namespace ad = autodiff;
+    typedef ad::real number;
+    typedef ad::VectorXreal vector;
+#else
+    typedef double number;  // only used for differentiable numbers! 
+    typedef std::array<double, 3> vector;
+#endif
+
+
 #include <iostream>
 
-using Array3Type = std::array<double, 3>;
+//using Array3Type = std::array<double, 3>;
 using Array3PointerType = std::array<double*, 3>; // Only for PYBIND11_OVERRIDE_PURE macro, else gets confused by commas 
 
 // These classes are necessary to override virtual functions when binding abstract c++ classes
@@ -32,10 +47,10 @@ public:
 };
 
 
-class PyVectorFieldBase: public Field<std::array<double, 3>, std::array<double*, 3>> {
+class PyVectorFieldBase: public Field<vector, std::array<double*, 3>> {
 public:
-    using Field<std::array<double, 3>, std::array<double*, 3>>:: Field; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(Array3Type, Field, at_position, x, y, z); }
+    using Field<vector, std::array<double*, 3>>:: Field; // Inherit constructors
+    vector at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(vector, Field, at_position, x, y, z); }
 
     std::array<double*, 3> on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, seed); }
     
@@ -54,7 +69,7 @@ public:
 class PyRegularVectorField: public RegularVectorField {
 public:
     using RegularVectorField:: RegularVectorField; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(Array3Type, RegularVectorField, at_position, x, y, z); }
+    vector at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(vector, RegularVectorField, at_position, x, y, z); }
 
     std::array<double*, 3> on_grid(int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RegularVectorField, on_grid, seed); }
     

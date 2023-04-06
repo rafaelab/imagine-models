@@ -3,7 +3,7 @@
 
 #include "../headers/helpers.h"
 
-std::array<double, 3>  TTMagneticField::_at_position(const double &x, const double &y, const double &z, const TTParams &p) const { 
+vector TTMagneticField::_at_position(const double &x, const double &y, const double &z, const TTParams &p) const { 
     double r = sqrt(x*x + y*y);
     double phi = atan2(y, x);
 
@@ -38,9 +38,10 @@ std::array<double, 3>  TTMagneticField::_at_position(const double &x, const doub
     //  if(r<1.e-26){B_r_phi = b_r*std::cos(phi+phase);} <-- hammurabi comment
 
     // B-field in cylindrical coordinates: <-- hammurabi comment
-    std::array<double, 3> B_cyl{B_r_phi * sin(p.b_p) * f_z, B_r_phi * cos(p.b_p) * f_z , 0.};
+    vector B_cyl{{B_r_phi * sin(p.b_p) * f_z, B_r_phi * cos(p.b_p) * f_z , 0.}};
 
-    std::array<double, 3> B_vec3{0, 0, 0};
+    vector B_vec3{{0, 0, 0}};
+    
     if (r <= p.b_r_max) {
         Cyl2Cart(phi, B_cyl, B_vec3);
     }

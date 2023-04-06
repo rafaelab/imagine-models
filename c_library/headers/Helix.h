@@ -7,18 +7,6 @@
 #include "autodiff.hh"
 #include "param.h"
 
-#if defined autodiff_FOUND
-    #include <autodiff/forward/real.hpp>
-    #include <autodiff/forward/dual.hpp>
-    #include <autodiff/forward/real/eigen.hpp>
-    namespace ad = autodiff;
-    typedef ad::real number;
-    typedef ad::VectorXreal vector;
-#else
-    typedef double number;  // only used for differentiable numbers! 
-    typedef std::array<double, 3> vector;
-#endif
-
 
 struct HelixParams : Params {
     //parameter_names = {"ampx", "ampy"};
@@ -37,18 +25,19 @@ class HelixMagneticField : public RegularVectorField  {
     protected:
         bool DEBUG = false;
         bool has_derivative = true;
+        vector  _at_position(const double &x, const double &y, const double &z, const HelixParams &p) const;
+
     public:
         using RegularVectorField :: RegularVectorField;
 
         HelixParams param;
+
+        vector at_position(const double &x, const double &y, const double &z) const {
+            return _at_position(x, y, z, this->param);
+        }
         
 
-        std::array<double, 3>  at_position(const double &x, const double &y, const double &z) const;
-
         #if defined autodiff_FOUND
-
-            vector  _at_position(const double &x, const double &y, const double &z, const HelixParams &p) const;
-
             Eigen::MatrixXd _derivative(const double &x, const double &y, const double &z,  HelixParams &p) {
                 vector out;
                 Eigen::MatrixXd deriv = ad::jacobian([&](auto _x, auto _y, auto _z, auto _p) {return this->_at_position(_x, _y, _z, _p);}, ad::wrt(p.ampx, p.ampy, p.ampz), ad::at(x, y, z, p), out);  

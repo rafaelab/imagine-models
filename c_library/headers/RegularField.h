@@ -93,7 +93,7 @@ public:
 };
 
 
-class RegularVectorField : public Field<std::array<double, 3>, std::array<double*, 3>>  {
+class RegularVectorField : public Field<vector, std::array<double*, 3>>  {
 protected:
     // Fields
 
@@ -121,13 +121,13 @@ public:
     };
 
   // Constructors
-  RegularVectorField () : Field<std::array<double, 3>, std::array<double*, 3>>() {
+  RegularVectorField () : Field<vector, std::array<double*, 3>>() {
       };
 
-  RegularVectorField (std::array<int, 3>  shape, std::array<double, 3> reference_point, std::array<double, 3>  grid_increment) : Field<std::array<double, 3>, std::array<double*, 3>>(shape, reference_point, grid_increment) {
+  RegularVectorField (std::array<int, 3>  shape, std::array<double, 3> reference_point, std::array<double, 3>  grid_increment) : Field<vector, std::array<double*, 3>>(shape, reference_point, grid_increment) {
       };
 
-  RegularVectorField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<std::array<double, 3>, std::array<double*, 3>>(grid_x, grid_y, grid_z) {
+  RegularVectorField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<vector, std::array<double*, 3>>(grid_x, grid_y, grid_z) {
       };
 
 
@@ -142,10 +142,10 @@ public:
     }
     std::array<double*, 3> grid_eval = allocate_memory(shape);;
     if (regular_grid) {
-      evaluate_function_on_grid<std::array<double, 3>>(grid_eval, shape, reference_point, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      evaluate_function_on_grid<vector>(grid_eval, shape, reference_point, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     }
     else {
-      evaluate_function_on_grid<std::array<double, 3>>(grid_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      evaluate_function_on_grid<vector>(grid_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     }
   return grid_eval;
   }
@@ -153,14 +153,14 @@ public:
   std::array<double*, 3> on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0) {
     std::array<int, 3> grid_shape = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
     std::array<double*, 3> grid_eval = allocate_memory(grid_shape);
-    evaluate_function_on_grid<std::array<double, 3>>(grid_eval, grid_x, grid_y, grid_z,
+    evaluate_function_on_grid<vector>(grid_eval, grid_x, grid_y, grid_z,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return grid_eval;
   }
 
  std::array<double*, 3> on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_reference_point, const std::array<double, 3> &grid_increment, int seed = 0) {
     std::array<double*, 3> grid_eval = allocate_memory(grid_shape);
-    evaluate_function_on_grid<std::array<double, 3>>(grid_eval, grid_shape, grid_reference_point, grid_increment,
+    evaluate_function_on_grid<vector>(grid_eval, grid_shape, grid_reference_point, grid_increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return grid_eval;
   }
