@@ -4,9 +4,15 @@ project(ImagineModels VERSION 0.0.1 DESCRIPTION "A library for Galactic models")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/findFFTW")
 include(GNUInstallDirs)
+INCLUDE_DIRECTORIES ( "/usr/local/include/eigen3 " )
 
 FIND_PACKAGE(FFTW)
 FIND_PACKAGE(autodiff)
+
+message(FFTW_FOUND="${FFTW_FOUND}")
+message(autodiff_FOUND="${autodiff_FOUND}")
+
+CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/headers/autodiff.hh.in ${CMAKE_SOURCE_DIR}/headers/autodiff.hh )
 
 
 set(INCLUDE_INSTALL_DIR
@@ -20,6 +26,7 @@ if (FFTW_FOUND)
         "headers/RandomModels.h"
 
         "headers/exceptions.h"
+        "headers/autodiff.hh"
 
         "headers/Field.h"
         "headers/RegularField.h"
@@ -63,6 +70,7 @@ else()
         "headers/RegularField.h"
 
         "headers/helpers.h"
+        "headers/autodiff.hh"
         "headers/Uniform.h"
         "headers/RegularJF12.h"
         "headers/Jaffe.h"
@@ -85,13 +93,16 @@ endif()
 
 target_include_directories(ImagineModels PRIVATE .)
 
-message(FFTW_FOUND="${FFTW_FOUND}")
 message(PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 message(IM_PUBLIC_HEADERS="${IM_PUBLIC_HEADERS}")
 message(CMAKE_INSTALL_LIBDIR="${CMAKE_INSTALL_LIBDIR}")
 message(CMAKE_INSTALL_INCLUDEDIR="${CMAKE_INSTALL_INCLUDEDIR}")
 message(CMAKE_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 message(CMAKE_MODULE_PATH="${CMAKE_MODULE_PATH}")
+message(CMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+
+
+target_link_libraries(ImagineModels autodiff::autodiff)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set_target_properties(ImagineModels PROPERTIES
