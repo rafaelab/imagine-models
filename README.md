@@ -9,8 +9,6 @@ A full list of implemented models can be found [here](#list-of-models).
 
 ### Requirements
 
-**TODO: check fftw3 dependence, make it optional** 
-
 Requires:
 
 - [Python 3](https://www.python.org/) (>=3.6)
@@ -19,6 +17,10 @@ Requires:
 Python Libraries:
 
 - [NumPy](https://numpy.org/) (>=1.22)
+
+Optional:
+
+- [FFTW3](http://fftw.org/) (>3.3, necessary for random models)
 
 Optional (Developers):
 
