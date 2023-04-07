@@ -32,6 +32,7 @@ void RegularJF12(py::module_ &m) {
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
         .def("at_position", &JF12MagneticField::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        .def("derivative", &JF12MagneticField::derivative,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
 
         .def_readwrite("param", &JF12MagneticField::param);
 

@@ -1,5 +1,5 @@
 from _ImagineModels import VectorFieldBase, ScalarFieldBase, RegularVectorField, RegularScalarField, \
-    JF12RegularField,  JaffeMagneticField, HelixMagneticField, UniformMagneticField, YMW16, Sun2008MagneticField
+    JF12RegularField,  JaffeMagneticField, HelixMagneticField, UniformMagneticField, YMW16, SunMagneticField
     
 try: 
     from _ImagineModels import JF12RandomField, ESRandomField, GaussianScalarField, LogNormalScalarField

@@ -14,7 +14,7 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
       const double rmin = 5.; // outer boundary of the molecular ring region
       const double rcent = 3. ; // inner boundary of the molecular ring region (field is
                          // zero within this region)
-      const double f[8] = {
+      const number f[8] = {
           0.130, 0.165, 0.094, 0.122,
           0.13,  0.118, 0.084, 0.156}; // fractions of circumference spanned by each
                                        // spiral, sums to unity
@@ -40,11 +40,10 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
       const double B0 = (rmin / r); //
       // the logistic equation, to be multiplied to the toroidal halo field and
       // (1-zprofile) multiplied to the disk:
-      const double zprofile{1. /
-                               (1 + exp(-2. / p.w_disk * (abs(z) - p.h_disk)))};
+      const number zprofile{1. / (1 + exp(-2. / p.w_disk * (abs(z) - p.h_disk)))};
 
       // printf("%g, %g \n", z, zprofile);
-      double B_cyl_disk[3] = {0, 0, 0}; // the disk field in cylindrical coordinates
+      number B_cyl_disk[3] = {0, 0, 0}; // the disk field in cylindrical coordinates
 
       if ((r > rcent)) // disk field zero elsewhere
       {
@@ -53,9 +52,9 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
         } else {
           // use flux conservation to calculate the field strength in the 8th spiral
           // arm
-          double bv_B[8] = {p.b_arm_1, p.b_arm_2, p.b_arm_3, p.b_arm_4,
+          number bv_B[8] = {p.b_arm_1, p.b_arm_2, p.b_arm_3, p.b_arm_4,
                             p.b_arm_5, p.b_arm_6, p.b_arm_7, 0.};
-          double b8 = 0.;
+          number b8 = 0.;
 
           for (int i = 0; i < 7; i++) {
             b8 -= f[i] * bv_B[i] / f[7];
@@ -64,7 +63,7 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
 
           // iteratively figure out which spiral arm the current coordinates (r.phi)
           // correspond to
-          double b_disk = 0.;
+          number b_disk = 0.;
           double r_negx =
               r * exp(-1 / tan(M_PI / 180. * (90 - inc)) * (phi - M_PI));
 
@@ -88,8 +87,8 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
       //-------------------------------------------------------------------------
       ////TOROIDAL HALO COMPONENT
 
-      double b1, rh;
-      double B_h = 0.;
+      number b1, rh;
+      number B_h = 0.;
 
       if (z >= 0) { // North
         b1 = p.Bn;
@@ -101,15 +100,14 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
 
       B_h = b1 * (1. - 1. / (1. + exp(-2. / p.wh * (r - rh)))) *
             exp(-(abs(z)) / (p.z0)); // vertical exponential fall-off
-      const double B_cyl_h[3] = {0., B_h * zprofile, 0.};
+      const number B_cyl_h[3] = {0., B_h * zprofile, 0.};
 
       //------------------------------------------------------------------------
       // X- FIELD
 
-      double Xtheta = 0.;
-      double rp_X =
-          0.; // the mid-plane radius for the field line that pass through r
-      double B_X = 0.;
+      number Xtheta = 0.;
+      number rp_X =  0.; // the mid-plane radius for the field line that pass through r
+      number B_X = 0.;
       double r_sign = 1.; // +1 for north, -1 for south
       if (z < 0) {
         r_sign = -1.;
@@ -117,7 +115,7 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
 
       // dividing line between region with constant elevation angle, and the
       // interior:
-      double rc_X = p.rpc_X + abs(z) / tan(p.Xtheta_const);
+      number rc_X = p.rpc_X + abs(z) / tan(p.Xtheta_const);
 
       if (r < rc_X) { // interior region, with varying elevation angle
         rp_X = r * p.rpc_X / rc_X;
@@ -135,7 +133,7 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
       }
 
       // X-field in cylindrical coordinates
-      double B_cyl_X[3] = {B_X * cos(Xtheta) * r_sign, 0., B_X * sin(Xtheta)};
+      number B_cyl_X[3] = {B_X * cos(Xtheta) * r_sign, 0., B_X * sin(Xtheta)};
 
       if (DEBUG) {
 
