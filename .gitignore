@@ -153,3 +153,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 demos/cpp/example
+c_library/headers/autodiff.hh
+c_library/headers/fftw.hh
