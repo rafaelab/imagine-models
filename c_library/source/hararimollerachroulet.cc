@@ -18,11 +18,11 @@ std::array<double, 3>  HMRMagneticField::at_position(const double &x, const doub
 
   double b_r = ( 3. * b_Rsun / r) * std::tanh(r / b_r1) * std::tanh(r / b_r1) * std::tanh(r / b_r1);
 
-  double B_r_phi = b_r * std::cos(phi - ((1. / std::tan(b_p)) * std::log(r / b_epsilon0)));
+  double B_r_phi = b_r * std::cos(phi - ((1. / std::tan(b_p*(M_PI/180.))) * std::log(r / b_epsilon0)));
 
   // B-field in cylindrical coordinates:
-  std::array<double, 3> B_cyl{B_r_phi * std::sin(b_p) * f_z, 
-                              B_r_phi * std::cos(b_p) * f_z , 
+  std::array<double, 3> B_cyl{B_r_phi * std::sin(b_p*(M_PI/180.)) * f_z, 
+                              B_r_phi * std::cos(b_p*(M_PI/180.)) * f_z , 
                               0.};
 
   std::array<double, 3> B_vec3;

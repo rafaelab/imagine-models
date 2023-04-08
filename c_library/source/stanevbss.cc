@@ -17,14 +17,14 @@ std::array<double, 3>  StanevBSSMagneticField::at_position(const double &x, cons
     }
 
     double phi_prime = b_phi0 - phi;  // PHIprime running clock-wise from neg. x-axis
-    double beta = 1. / tan(b_p);
+    double beta = 1. / tan(b_p*(M_PI/180.));
 
     double B_0 = b_b0 * b_Rsun / 4. ; 
     if (r > 4.) {
         B_0 = b_b0 * b_Rsun /r;}
 
-    std::array<double, 3> B_cyl = {B_0 * cos(phi_prime -beta * log(r/b_r0)) * sin(b_p) * exp(-std::abs(z)/b_z0),
-				                  -B_0 * cos(phi_prime -beta * log(r/b_r0)) * cos(b_p) * exp(-std::abs(z)/b_z0),
+    std::array<double, 3> B_cyl = {B_0 * cos(phi_prime -beta * log(r/b_r0)) * sin(b_p*(M_PI/180.)) * exp(-std::abs(z)/b_z0),
+				                  -B_0 * cos(phi_prime -beta * log(r/b_r0)) * cos(b_p*(M_PI/180.)) * exp(-std::abs(z)/b_z0),
 				                   0.};
 
     B_vec3 = Cyl2Cart(phi, B_cyl);

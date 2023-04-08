@@ -17,12 +17,12 @@ std::array<double, 3>  FauvetMagneticField::at_position(const double &x, const d
     }
 
 	double phi = atan2(y, x);
-    double chi_z = b_chi0 * tanh(z/b_z0);
-    double beta=1./tan(b_p);
+    double chi_z = b_chi0*(M_PI/180.) * tanh(z/b_z0);
+    double beta=1./tan(b_p*(M_PI/180.));
 
     // B-field in cylindrical coordinates:
-    std::array<double, 3> B_cyl{b_b0 * cos(phi + beta * log(r/b_r0)) * sin(b_p) * cos(chi_z),
-                               -b_b0 * cos(phi + beta * log(r/b_r0)) * cos(b_p) * cos(chi_z), 
+    std::array<double, 3> B_cyl{b_b0 * cos(phi + beta * log(r/b_r0)) * sin(b_p*(M_PI/180.)) * cos(chi_z),
+                               -b_b0 * cos(phi + beta * log(r/b_r0)) * cos(b_p*(M_PI/180.)) * cos(chi_z), 
                                 b_b0 * sin(chi_z)};
   
 

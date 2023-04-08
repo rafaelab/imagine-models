@@ -25,11 +25,10 @@ double phi = atan2(y, z);
     {
       D2 = 1.;
     }
-  else if(r <= 5.)
+  else //if(r <= 5.)
     {
       D2 =- 1.;
     }
-  else {std::cerr << " Error! r in Sun field is:" << r << "kpc " << std::endl; exit(1);}
   // ------------------------------------------------------------
 
   // now we set D1
@@ -39,11 +38,10 @@ double phi = atan2(y, z);
     {
       D1 = b_B0 * exp(-((r - b_Rsun) / b_R0) - (std::abs(z) / b_z0));
     }
-  else if(r <= b_Rc)
+  else //if(r <= b_Rc)
     {
       D1 = b_Bc;
     }
-  else {std::cerr << " Error! r in Sun field is:" << r << "kpc " << std::endl; exit(1);}
   // ------------------------------------------------------------
   
   double p_ang = b_pitch_deg * M_PI / 180.;

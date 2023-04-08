@@ -19,9 +19,9 @@ class WMAPMagneticField : public RegularVectorField  {
         double b_b0 = 6.; // muG
         double b_z0 = 1.; // kpc
         double b_r0 = 8.; // kpc
-        double b_psi0 = (M_PI/180.)*27; // degree
-        double b_psi1 = (M_PI/180.)*0.9; // degree
-        double b_xsi0 = (M_PI/180.)*25; // degree
+        double b_psi0 = 27; // degree
+        double b_psi1 = 0.9; // degree
+        double b_xsi0 = 25; // degree
 
         bool anti = false;
 

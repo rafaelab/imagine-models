@@ -17,7 +17,7 @@ class TTMagneticField : public RegularVectorField  {
         double b_r_min = 4.; // kpc
         double b_d = -0.5; // kpc
         double b_z0 = 1.5; // kpc
-        double b_p = (M_PI/180.)*(-8); // degree
+        double b_p = -8; // degree
 
 
         std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const;

@@ -6,6 +6,9 @@
 
 std::array<double, 3> JaffeMagneticField::at_position(const double &x, const double &y, const double &z) const {
     if (x == 0. && y == 0. && z == 0.) {
+        if (DEBUG) {
+          std::cout << "jaffe.cc: origin" << std::endl;
+         }
         return std::array<double, 3>{0., 0., 0.};
       }
     double inner_b{0};
@@ -15,17 +18,21 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
       inner_b = bar_amp;}
     std::array<double, 3> bhat = orientation(x, y, z);
     std::array<double, 3> btot{0., 0., 0.};
+    
     double scaling = radial_scaling(x, y) *
            (disk_amp * disk_scaling(z) +
             halo_amp * halo_scaling(z));
-    for(int i=0;i<bhat.size();++i) {
+    
+    for(int i =0; i < bhat.size(); ++i) {
         	btot[i] = bhat[i] * scaling;}
     // compress factor for each arm or for ring/bar
-    std::vector<double> arm;
-    arm = arm_compress(x, y, z);
+    std::vector<double> arm = arm_compress(x, y, z);
     // only inner region
     if (arm.size() == 1) {
-      for(int i=0;i<bhat.size();++i) {
+      for(int i = 0; i < bhat.size(); ++i) {
+          if (DEBUG) {
+          std::cout << "inner region bhat: " << i << std::endl;
+         }
         btot[i] += bhat[i] * arm[0] * inner_b;}
     }
 
@@ -33,6 +40,9 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
     else {
       std::vector<double> arm_amp{arm_amp1, arm_amp2, arm_amp3, arm_amp4};
       for (decltype(arm.size()) i = 0; i < arm.size(); ++i) {
+        if (DEBUG) {
+          std::cout << "appending arm: " << i << std::endl;
+         }
         for(int j=0;j<bhat.size();++j) {
           btot[j] += bhat[j] * arm[i] * arm_amp[i];}
       }
@@ -46,8 +56,8 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
         sqrt(x * x + y * y)}; // cylindrical frame
     const double r_lim = ring_r;
     const double bar_lim{bar_a + 0.5 * comp_d};
-    const double cos_p = std::cos(arm_pitch);
-    const double sin_p = std::sin(arm_pitch); // pitch angle
+    const double cos_p = std::cos(arm_pitch*(M_PI/180.));
+    const double sin_p = std::sin(arm_pitch*(M_PI/180.)); // pitch angle
     std::array<double, 3> tmp{0., 0., 0.};
     double quadruple{1};
     if (r < 0.5) // forbiden region
@@ -73,8 +83,8 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
     else if (bar) {
       const double cos_phi = std::cos(bar_phi0);
       const double sin_phi = std::sin(bar_phi0);
-      const double x = cos_phi * x - sin_phi * y;
-      const double y = sin_phi * x + cos_phi * y;
+      const double xb = cos_phi * x - sin_phi * y;
+      const double yb = sin_phi * x + cos_phi * y;
       // inside spiral arm
       if (r > bar_lim) {
         tmp[0] =
@@ -84,9 +94,9 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
       }
       // inside elliptical bar
       else {
-        if (y != 0) {
-          const double new_x = copysign(1, y);
-          const double new_y = copysign(1, y) * (x / y) *
+        if (yb != 0) {
+          const double new_x = copysign(1, yb);
+          const double new_y = copysign(1, yb) * (xb / yb) *
                                 bar_b * bar_b /
                                 (bar_a * bar_a);
           tmp[0] =
@@ -96,12 +106,12 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
           // versor
           double tmp_length = std::sqrt(tmp[0]* tmp[0] + tmp[1]* tmp[1] + tmp[2]* tmp[2]);
           if (tmp_length != 0.) {
-            for(int i=0;i<tmp.size();++i) {
-              tmp[i] = tmp[i]/tmp_length;}
+            for(int i = 0; i < tmp.size(); ++i) {
+              tmp[i] = tmp[i] / tmp_length;}
             }
         } else {
-          tmp[0] = (2 * bss - 1) * copysign(1, x) * sin_phi;
-          tmp[1] = (2 * bss - 1) * copysign(1, x) * cos_phi;
+          tmp[0] = (2 * bss - 1) * copysign(1, xb) * sin_phi;
+          tmp[1] = (2 * bss - 1) * copysign(1, xb) * cos_phi;
         }
       }
     }
@@ -154,7 +164,7 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
     const double r_scaling{radial_scaling(x, y)};
     const double z_scaling{arm_scaling(z)};
     // only difference from normal arm_compress
-    const double d0_inv{(r_scaling) / comp_d};
+    const double d0_inv{(r_scaling*z_scaling) / comp_d};
     double factor{c0 * r_scaling * z_scaling};
     if (r > 1) {
       double cdrop{std::pow(r, -comp_p)};
@@ -175,8 +185,8 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
     const double r{sqrt(x * x + y * y)};
     const double r_lim{ring_r};
     const double bar_lim{bar_a + 0.5 * comp_d};
-    const double cos_p{std::cos(arm_pitch)};
-    const double sin_p{std::sin(arm_pitch)}; // pitch angle
+    const double cos_p{std::cos(arm_pitch*(M_PI/180.))};
+    const double sin_p{std::sin(arm_pitch*(M_PI/180.))}; // pitch angle
     const double beta_inv{-sin_p / cos_p};
     double theta{atan2(y, x)};
     if (theta < 0)
@@ -190,7 +200,7 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
       // in spiral arm, return vector with arm_num elements
       else {
         // loop through arms
-        std::vector<double> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
+        std::vector<double> arm_phi{arm_phi1*(M_PI/180.), arm_phi2*(M_PI/180.), arm_phi3*(M_PI/180.), arm_phi4*(M_PI/180.)};
         for (int i = 0; i < arm_num; ++i) {
           double d_ang{arm_phi[i] - theta};
           double d_rad{
@@ -228,7 +238,7 @@ std::array<double, 3> JaffeMagneticField::at_position(const double &x, const dou
       // in spiral arm, return vector with arm_num elements
       else {
         // loop through arms
-        std::vector<double> arm_phi{arm_phi1, arm_phi2, arm_phi3, arm_phi4};
+        std::vector<double> arm_phi{arm_phi1*(M_PI/180.), arm_phi2*(M_PI/180.), arm_phi3*(M_PI/180.), arm_phi4*(M_PI/180.)};
         for (int i = 0; i < arm_num; ++i) {
           double d_ang{arm_phi[i] - theta};
           double d_rad{

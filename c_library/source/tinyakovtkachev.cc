@@ -8,8 +8,8 @@ std::array<double, 3>  TTMagneticField::at_position(const double &x, const doubl
     double r = std::sqrt(x*x + y*y);
     double phi = std::atan2(y, x);
 
-    double beta = 1./std::tan(b_p);
-    if(std::abs(b_p) < 1.e-16) { 
+    double beta = 1./std::tan(b_p*(M_PI/180.));
+    if(std::abs(b_p*(M_PI/180.)) < 1.e-16) { 
         beta=1.;
         }
 
@@ -39,7 +39,7 @@ std::array<double, 3>  TTMagneticField::at_position(const double &x, const doubl
     //  if(r<1.e-26){B_r_phi = b_r*std::cos(phi+phase);} <-- hammurabi comment
 
     // B-field in cylindrical coordinates: <-- hammurabi comment
-    std::array<double, 3> B_cyl{B_r_phi*std::sin(b_p)*f_z, B_r_phi*std::cos(b_p)*f_z , 0.};
+    std::array<double, 3> B_cyl{B_r_phi*std::sin(*(M_PI/180.))*f_z, B_r_phi*std::cos(b_p*(M_PI/180.))*f_z , 0.};
 
     std::array<double, 3> B_vec3;
     if (r <= b_r_max) {

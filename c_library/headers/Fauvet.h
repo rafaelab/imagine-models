@@ -19,8 +19,8 @@ class FauvetMagneticField : public RegularVectorField  {
         double b_b0 = 7.1; // muG
         double b_z0 = 1.; // kpc
         double b_r0 = 8.; // kpc
-        double b_p = (M_PI/180.)*(-26.1); // degree
-        double b_chi0 = (M_PI/180.)*22.4; // degree
+        double b_p = -26.1; // degree
+        double b_chi0 = 22.4; // degree
 
         double h_b0 = 1.; // muG
         double h_z0 = 1.5; // kpc

@@ -18,8 +18,8 @@ std::array<double, 3>  WMAPMagneticField::at_position(const double &x, const dou
 
 	double phi = atan2(y, x);
 
-    double psi_r = b_psi0 + b_psi1 * log(r/b_r0);
-    double xsi_z = b_xsi0 * tanh(z/b_z0);
+    double psi_r = b_psi0*(M_PI/180.) + b_psi1*(M_PI/180.) * log(r/b_r0);
+    double xsi_z = b_xsi0*(M_PI/180.) * tanh(z/b_z0);
     
     std::array<double, 3> B_cyl = {b_b0 * sin(psi_r) * cos(xsi_z), 
                                    b_b0 * cos(psi_r) * cos(xsi_z), 
