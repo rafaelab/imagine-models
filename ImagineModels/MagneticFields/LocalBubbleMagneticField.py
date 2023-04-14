@@ -1,15 +1,15 @@
 import numpy as np
 import healpy as hp
 
-#from ImagineModels import RegularVectorField, cyl2cart
+from ImagineModels import RegularVectorField, cyl2cart
 
 mypath = '/home/vincent/Documents/BxB/LocalBubble_HDataverse/L19_map-inner_final.fits'
 
-class LBMagneticField():
+class LBMagneticField(RegularVectorField):
     """
         ===  LBMagneticField : GMF in the shell of the LocalBubble ===
 
-        This implements the analytical model for the GMF in the shell of the
+        Implementation of the analytical model for the GMF in the shell of the
             Local Bubble as presented in Alves et al. 2018
                 and updated in Pelgrims et al. 2020 for any close shape of the
                 inner surface of the Local Bubble.
@@ -18,8 +18,9 @@ class LBMagneticField():
                     
             LBMagneticField(SkyCoordinates,**kwargs{numerous parameters})
                 
-                " B_today = B0 (n.er) - er (n.B0)
-                " where     B_today = vector field now
+                " B_today \propto n x (B0 x er)
+                "           = B0 (n.er) - er (n.B0)
+                "   where   B_today = vector field now
                 "           B0 is vector field before explosion (in Cart)
                 "           n is normal vector to the surface of today's
                 "               shell (in Cart)
@@ -29,19 +30,15 @@ class LBMagneticField():
 
             INPUT:
             ------
-             - SkyCoordinates :  an (2,n)-array with Galactic coordinates
-                        (Longitude and Latitudes) toward which the model has to be
-                        evaluated. Default format is Lon,Lat in degrees.
-             **kwargs :
-               - ...
               [model parameter]
                - dx,dy,dz: offset of the explosion center from the Sun [kpc]
                - theta_B0,phi_B0: co-latitude and longitude describing the 3D
                                     orientation of the Bfield BEFORE explosion.
-                                    Supposed to be uniform. [radians]
-               - LB_distance: path to a fits file with healpix maps of the heliocentric
-                                distances of the inner of the LB as measured from the Sun.
-                                [! the default map is in pc]
+                                    (assumed to be uniform) [radians]
+               - LB_distance: path to the fits file with healpix maps of the
+                                heliocentric distances of the inner of the LB
+                                as measured from the Sun and as determined
+                                in Pelgrims+2020. [! the maps are in pc]
                              or healpix [ring format] map of wanted shape [kpc]
                - surfaceLabel: if 'path' is given, the label is used to select
                                 a given model of the shape of the inner shell
@@ -50,25 +47,24 @@ class LBMagneticField():
                                 to point to the corresponding shell model up to
                                 the maximum multipole sph. harm expansion as
                                 defined in Pelgrims+2020.
-
-            OUTPUT:
-            -------
-            [Bx,By,Bz]: the component of the GMF vector field in the shell of the LB
-                            in CARTESIAN coordinates centered on the Galactic Center
+                    Note: the Pelgrims+2020 models for the shape of the shell
+                    -----   can be downloaded from:
+                                https://doi.org/10.7910/DVN/RHPVNC
 
             Created on Apr 11 2023
             @author: V.Pelgrims
             """
 
-    def __init__(self, theta_B0=1.278, phi_B0=1.278,\
-                        dx=0.058,dy=0.079,dz=-0.086,\
-                            LB_distance=mypath, surfaceLabel='lmax6'):
+    def __init__(self, LB_distance,\
+                        theta_B0=1.278, phi_B0=1.278,\
+                            dx=0.058,dy=0.079,dz=-0.086,\
+                             surfaceLabel='lmax6'):
         self.theta_B0 = theta_B0    # [rad]
         self.phi_B0 = phi_B0        # [rad]
         self.dx = dx                # [kpc]
         self.dy = dy                # [kpc]
         self.dz = dz                # [kpc]
-        
+        my
         if type(LB_distance) is str:
             if surfaceLabel == 'lmax2':
                 field = 1
@@ -89,7 +85,9 @@ class LBMagneticField():
             r_edge = LB_distance
         else:
             raise ValueError('Bad intry for LB_surface variable.',\
-                                'We expect a path to Pelgrims+2020 map or an healpix map')
+                                'We expect a path to Pelgrims+2020 map',\
+                                    'or an healpix map with distance to the',\
+                                        'shell of your bubble')
 
         self.nside = hp.get_nside(r_edge)
         self.npix = hp.nside2npix(self.nside)
@@ -106,6 +104,12 @@ class LBMagneticField():
                 given in SkyCoordinates (2,n)
                 Longitudes and Latitudes are expected to be in degrees.
                 If not specified, full-sky is assumed.
+
+            OUTPUT:
+            -------
+            [Bx,By,Bz]: the component of the GMF vector field in the shell of the LB
+                            in CARTESIAN coordinates centered on the Galactic Center
+
         '''
         # 1. find the indices of the corresponding healpix pixels
         if SkyCoordinates is not None:
@@ -116,7 +120,7 @@ class LBMagneticField():
             pix_ids = np.arange(self.npix)
         #
         
-        # 2. evaluates the model for those pixels.
+        # 2. evaluates the model for those pixels
         
         # surface xyz in explosion center
         xell = self.Surf_Cart[0] - self.dx
@@ -143,7 +147,6 @@ class LBMagneticField():
         B0z = np.cos(self.theta_B0)
 
         # computation of necessary dot products:
-
         # nell . B0
         nell_B0 = nell_x*B0x + nell_y*B0y + nell_z*B0z
         # nell . erell
@@ -157,6 +160,7 @@ class LBMagneticField():
         erell_y = erell_y[pix_ids]
         erell_z = erell_z[pix_ids]
         nell_erell = nell_erell[pix_ids]
+        nell_B0 = nell_B0[pix_ids]
 
         # B_today = B0 (n.er) - er (n.B0)
 
@@ -177,7 +181,7 @@ class LBMagneticField():
         '''
             Update the shell model and related quantities:
                 - Cart. coordinates of the shell
-                - normal vector
+                - normal vectors
         '''
 
         npix = self.npix
@@ -213,6 +217,31 @@ class LBMagneticField():
         self.Surf_Cart = Surf_Cart
         #
     #
+    
+    def position_at_LonLat(self,SkyCoordinates=None):
+        '''
+            Find the Cartesian coordinates where the sky and the model are
+            defined for a specific set of lines of sight (sky coordinates).
+        '''
+        # 1. find the indices of the corresponding healpix pixels
+        if SkyCoordinates is not None:
+            pix_ids = hp.ang2pix(self.nside,SkyCoordinates[0],SkyCoordinates[1],\
+                                    lonlat=True)
+        else:
+            # if sky coord. not specified, full-sky is assumed.
+            pix_ids = np.arange(self.npix)
+        #
+        return self.Surf_Cart[:,pix_ids]
+    
+    def at_position(self, x, y, z):
+        mess = '''You shoud not query this model from Cartesian coordinates.
+                Instead, use the at_LonLat() function and specify the sky
+                directions you are interested in by the model.
+                You may also use the position_at_LonLat() to know what are
+                    the Cartesian coordinates where the model is defined.'''
+
+        raise ValueError(mess)
+        return
     
 
 def vec_Cart2Sph(vectorField,Position):
