@@ -64,7 +64,7 @@ class LBMagneticField(RegularVectorField):
         self.dx = dx                # [kpc]
         self.dy = dy                # [kpc]
         self.dz = dz                # [kpc]
-        my
+
         if type(LB_distance) is str:
             if surfaceLabel == 'lmax2':
                 field = 1
