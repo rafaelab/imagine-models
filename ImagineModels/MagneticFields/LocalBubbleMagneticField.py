@@ -3,7 +3,6 @@ import healpy as hp
 
 from ImagineModels import RegularVectorField, cyl2cart
 
-mypath = '/home/vincent/Documents/BxB/LocalBubble_HDataverse/L19_map-inner_final.fits'
 
 class LBMagneticField(RegularVectorField):
     """
