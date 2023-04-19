@@ -58,6 +58,7 @@ class LBMagneticField(RegularVectorField):
                         theta_B0=1.278, phi_B0=1.278,\
                             dx=0.058,dy=0.079,dz=-0.086,\
                              surfaceLabel='lmax6'):
+        super().__init__()
         self.theta_B0 = theta_B0    # [rad]
         self.phi_B0 = phi_B0        # [rad]
         self.dx = dx                # [kpc]
@@ -80,7 +81,7 @@ class LBMagneticField(RegularVectorField):
             #
             r_edge = hp.read_map(LB_distance,field=field) / 1000   # to be in [kpc]
             #
-        elif type(LB_distance) is ndarray:
+        elif type(LB_distance) is np.ndarray:
             r_edge = LB_distance
         else:
             raise ValueError('Bad intry for LB_surface variable.',\
