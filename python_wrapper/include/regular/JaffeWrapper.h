@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "../../../c_library/headers/Jaffe.h"
+#include "ImagineModels/Jaffe.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

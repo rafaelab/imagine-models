@@ -9,8 +9,6 @@
 //PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
 //PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
 
-#include "../c_library/include/config/fftw.hh"
-
 #include "include/FieldBases.h"
 
 #include "include/regular/RegularFieldBases.h"

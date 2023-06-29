@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "../../../c_library/headers/Sun.h"
+#include "ImagineModels/Sun.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

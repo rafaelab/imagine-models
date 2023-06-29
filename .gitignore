@@ -1,5 +1,6 @@
 _build/
 _generate/
+extern/
 
 venv_imagine
 env_imagine_develop
@@ -155,3 +156,6 @@ dmypy.json
 demos/cpp/example
 c_library/headers/autodiff.hh
 c_library/headers/fftw.hh
+
+# MacOS
+.DS_Store

@@ -1,8 +1,8 @@
 #include <functional>
 #include <cmath>
 
-#include "Field.h"
-#include "RegularField.h"
+#include "ImagineModels/Field.h"
+#include "ImagineModels/RegularField.h"
 
 
 // StanevBSS (HMR) see https://arxiv.org/abs/astro-ph/9607086

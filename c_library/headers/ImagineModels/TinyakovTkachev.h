@@ -1,8 +1,8 @@
 #include <functional>
 #include <cmath>
 
-#include "Field.h"
-#include "RegularField.h"
+#include "ImagineModels/Field.h"
+#include "ImagineModels/RegularField.h"
 
 
 //Tinyakov and Tkachev (TT) https://arxiv.org/abs/astro-ph/0102101, implementation of https://arxiv.org/pdf/astro-ph/0510444.pdf (Kachelriess et al.)

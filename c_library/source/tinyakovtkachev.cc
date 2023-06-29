@@ -1,8 +1,8 @@
 #include <cmath>
-#include "../headers/hamunits.h"
-#include "../headers/TinyakovTkachev.h"
+#include "ImagineModels/hamunits.h"
+#include "ImagineModels/TinyakovTkachev.h"
 
-#include "../headers/helpers.h"
+#include "ImagineModels/helpers.h"
 
 std::array<double, 3>  TTMagneticField::at_position(const double &x, const double &y, const double &z) const { 
     double r = std::sqrt(x*x + y*y);
