@@ -11,19 +11,12 @@ include(FetchContent)
 include(GNUInstallDirs)
 # find_package(PkgConfig REQUIRED)
 
-# Fetching the findFFTW cmake package
+# Activating the findFFTW cmake package
 set(INTERNAL_findFFTW_DIR ${PROJECT_SOURCE_DIR}/extern/findFFTW)
-FetchContent_Declare(findFFTW
-    GIT_REPOSITORY https://github.com/egpbos/findFFTW
-    GIT_TAG ac788529392825067c9118f9f099aaa1efb77589
-    GIT_SHALLOW ON
-    GIT_SUBMODULES ""
-    GIT_CONFIG advice.detachedHead=False
-    SOURCE_DIR ${INTERNAL_findFFTW_DIR}
-)
-FetchContent_Populate(findFFTW)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${INTERNAL_findFFTW_DIR}")
-
+if(NOT EXISTS ${INTERNAL_findFFTW_DIR})
+    message(FATAL_ERROR "The findFFTW submodule was not initialized! Please run 'git submodule update --init'." )
+endif()
 find_package(FFTW QUIET COMPONENTS DOUBLE_LIB)
 if(FFTW_FOUND)
 message("-- FFTW libraries found: ${FFTW_DOUBLE_LIB}; will include random field generation routines.")
@@ -45,9 +38,8 @@ find_package(Python3 COMPONENTS Interpreter Development)
 if(Python3_FOUND AND FFTW_FOUND)
     message("-- Python ${Python3_VERSION} and FFTW ${FFTW_VERSION} found. Enabling support for pybind.")
     if(NOT EXISTS ${INTERNAL_PYBIND11_DIR})
-        message(FATAL_ERROR "Pybind11 submodule was not materialized!" )
+        message(FATAL_ERROR "The pybind11 submodule was not initialized! Please run 'git submodule update --init'." )
     endif()
-    # set(pybind11_INCLUDE_DIR ${INTERNAL_PYBIND11_DIR}/include)
     add_subdirectory(${INTERNAL_PYBIND11_DIR})
     pybind11_add_module(_ImagineModels ${PROJECT_SOURCE_DIR}/python_wrapper/ImagineModels.cc)
     target_include_directories(_ImagineModels PUBLIC ${FFTW_INCLUDE_DIRS})
