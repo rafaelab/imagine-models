@@ -4,8 +4,8 @@
 #include <functional>
 #include <cassert> 
 
-#include "Field.h"
-#include "RegularField.h"
+#include "ImagineModels/Field.h"
+#include "ImagineModels/RegularField.h"
 
 class YMW16 : public RegularScalarField {
 protected:

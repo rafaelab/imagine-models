@@ -1,8 +1,8 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
-#include "../headers/hamunits.h"
-#include "../headers/EnsslinSteininger.h"
+#include "ImagineModels/hamunits.h"
+#include "ImagineModelsRandom/EnsslinSteininger.h"
 
 
 double ESRandomField::calculate_fourier_sigma(const double &abs_k) const {

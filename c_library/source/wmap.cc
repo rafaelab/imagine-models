@@ -1,8 +1,8 @@
 #include <cmath>
-#include "../headers/hamunits.h"
-#include "../headers/WMAP.h"
+#include "ImagineModels/hamunits.h"
+#include "ImagineModels/WMAP.h"
 
-#include "../headers/helpers.h"
+#include "ImagineModels/helpers.h"
 
 
 // ??????, implementation from Hammurabi (old)

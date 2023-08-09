@@ -1,8 +1,8 @@
 #include <cmath>
-#include "../headers/hamunits.h"
-#include "../headers/Sun.h"
+#include "ImagineModels/hamunits.h"
+#include "ImagineModels/Sun.h"
 
-#include "../headers/helpers.h"
+#include "ImagineModels/helpers.h"
 
 //Sun et al. A&A V.477 2008 ASS+RING model magnetic field
 std::array<double, 3>  Sun2008MagneticField::at_position(const double &x, const double &y, const double &z) const {

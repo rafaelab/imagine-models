@@ -7,9 +7,9 @@
 #include <cassert>
 #include <iostream>
 
-#include "Field.h"
-#include "RandomField.h"
-#include "RegularJF12.h"
+#include "ImagineModels/Field.h"
+#include "ImagineModels/RandomField.h"
+#include "ImagineModels/RegularJF12.h"
 
 class JF12RandomField : public RandomVectorField {
   protected:

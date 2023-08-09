@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "../../../c_library/headers/Fauvet.h"
+#include "ImagineModels/Fauvet.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

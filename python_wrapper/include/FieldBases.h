@@ -3,8 +3,6 @@
 
 #include <pybind11/pybind11.h>
 
-#include "../../c_library/include/config/fftw.hh"
-
 #include "regular_trampoline.h"
 
 #ifdef FFTW_FOUND

@@ -1,8 +1,8 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
-#include "../headers/hamunits.h"
-#include "../headers/Jaffe.h"
+#include "ImagineModels/hamunits.h"
+#include "ImagineModels/Jaffe.h"
 
 std::array<double, 3> JaffeMagneticField::at_position(const double &x, const double &y, const double &z) const {
     if (x == 0. && y == 0. && z == 0.) {

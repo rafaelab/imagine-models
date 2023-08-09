@@ -9,8 +9,8 @@
 #include <iostream>
 #include <algorithm>
 
-#include "exceptions.h"
-#include "Field.h"
+#include "ImagineModels/exceptions.h"
+#include "ImagineModels/Field.h"
 
 class RegularScalarField : public Field<double, double*>  {
 protected:

@@ -1,10 +1,10 @@
-#include <ImagineModels/RegularModels.h>
-
 #include <cassert>
 #include <iostream>
 #include <vector>
 #include <map>
 #include <memory>
+
+#include "ImagineModels/RegularModels.h"
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 

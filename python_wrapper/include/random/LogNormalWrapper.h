@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "../../../c_library/headers/LogNormal.h"
+#include "ImagineModelsRandom/LogNormal.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

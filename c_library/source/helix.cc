@@ -1,6 +1,6 @@
 #include <cmath>
-#include "../headers/hamunits.h"
-#include "../headers/Helix.h"
+#include "ImagineModels/hamunits.h"
+#include "ImagineModels/Helix.h"
 
 // Create helical magnetic field from rmin to rmax with form (bx cos(phi), by
 // sin(phi), bz phi)
