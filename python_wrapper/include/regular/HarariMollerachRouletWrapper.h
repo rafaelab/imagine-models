@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "ImagineModels/HarariMollerachRoulet.h"
+#include "HarariMollerachRoulet.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

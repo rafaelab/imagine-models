@@ -2,8 +2,8 @@
 #include <vector>
 #include <iostream>
 
-#include "ImagineModels/Field.h"
-#include "ImagineModels/RegularField.h"
+#include "Field.h"
+#include "RegularField.h"
 
 class JaffeMagneticField : public RegularVectorField {
     protected:

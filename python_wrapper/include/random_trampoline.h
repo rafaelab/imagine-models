@@ -1,10 +1,10 @@
 #ifndef RANDOM_TRAMPOLINE_H
 #define RANDOM_TRAMPOLINE_H
 
-#include "ImagineModels/hamunits.h"
-#include "ImagineModels/Field.h"
+#include "hamunits.h"
+#include "Field.h"
 
-#include "ImagineModels/RandomField.h"
+#include "RandomField.h"
 
 
 #include <iostream>

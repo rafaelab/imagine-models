@@ -12,8 +12,8 @@
 #include <memory>
 #include <initializer_list>
 
-#include "ImagineModels/exceptions.h"
-#include "ImagineModels/Field.h"
+#include "exceptions.h"
+#include "Field.h"
 
 
 

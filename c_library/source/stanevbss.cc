@@ -1,8 +1,8 @@
 #include <cmath>
-#include "ImagineModels/hamunits.h"
-#include "ImagineModels/StanevBSS.h"
+#include "hamunits.h"
+#include "StanevBSS.h"
 
-#include "ImagineModels/helpers.h"
+#include "helpers.h"
 
 
 // https://arxiv.org/abs/astro-ph/9607086, implementation from Hammurabi (old)

@@ -24,7 +24,7 @@
 #include "include/regular/JaffeWrapper.h"
 #include "include/regular/RegularJF12Wrapper.h"
 
-#ifdef FFTW_FOUND
+#if FFTW_FOUND
   #include "include/random/RandomFieldBases.h"
   #include "include/random/RandomJF12Wrapper.h"
   #include "include/random/EnsslinSteiningerWrapper.h"
@@ -52,8 +52,9 @@ void Fauvet(py::module_ &);
 
 void YMW(py::module_ &);
 
-#ifdef FFTW_FOUND
+#if FFTW_FOUND
     void RandomFieldBases(py::module_ &);
+    
     void RandomJF12(py::module_ &);
     void EnsslinSteininger(py::module_ &);
     void GaussianScalar(py::module_ &);
@@ -78,7 +79,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
     WMAP(m);
     Fauvet(m);
 
-    #ifdef FFTW_FOUND
+    #if FFTW_FOUND
       RandomFieldBases(m);    
       RandomJF12(m);
       EnsslinSteininger(m);

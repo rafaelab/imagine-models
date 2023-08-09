@@ -1,8 +1,8 @@
 #include <functional>
 #include <cmath>
 
-#include "ImagineModels/Field.h"
-#include "ImagineModels/RegularField.h"
+#include "Field.h"
+#include "RegularField.h"
 
 
 // Harari, Mollerach, Roulet (HMR) see https://arxiv.org/abs/astro-ph/9906309, implementation of https://arxiv.org/pdf/astro-ph/0510444.pdf 

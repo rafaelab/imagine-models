@@ -1,8 +1,8 @@
 #include <cmath>
-#include "ImagineModels/hamunits.h"
-#include "ImagineModels/HarariMollerachRoulet.h"
+#include "hamunits.h"
+#include "HarariMollerachRoulet.h"
 
-#include "ImagineModels/helpers.h"
+#include "helpers.h"
 
 std::array<double, 3>  HMRMagneticField::at_position(const double &x, const double &y, const double &z) const { 
 

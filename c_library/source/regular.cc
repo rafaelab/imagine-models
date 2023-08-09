@@ -1,7 +1,7 @@
 #include <cmath>
 #include <iostream>
-#include "ImagineModels/MagneticField.h"
-#include "ImagineModels/ThermalElectronField.h"
+#include "MagneticField.h"
+#include "ThermalElectronField.h"
 
  std::vector<std::vector<std::vector<std::vector<double>>>> RegularMagneticField::_evaluate_grid(
     std::vector<double> grid_x, const std::vector<double> grid_y, const std::vector<double> grid_z,

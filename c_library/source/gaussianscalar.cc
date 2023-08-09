@@ -1,8 +1,8 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
-#include "ImagineModels/hamunits.h"
-#include "ImagineModelsRandom/GaussianScalar.h"
+#include "hamunits.h"
+#include "GaussianScalar.h"
 
 void GaussianScalarField::_on_grid(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 

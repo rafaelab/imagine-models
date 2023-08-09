@@ -6,8 +6,8 @@
 #include <cassert>
 #include <iostream>
 
-#include "ImagineModels/Field.h"
-#include "ImagineModels/RegularField.h"
+#include "Field.h"
+#include "RegularField.h"
 
 
 class JF12MagneticField : public RegularVectorField {
