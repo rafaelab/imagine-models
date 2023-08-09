@@ -4,7 +4,7 @@
 #include <map>
 #include <memory>
 
-#include "ImagineModels/RegularModels.h"
+#include "RegularModels.h"
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 

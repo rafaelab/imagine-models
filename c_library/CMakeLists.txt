@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 
 set(IM_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/headers/)
-include_directories(${IM_INCLUDE_DIR})
+
 set(IM_SRC_DIR ${PROJECT_SOURCE_DIR}/source/)
 set(IM_SRC_FILES
     ${IM_SRC_DIR}/helix.cc
@@ -31,6 +31,12 @@ if(FFTW_FOUND)
 endif()
 
 add_library(ImagineModels SHARED ${IM_SRC_FILES})
+target_include_directories(ImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModels)
+
+if (FFTW_FOUND)
+    target_include_directories(ImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModelsRandom)
+endif()
+
 target_link_libraries(ImagineModels PUBLIC ${LIBRARIES})
 set_target_properties(ImagineModels PROPERTIES
     VERSION ${PROJECT_VERSION}
@@ -46,7 +52,7 @@ foreach(test ${TESTSOURCES})
     add_test(${test_name} ${test_name})
 endforeach()
 
-configure_file(ImagineModels.pc.in ImagineModels.pc @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/ImagineModels.pc.in ${CMAKE_BINARY_DIR}/ImagineModels.pc @ONLY)
 
 install(TARGETS ImagineModels LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${CMAKE_BINARY_DIR}/ImagineModels.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)

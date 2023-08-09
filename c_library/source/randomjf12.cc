@@ -1,8 +1,8 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
-#include "ImagineModels/hamunits.h"
-#include "ImagineModelsRandom/RandomJF12.h"
+#include "hamunits.h"
+#include "RandomJF12.h"
 
 
 double JF12RandomField::calculate_fourier_sigma(const double &abs_k) const {

@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "ImagineModels/StanevBSS.h"
+#include "StanevBSS.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;

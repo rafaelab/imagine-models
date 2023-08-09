@@ -4,7 +4,7 @@
 #include <map>
 #include <memory>
 
-#include "ImagineModels/RegularModels.h"
+#include "RegularModels.h"
 
 void test_at_position(std::map<std::string, std::map<std::array<double, 3>, std::array<double, 3>>> val_pos_map,
                       std::map <std::string, std::shared_ptr<RegularVectorField>> model_dict

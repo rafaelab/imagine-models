@@ -3,8 +3,8 @@
 #include <cassert>
 #include <iostream>
 
-#include "ImagineModels/Field.h"
-#include "ImagineModels/RandomField.h"
+#include "Field.h"
+#include "RandomField.h"
 
 class GaussianScalarField : public RandomScalarField {
   protected:

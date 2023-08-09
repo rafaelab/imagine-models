@@ -1,7 +1,7 @@
 #include <cassert>
 
-#include "ImagineModels/hamunits.h"
-#include "ImagineModels/YMW.h"
+#include "hamunits.h"
+#include "YMW.h"
 
 double YMW16::at_position(const double &x, const double &y, const double &z) const  { 
   // YMW16 using a different Cartesian frame from our default one

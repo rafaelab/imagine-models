@@ -1,8 +1,8 @@
 #include <functional>
 #include <cmath>
 
-#include "ImagineModels/Field.h"
-#include "ImagineModels/RegularField.h"
+#include "Field.h"
+#include "RegularField.h"
 
 
 //Sun et al. A&A V.477 2008 ASS+RING model magnetic field

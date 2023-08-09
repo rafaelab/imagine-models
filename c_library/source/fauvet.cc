@@ -1,8 +1,8 @@
 #include <cmath>
-#include "ImagineModels/hamunits.h"
-#include "ImagineModels/Fauvet.h"
+#include "hamunits.h"
+#include "Fauvet.h"
 
-#include "ImagineModels/helpers.h"
+#include "helpers.h"
 
 
 // ??????, implementation from Hammurabi (old)

@@ -5,7 +5,7 @@
 
 #include "regular_trampoline.h"
 
-#ifdef FFTW_FOUND
+#if FFTW_FOUND
     #include "random_trampoline.h"
 #endif
 
@@ -19,7 +19,7 @@ void FieldBases(py::module_ &m) {
 
     py::class_<Field<double, double*>,  PyScalarFieldBase>(m, "ScalarFieldBase");
 
-    #ifdef FFTW_FOUND
+    #if FFTW_FOUND
         py::class_<RandomField<std::array<double, 3>, std::array<double*, 3>>,  PyVectorRandomFieldBase>(m, "VectorRandomFieldBase");
 
         py::class_<RandomField<double, double*>,  PyScalarRandomFieldBase>(m, "ScalarRandomFieldBase");

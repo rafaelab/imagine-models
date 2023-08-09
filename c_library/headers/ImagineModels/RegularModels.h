@@ -1,10 +1,10 @@
 #include "RegularField.h"
 
-#include "ImagineModels/RegularJF12.h"
-#include "ImagineModels/Jaffe.h"
-#include "ImagineModels/Helix.h"
-#include "ImagineModels/Uniform.h"
-#include "ImagineModels/Sun.h"
-#include "ImagineModels/TinyakovTkachev.h"
+#include "RegularJF12.h"
+#include "Jaffe.h"
+#include "Helix.h"
+#include "Uniform.h"
+#include "Sun.h"
+#include "TinyakovTkachev.h"
 
-#include "ImagineModels/YMW.h"
+#include "YMW.h"

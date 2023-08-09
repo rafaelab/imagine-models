@@ -1,8 +1,8 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
-#include "ImagineModels/hamunits.h"
-#include "ImagineModels/RegularJF12.h"
+#include "hamunits.h"
+#include "RegularJF12.h"
 
 // This line is needed to avoid linker errors due to templates
 //template class JF12MagneticField<std::vector<double>>;
