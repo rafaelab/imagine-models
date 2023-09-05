@@ -1,4 +1,7 @@
-#include "../../../c_library/headers/RegularJF12.h"
+
+#include <pybind11/pybind11.h>
+
+#include "RegularJF12.h"
 
 
 void RegularJF12(py::module_ &m) {

@@ -1,4 +1,9 @@
-#include "../../../c_library/headers/TinyakovTkachev.h"
+#include <pybind11/pybind11.h>
+
+#include "TinyakovTkachev.h"
+
+namespace py = pybind11;
+using namespace pybind11::literals;
 
 void TinyakovTkachev(py::module_ &m) {
     py::class_<TTParams>(m, "TTParams")

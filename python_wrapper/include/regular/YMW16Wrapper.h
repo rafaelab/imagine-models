@@ -1,4 +1,9 @@
-#include "../../../c_library/headers/YMW.h"
+#include <pybind11/pybind11.h>
+
+#include "YMW.h"
+
+namespace py = pybind11;
+using namespace pybind11::literals;
 
 void YMW(py::module_ &m) {
 

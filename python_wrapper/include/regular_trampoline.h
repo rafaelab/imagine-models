@@ -1,10 +1,10 @@
 #ifndef REGULAR_TRAMPOLINE_H
 #define REGULAR_TRAMPOLINE_H
 
-#include "../../c_library/headers/hamunits.h"
-#include "../../c_library/headers/Field.h"
+#include "hamunits.h"
+#include "Field.h"
 
-#include "../../c_library/headers/RegularField.h"
+#include "RegularField.h"
 
 #include "../../c_library/headers/autodiff.hh"
 

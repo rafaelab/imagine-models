@@ -1,5 +1,6 @@
 _build/
 _generate/
+extern/
 
 venv_imagine
 env_imagine_develop
@@ -8,9 +9,12 @@ Playground/
 test/cpp/test
 demos/cpp/example
 c_library/build
+c_library/include/config/fftw.hh
+c_library/include/config/autodiff.hh
 python_wrapper/playground*
 YouriJF12
 *.out
+*.pc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

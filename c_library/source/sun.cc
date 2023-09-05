@@ -1,12 +1,14 @@
 #include <cmath>
-#include "../headers/hamunits.h"
-#include "../headers/Sun.h"
+#include "hamunits.h"
+#include "Sun.h"
 
-#include "../headers/helpers.h"
+#include "helpers.h"
 
 //Sun et al. A&A V.477 2008 ASS+RING model magnetic field
 vector SunMagneticField::_at_position(const double &x, const double &y, const double &z, const SunParams &p) const {
 
+double r = sqrt(x*x + y*y);
+double phi = atan2(y, z);
 double r = sqrt(x*x + y*y);
 double phi = atan2(y, z);
   
@@ -25,11 +27,10 @@ double phi = atan2(y, z);
     {
       D2 = 1.;
     }
-  else if(r <= 5.)
+  else //if(r <= 5.)
     {
       D2 =- 1.;
     }
-  else {std::cerr << " Error! r in Sun field is:" << r << "kpc " << std::endl; exit(1);}
   // ------------------------------------------------------------
 
   // now we set D1
@@ -40,10 +41,10 @@ double phi = atan2(y, z);
       D1 =  p.b_B0 * exp(-((r -  p.b_Rsun) /  p.b_R0) - (abs(z) /  p.b_z0));
     }
   else if(r <=  p.b_Rc)
+  else //if(r <= b_Rc)
     {
       D1 =  p.b_Bc;
     }
-  else {std::cerr << " Error! r in Sun field is:" << r << "kpc " << std::endl; exit(1);}
   // ------------------------------------------------------------
   
   double p_ang = p.b_pitch_deg * M_PI / 180.;
@@ -74,9 +75,9 @@ double phi = atan2(y, z);
 
   B_cyl[1] += halo_field;
 
-  vector B_vec3{{0, 0, 0}};
+  std::array<double, 3> B_vec3;
 
-  Cyl2Cart(phi, B_cyl, B_vec3);
+  B_vec3 = Cyl2Cart(phi, B_cyl);
 
   return B_vec3; 
 };

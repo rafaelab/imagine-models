@@ -1,8 +1,8 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
-#include "../headers/hamunits.h"
-#include "../headers/RegularJF12.h"
+#include "hamunits.h"
+#include "RegularJF12.h"
 
 vector JF12MagneticField::_at_position(const double &x, const double &y, const double &z, const JF12RegularParams &p) const {
   // define fixed parameters

@@ -1,6 +1,6 @@
 #include <cmath>
-#include "../headers/hamunits.h"
-#include "../headers/Helix.h"
+#include "hamunits.h"
+#include "Helix.h"
 
 vector HelixMagneticField::_at_position(const double &x, const double &y, const double &z, const HelixParams &p
 ) const {

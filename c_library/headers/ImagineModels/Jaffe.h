@@ -5,7 +5,13 @@
 #include "Field.h"
 #include "RegularField.h"
 
-struct JaffeParams : Params {
+class JaffeMagneticField : public RegularVectorField {
+    protected:
+      bool DEBUG = false;
+    public:
+
+    using RegularVectorField :: RegularVectorField;
+
       bool quadruple = false; // quadruple pattern in halo
       bool bss = false; // bi-symmetric
 
@@ -45,33 +51,21 @@ struct JaffeParams : Params {
       double comp_r = 12; // radial cutoff scale, kpc
       double comp_p = 3; //cutoff power
 
-    };
+    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const;
 
+    std::array<double, 3> orientation(const double &x, const double &y, const double &z) const;
 
+    double radial_scaling(const double &x, const double &y) const;
 
-class JaffeMagneticField : public RegularVectorField {
-    protected:
-    
-      bool DEBUG = false;
-      vector _at_position(const double &x, const double &y, const double &z, const JaffeParams &p) const;
+    std::vector<double> arm_compress(const double &x, const double &y,  const double &z) const;
 
-    public:
+    std::vector<double> arm_compress_dust(const double &x, const double &y, const double &z) const;
 
-    JaffeParams param;
+    std::vector<double> dist2arm(const double &x, const double &y) const;
 
-    using RegularVectorField :: RegularVectorField;
+    double arm_scaling(const double &z) const;
 
-    vector at_position(const double &x, const double &y, const double &z) const {
-        return _at_position(x, y, z, this->param);
-    }
+    double disk_scaling(const double &z) const;
 
-    std::array<double, 3> orientation(const double &x, const double &y, const double &z, const JaffeParams &p) const;
-    std::vector<double> arm_compress(const double &x, const double &y,  const double &z, const JaffeParams &p) const;
-    std::vector<double> arm_compress_dust(const double &x, const double &y, const double &z, const JaffeParams &p) const;
-    std::vector<double> dist2arm(const double &x, const double &y, const JaffeParams &p) const;
-    double radial_scaling(const double &x, const double &y, const JaffeParams &p) const;
-    double arm_scaling(const double &z, const JaffeParams &p) const;
-    double disk_scaling(const double &z, const JaffeParams &p) const;
-    double halo_scaling(const double &z, const JaffeParams &p) const;
-
+    double halo_scaling(const double &z) const;
 };

@@ -1,7 +1,7 @@
 #include <cmath>
 #include "../headers/TinyakovTkachev.h"
 
-#include "../headers/helpers.h"
+#include "helpers.h"
 
 vector TTMagneticField::_at_position(const double &x, const double &y, const double &z, const TTParams &p) const { 
     double r = sqrt(x*x + y*y);

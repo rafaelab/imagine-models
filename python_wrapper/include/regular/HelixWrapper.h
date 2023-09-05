@@ -1,4 +1,9 @@
-#include "../../../c_library/headers/Helix.h"
+#include <pybind11/pybind11.h>
+
+#include "Helix.h"
+
+namespace py = pybind11;
+using namespace pybind11::literals;
 
 
 void Helix(py::module_ &m) {

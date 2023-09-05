@@ -1,4 +1,9 @@
-#include "../../../c_library/headers/HarariMollerachRoulet.h"
+#include <pybind11/pybind11.h>
+
+#include "HarariMollerachRoulet.h"
+
+namespace py = pybind11;
+using namespace pybind11::literals;
 
 void HarariMollerachRoulet(py::module_ &m) {
     py::class_<HMRParams>(m, "HMRParams")

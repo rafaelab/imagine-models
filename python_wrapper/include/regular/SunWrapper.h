@@ -1,4 +1,6 @@
-#include "../../../c_library/headers/Sun.h"
+#include <pybind11/pybind11.h>
+
+#include "Sun.h"
 
 
 void Sun2008(py::module_ &m) {

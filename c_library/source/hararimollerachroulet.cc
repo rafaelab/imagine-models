@@ -1,7 +1,8 @@
 #include <cmath>
-#include "../headers/HarariMollerachRoulet.h"
+#include "hamunits.h"
+#include "HarariMollerachRoulet.h"
 
-#include "../headers/helpers.h"
+#include "helpers.h"
 
 vector HMRMagneticField::_at_position(const double &x, const double &y, const double &z, const HMRParams &p) const { 
 
@@ -16,16 +17,19 @@ vector HMRMagneticField::_at_position(const double &x, const double &y, const do
 
   double b_r = ( 3. * p.b_Rsun / r) * tanh(r / p.b_r1) * tanh(r / p.b_r1) * tanh(r / p.b_r1);
 
-  double B_r_phi = b_r * cos(phi - ((1. / tan(p.b_p)) * log(r / p.b_epsilon0)));
+  double B_r_phi = b_r * std::cos(phi - ((1. / std::tan(b_p*(M_PI/180.))) * std::log(r / b_epsilon0)));
 
   // B-field in cylindrical coordinates:
-  vector B_cyl{{B_r_phi * sin(p.b_p) * f_z, 
-                B_r_phi * cos(p.b_p) * f_z, 
-                0.}};
+  std::array<double, 3> B_cyl{B_r_phi * std::sin(b_p*(M_PI/180.)) * f_z, 
+                              B_r_phi * std::cos(b_p*(M_PI/180.)) * f_z , 
+                              0.};
 
-  vector B_vec3{{0, 0, 0}};
-  if (r <= p.b_r_max) {
-    Cyl2Cart(phi, B_cyl, B_vec3);
+  std::array<double, 3> B_vec3;
+  if (r <= b_r_max) {
+    B_vec3 = Cyl2Cart(phi, B_cyl);
+  }
+  else {
+    B_vec3 = {0, 0, 0};
   }
   
   return B_vec3;
