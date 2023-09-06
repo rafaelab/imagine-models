@@ -1,3 +1,6 @@
+#ifndef HELIXWRAPPER_H
+#define HELIXWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "Helix.h"
@@ -28,3 +31,5 @@ void Helix(py::module_ &m) {
 
         .def_readwrite("param", &HelixMagneticField::param);
 }
+
+#endif

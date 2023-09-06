@@ -1,3 +1,6 @@
+#ifndef JAFFEWRAPPER_H
+#define JAFFEWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "Jaffe.h"
@@ -58,3 +61,5 @@ void Jaffe(py::module_ &m) {
 
             
 }
+
+#endif

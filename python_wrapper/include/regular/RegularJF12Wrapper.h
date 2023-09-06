@@ -1,3 +1,5 @@
+#ifndef REGULARJF12WRAPPER_H
+#define REGULARJF12WRAPPER_H
 
 #include <pybind11/pybind11.h>
 
@@ -40,3 +42,5 @@ void RegularJF12(py::module_ &m) {
         .def_readwrite("param", &JF12MagneticField::param);
 
 }
+
+#endif

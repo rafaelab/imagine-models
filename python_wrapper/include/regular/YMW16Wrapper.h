@@ -1,3 +1,6 @@
+#ifndef YMWWRAPPER_H
+#define YMWWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "YMW.h"
@@ -76,3 +79,5 @@ void YMW(py::module_ &m) {
         .def_readwrite("param", &YMW16::param);
 
 }
+
+#endif

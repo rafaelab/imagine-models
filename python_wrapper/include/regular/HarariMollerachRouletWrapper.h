@@ -1,3 +1,6 @@
+#ifndef HMRWRAPPER_H
+#define HMRWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "HarariMollerachRoulet.h"
@@ -27,3 +30,5 @@ void HarariMollerachRoulet(py::module_ &m) {
 
 
 }
+
+#endif

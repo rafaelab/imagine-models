@@ -1,3 +1,6 @@
+#ifndef FAUVETWRAPPER_H
+#define FAUVETWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "Fauvet.h"
@@ -29,3 +32,5 @@ void Fauvet(py::module_ &m) {
         .def_readwrite("h_z1b", &FauvetMagneticField::h_z1b);
     
 }
+
+#endif

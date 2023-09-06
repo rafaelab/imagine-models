@@ -1,3 +1,6 @@
+#ifndef TTWRAPPER_H
+#define TTWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "TinyakovTkachev.h"
@@ -26,3 +29,5 @@ void TinyakovTkachev(py::module_ &m) {
         .def_readwrite("param", &TTMagneticField::param);
 
 }
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef STANEVBSSWRAPPER_H
+#define STANEVBSSWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "StanevBSS.h"
@@ -23,3 +26,5 @@ void StanevBSS(py::module_ &m) {
         .def_readwrite("b_p", &StanevBSSMagneticField::b_p);
     
 }
+
+#endif

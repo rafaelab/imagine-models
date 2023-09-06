@@ -1,7 +1,9 @@
+#ifndef SUNWRAPPER_H
+#define SUNWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "Sun.h"
-
 
 void Sun2008(py::module_ &m) {
 
@@ -29,5 +31,6 @@ void Sun2008(py::module_ &m) {
         .def("at_position", &SunMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
 
         .def_readwrite("param", &SunMagneticField::param);
-
 }
+
+#endif

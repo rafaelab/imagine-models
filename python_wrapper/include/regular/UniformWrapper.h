@@ -1,3 +1,6 @@
+#ifndef UNIFORMWRAPPER_H
+#define UNIFORMWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "Uniform.h"
@@ -22,6 +25,6 @@ py::class_<UniformMagneticField, RegularVectorField>(m, "UniformMagneticField")
     .def("at_position", &UniformMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
 
     .def_readwrite("param", &UniformMagneticField::param);
-
-
 }
+
+#endif

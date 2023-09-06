@@ -1,3 +1,6 @@
+#ifndef WMAPWRAPPER_H
+#define WMAPWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "WMAP.h"
@@ -24,5 +27,6 @@ void WMAP(py::module_ &m) {
         .def_readwrite("b_psi1", &WMAPMagneticField::b_psi1)
         .def_readwrite("b_xsi0", &WMAPMagneticField::b_xsi0)
         .def_readwrite("b_anti", &WMAPMagneticField::anti);
-    
 }
+
+#endif
