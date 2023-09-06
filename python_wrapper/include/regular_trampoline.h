@@ -6,21 +6,6 @@
 
 #include "RegularField.h"
 
-#include "../../c_library/headers/autodiff.hh"
-
-#if defined autodiff_FOUND
-    #include <autodiff/forward/real.hpp>
-    #include <autodiff/forward/dual.hpp>
-    #include <autodiff/forward/real/eigen.hpp>
-    namespace ad = autodiff;
-    typedef ad::real number;
-    typedef ad::VectorXreal vector;
-#else
-    typedef double number;  // only used for differentiable numbers! 
-    typedef std::array<double, 3> vector;
-#endif
-
-
 #include <iostream>
 
 //using Array3Type = std::array<double, 3>;
@@ -28,10 +13,10 @@ using Array3PointerType = std::array<double*, 3>; // Only for PYBIND11_OVERRIDE_
 
 // These classes are necessary to override virtual functions when binding abstract c++ classes
 
-class PyScalarFieldBase: public Field<double, double*> {
+class PyScalarFieldBase: public Field<number, double*> {
 public:
-    using Field<double, double*>:: Field; // Inherit constructors
-    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, Field, at_position, x, y, z); }
+    using Field<number, double*>:: Field; // Inherit constructors
+    number at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(number, Field, at_position, x, y, z); }
 
     double* on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, seed); }
     
@@ -83,7 +68,7 @@ public:
 class PyRegularScalarField : public RegularScalarField {
 public:
     using RegularScalarField:: RegularScalarField; // Inherit constructors
-    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, RegularScalarField, at_position, x, y, z); }
+    number at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(number, RegularScalarField, at_position, x, y, z); }
     
     double* on_grid(const int seed=0) override {PYBIND11_OVERRIDE_PURE(double*, RegularScalarField, on_grid,  seed); }
 

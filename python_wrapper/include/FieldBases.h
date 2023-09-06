@@ -17,7 +17,7 @@ void FieldBases(py::module_ &m) {
     
     py::class_<Field<vector, std::array<double*, 3>>,  PyVectorFieldBase>(m, "VectorFieldBase");
 
-    py::class_<Field<double, double*>,  PyScalarFieldBase>(m, "ScalarFieldBase");
+    py::class_<Field<number, double*>,  PyScalarFieldBase>(m, "ScalarFieldBase");
 
     #if FFTW_FOUND
         py::class_<RandomField<std::array<double, 3>, std::array<double*, 3>>,  PyVectorRandomFieldBase>(m, "VectorRandomFieldBase");

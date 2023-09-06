@@ -15,14 +15,9 @@ using namespace pybind11::literals;
 //PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
 //PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
 
-#include "../c_library/headers/autodiff.hh"
-#ifdef autodiff_FOUND
+#if autodiff_FOUND
   #include "include/autodiff_wrapper.h"
-  namespace ad = autodiff;
 #endif
-
-
-#include "../c_library/headers/fftw.hh"
 
 #include "include/FieldBases.h"
 

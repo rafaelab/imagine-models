@@ -80,8 +80,6 @@ class JaffeMagneticField : public RegularVectorField {
     }
     #endif
 
-    std::array<double, 3> at_position(const double &x, const double &y, const double &z, const JaffeParams &p) const;
-
     vector orientation(const double &x, const double &y, const double &z, const JaffeParams &p) const;
 
     number radial_scaling(const double &x, const double &y, const JaffeParams &p) const;
