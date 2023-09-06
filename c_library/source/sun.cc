@@ -9,8 +9,6 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
 
 double r = sqrt(x*x + y*y);
 double phi = atan2(y, z);
-double r = sqrt(x*x + y*y);
-double phi = atan2(y, z);
   
   // first we set D2
   // ------------------------------------------------------------
@@ -35,34 +33,33 @@ double phi = atan2(y, z);
 
   // now we set D1
   // ------------------------------------------------------------
-  double D1;
+  number D1;
   if(r >  p.b_Rc)
     {
       D1 =  p.b_B0 * exp(-((r -  p.b_Rsun) /  p.b_R0) - (abs(z) /  p.b_z0));
     }
-  else if(r <=  p.b_Rc)
   else //if(r <= b_Rc)
     {
       D1 =  p.b_Bc;
     }
   // ------------------------------------------------------------
   
-  double p_ang = p.b_pitch_deg * M_PI / 180.;
+  number p_ang = p.b_pitch_deg * M_PI / 180.;
   vector B_cyl{{ D1 * D2 * sin(p_ang), 
                 -D1 * D2 * cos(p_ang), 
                  0. }};
 
   // [ORIGINAL HAMMURABI COMMENT]  Taking into account the halo field
-  double halo_field;
+  number halo_field;
 
   // [ORIGINAL HAMMURABI COMMENT]  for better overview
-  double b3H_z1_actual;
+  number b3H_z1_actual;
   if (abs(z) <  p.bH_z0) {
     b3H_z1_actual =  p.bH_z1a;
     }
   else{b3H_z1_actual = p.bH_z1b;}
-  double hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (abs(z) - p.bH_z0) * (abs(z) - p.bH_z0));
-  double hf_piece2 = exp(-(r - p.bH_R0) / (p.bH_R0));
+  number hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (abs(z) - p.bH_z0) * (abs(z) - p.bH_z0));
+  number hf_piece2 = exp(-(r - p.bH_R0) / (p.bH_R0));
 
   halo_field = p.bH_B0 * hf_piece1 * (r / p.bH_R0) * hf_piece2;
 
@@ -75,7 +72,7 @@ double phi = atan2(y, z);
 
   B_cyl[1] += halo_field;
 
-  std::array<double, 3> B_vec3;
+  vector B_vec3;
 
   B_vec3 = Cyl2Cart(phi, B_cyl);
 
