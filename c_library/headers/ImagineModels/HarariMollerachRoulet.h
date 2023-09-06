@@ -1,3 +1,6 @@
+#ifndef HMR_H
+#define HMR_H
+
 #include <functional>
 #include <cmath>
 
@@ -44,3 +47,5 @@ class HMRMagneticField : public RegularVectorField  {
             }
         #endif    
  };
+
+ #endif

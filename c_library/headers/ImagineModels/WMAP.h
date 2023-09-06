@@ -1,3 +1,8 @@
+#ifndef WMAP_H
+#define WMAP_H
+
+
+
 #include <functional>
 #include <cmath>
 
@@ -28,3 +33,5 @@ class WMAPMagneticField : public RegularVectorField  {
 
         vector at_position (const double &x, const double &y, const double &z) const;
  };
+
+#endif

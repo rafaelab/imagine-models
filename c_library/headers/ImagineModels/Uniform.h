@@ -1,3 +1,7 @@
+#ifndef UNIFORM_H
+#define UNIFORM_H
+
+
 #include <functional>
 #include <cmath>
 
@@ -30,3 +34,5 @@ class UniformMagneticField : public RegularVectorField  {
             return _at_position(x, y, z, this->param);
         }
  };
+
+#endif

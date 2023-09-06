@@ -1,3 +1,8 @@
+#ifndef TT_H
+#define TT_H
+
+
+
 #include <functional>
 #include <cmath>
 
@@ -45,3 +50,5 @@ class TTMagneticField : public RegularVectorField  {
             }
         #endif       
  };
+
+ #endif

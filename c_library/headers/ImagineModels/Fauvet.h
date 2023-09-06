@@ -1,3 +1,6 @@
+#ifndef FAUVET_H
+#define FAUVET_H
+
 #include <functional>
 #include <cmath>
 
@@ -31,3 +34,5 @@ class FauvetMagneticField : public RegularVectorField  {
         vector at_position (const double &x, const double &y, const double &z) const;
  
 };
+
+#endif

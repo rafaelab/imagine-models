@@ -1,3 +1,7 @@
+#ifndef STANEVBSS_H
+#define STANEVBSS_H
+
+
 #include <functional>
 #include <cmath>
 
@@ -24,3 +28,5 @@ class StanevBSSMagneticField : public RegularVectorField  {
 
         vector at_position (const double &x, const double &y, const double &z) const;
  };
+
+ #endif

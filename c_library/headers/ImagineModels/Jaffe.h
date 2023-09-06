@@ -1,3 +1,7 @@
+#ifndef JAFFE_H
+#define JAFFE_H
+
+
 #include <cmath>
 #include <vector>
 #include <iostream>
@@ -94,3 +98,6 @@ class JaffeMagneticField : public RegularVectorField {
 
     number halo_scaling(const double &z, const JaffeParams &p) const;
 };
+
+
+#endif

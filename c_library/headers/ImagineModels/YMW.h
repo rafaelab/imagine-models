@@ -1,3 +1,6 @@
+#ifndef YMW16_H
+#define YMW16_H
+
 #include <cmath>
 #include <vector>
 #include <stdexcept>
@@ -115,3 +118,5 @@ public:
   #endif
 
 };
+
+#endif

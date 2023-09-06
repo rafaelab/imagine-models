@@ -1,3 +1,7 @@
+#ifndef SUN_H
+#define SUN_H
+
+
 #include <functional>
 #include <cmath>
 
@@ -47,5 +51,6 @@ class SunMagneticField : public RegularVectorField  {
         return _derivative(x, y, z, this->param);
     }
     #endif
-
  };
+
+ #endif

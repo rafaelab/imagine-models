@@ -1,7 +1,10 @@
+#ifndef HELIX_H
+#define HELIX_H
+
+
 #include <functional>
 #include <cmath>
 
-//#include "param.h"
 #include "Field.h"
 #include "RegularField.h"
 
@@ -49,3 +52,5 @@ class HelixMagneticField : public RegularVectorField  {
             }
         #endif        
  };
+
+ #endif
