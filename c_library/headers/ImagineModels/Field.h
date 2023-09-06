@@ -112,25 +112,23 @@ public:
              for (int k=0; k < size[2]; k++) {
                  fval[m + n + k] = static_cast<double>(eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]));
          }   }   }
-    }
+    } 
 
 
   // Evaluate vector valued functions on irregular grids (replace with template for ndim?)
   template <typename FRTYPE> 
   void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<FRTYPE(double, double, double)> eval) {
     std::vector<int> size{(int)ggx.size(), (int)ggy.size(), (int)ggz.size()};
-     for (int i=0; i < size[0]; i++) {
-         int m = i*size[1]*size[2];
-         for (int j=0; j < size[1]; j++) {
-             int n = j*size[2];
-             for (int k=0; k < size[2]; k++) {
-                 FRTYPE v = eval(ggx.at(i), ggy.at(j), ggz.at(k));
-                 fval[0][m + n + k] = static_cast<double>(v[0]);
-                 fval[1][m + n + k] = static_cast<double>(v[1]);
-                 fval[2][m + n + k] = static_cast<double>(v[2]);
-              }
-          }   
-      }   
+    for (int i=0; i < size[0]; i++) {
+        int m = i*size[1]*size[2];
+        for (int j=0; j < size[1]; j++) {
+            int n = j*size[2];
+            for (int k=0; k < size[2]; k++) {
+                FRTYPE v = eval(ggx.at(i), ggy.at(j), ggz.at(k));
+                fval[0][m + n + k] = static_cast<double>(v[0]);
+                fval[1][m + n + k] = static_cast<double>(v[1]);
+                fval[2][m + n + k] = static_cast<double>(v[2]);
+        }   }   }   
   }
 
   // Evaluate vector valued functions on regular grids

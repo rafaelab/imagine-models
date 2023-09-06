@@ -13,7 +13,6 @@
 #include "Field.h"
 
 #if autodiff_FOUND
-    // #include "autodiff.hh"
     #include <autodiff/forward/real.hpp>
     #include <autodiff/forward/dual.hpp>
     #include <autodiff/forward/real/eigen.hpp>
@@ -27,7 +26,7 @@
 
 
 
-class RegularScalarField : public Field<double, double*>  {
+class RegularScalarField : public Field<number, double*>  {
 protected:
     // Fields
 
@@ -48,13 +47,13 @@ public:
 
   ~RegularScalarField() {};
   
-  RegularScalarField () : Field<double, double*>() {
+  RegularScalarField () : Field<number, double*>() {
       };
 
-  RegularScalarField (std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  increment) : Field<double, double*>(shape, reference_point, increment) {
+  RegularScalarField (std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  increment) : Field<number, double*>(shape, reference_point, increment) {
       };
 
-  RegularScalarField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<double, double*>(grid_x, grid_y, grid_z) {
+  RegularScalarField (std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : Field<number, double*>(grid_x, grid_y, grid_z) {
       };
 
   // Fields
@@ -67,10 +66,10 @@ public:
     }
     double* grid_eval = allocate_memory(shape);
     if (regular_grid) {
-      evaluate_function_on_grid<double>(grid_eval, shape, reference_point, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      evaluate_function_on_grid<number>(grid_eval, shape, reference_point, increment, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     }
     else {
-      evaluate_function_on_grid<double>(grid_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
+      evaluate_function_on_grid<number>(grid_eval, grid_x, grid_y, grid_z, [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     }
     return grid_eval;
   }
@@ -78,14 +77,14 @@ public:
   double* on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, const int seed = 0) {
     double *grid_eval =  allocate_memory(shape);
     //auto grid_eval = std::make_shared<double>();
-    evaluate_function_on_grid<double>(grid_eval, grid_x, grid_y, grid_z,
+    evaluate_function_on_grid<number>(grid_eval, grid_x, grid_y, grid_z,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return grid_eval;
   }
 
   double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_reference_point, const std::array<double, 3> &grid_increment, const int seed = 0) {
     double *grid_eval =  allocate_memory(shape);
-    evaluate_function_on_grid<double>(grid_eval, grid_shape, grid_reference_point, grid_increment,
+    evaluate_function_on_grid<number>(grid_eval, grid_shape, grid_reference_point, grid_increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return grid_eval;
   }
