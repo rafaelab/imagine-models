@@ -80,9 +80,9 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       double b_reg_length = std::sqrt(std::pow(b_reg_x, 2) + std::pow(b_reg_y, 2) + std::pow(b_reg_z, 2));
       double sp = std::sqrt(spatial_profile(xx, yy, zz));
         // assemble b_Re
-      std::array<double, 3> b_rand_val{(val[0])[idx] * sp,
-                                       (val[1])[idx] * sp,
-                                       (val[2])[idx] * sp};
+      vector b_rand_val{{(val[0])[idx] * sp,
+                         (val[1])[idx] * sp,
+                         (val[2])[idx] * sp}};
       if (b_reg_length < 1e-10) // zero regular field, no prefered anisotropy
         return b_rand_val;
       // impose anisotropy
@@ -91,11 +91,11 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       b_reg_z /= b_reg_length;
       const double rho2 = anisotropy_rho * anisotropy_rho;
       const double rhonorm = 1. / std::sqrt(0.33333333 * rho2 + 0.66666667 / rho2);
-      double reg_dot_rand  = b_reg_x*b_rand_val[0] + b_reg_y*b_rand_val[1] + b_reg_z*b_rand_val[2];
+      number reg_dot_rand  = b_reg_x*b_rand_val[0] + b_reg_y*b_rand_val[1] + b_reg_z*b_rand_val[2];
 
       for (int ii=0; ii==3; ++ii) {
-        double b_rand_par = b_rand_val[ii] * reg_dot_rand;
-        double b_rand_perp = b_rand_val[ii]  - b_rand_par;
+        number b_rand_par = b_rand_val[ii] * reg_dot_rand;
+        number b_rand_perp = b_rand_val[ii]  - b_rand_par;
         b_rand_val[ii] = (b_rand_par * anisotropy_rho + b_rand_perp / anisotropy_rho) * rhonorm;
       }
       return b_rand_val;
@@ -104,7 +104,7 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
   //std::cout << "before apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   std::array<int, 3> padded_shape = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
   int padded_size = padded_shape[0]*padded_shape[1]*padded_shape[2];
-  evaluate_function_on_grid(val, padded_shape, rpt, inc, apply_profile);
+  evaluate_function_on_grid<vector>(val, padded_shape, rpt, inc, apply_profile);
   //std::cout << "after apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   //std::cout << "grid_size " << grid_size << std::endl;
   for (int i =0; i<3; ++i) {

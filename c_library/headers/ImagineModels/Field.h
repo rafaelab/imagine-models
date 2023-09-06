@@ -1,7 +1,6 @@
 #ifndef FIELD_H
 #define FIELD_H
 
-
 #include <vector>
 #include <array>
 #include <functional>
@@ -11,6 +10,18 @@
 
 #include "exceptions.h"
 #include "param.h"
+
+#if autodiff_FOUND
+    #include <autodiff/forward/real.hpp>
+    #include <autodiff/forward/dual.hpp>
+    #include <autodiff/forward/real/eigen.hpp>
+    namespace ad = autodiff;
+    typedef ad::real number;
+    typedef ad::VectorXreal vector;
+#else
+    typedef double number;  // only used for differentiable numbers! 
+    typedef std::array<double, 3> vector;
+#endif
 
 
 template<typename POSTYPE, typename GRIDTYPE>

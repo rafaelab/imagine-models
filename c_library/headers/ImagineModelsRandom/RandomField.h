@@ -77,7 +77,7 @@ public:
 #include "random.tpp"
 
 
-class RandomScalarField : public RandomField<double, double*>  {
+class RandomScalarField : public RandomField<number, double*>  {
 protected:
     // Fields
     fftw_plan c2r;
@@ -124,10 +124,10 @@ protected:
   }
 
 public:
-  RandomScalarField() : RandomField<double, double*>() {
+  RandomScalarField() : RandomField<number, double*>() {
     };
 
-  RandomScalarField(std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  increment) : RandomField<double, double*>(shape, reference_point, increment) {
+  RandomScalarField(std::array<int, 3>  shape, std::array<double, 3>  reference_point, std::array<double, 3>  increment) : RandomField<number, double*>(shape, reference_point, increment) {
     //accumulate wisdom
     double* grid_eval = allocate_memory(shape);
     fftw_complex* grid_eval_comp = reinterpret_cast<fftw_complex*>(grid_eval);
@@ -185,7 +185,7 @@ public:
 
 
 
-class RandomVectorField : public RandomField<std::array<double, 3>, std::array<double*, 3>>  {
+class RandomVectorField : public RandomField<vector, std::array<double*, 3>>  {
 protected:
     // Fields
 
@@ -274,7 +274,7 @@ public:
   // fields
   const int ndim = 3;
   // methods
-  std::array<double, 3> at_position(const double &x, const double &y, const double &z) const {
+  vector at_position(const double &x, const double &y, const double &z) const {
     throw NotImplementedException();
    // T c{0};
    // return c;

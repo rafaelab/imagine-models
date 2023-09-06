@@ -12,18 +12,6 @@
 #include "exceptions.h"
 #include "Field.h"
 
-#if autodiff_FOUND
-    #include <autodiff/forward/real.hpp>
-    #include <autodiff/forward/dual.hpp>
-    #include <autodiff/forward/real/eigen.hpp>
-    namespace ad = autodiff;
-    typedef ad::real number;
-    typedef ad::VectorXreal vector;
-#else
-    typedef double number;  // only used for differentiable numbers! 
-    typedef std::array<double, 3> vector;
-#endif
-
 
 
 class RegularScalarField : public Field<number, double*>  {
