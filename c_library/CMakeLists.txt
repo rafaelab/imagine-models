@@ -6,23 +6,33 @@ set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 
 set(IM_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/headers/)
 INCLUDE_DIRECTORIES ( "/usr/local/include/eigen3 " )
-
-FIND_PACKAGE(FFTW)
-FIND_PACKAGE(autodiff)
+set(IM_SOURCE_DIR ${PROJECT_SOURCE_DIR}/source)
 
 
 set(INCLUDE_INSTALL_DIR
-"${CMAKE_INSTALL_INCLUDEDIR}/ImagineModels"
+"${CMAKE_INSTALL_INCLUDEDIR}/ImagineModels")
 # CACHE PATH "The directory relative to CMAKE_INSTALL_PREFIX where ImagineModel header files are installed"
 
+set(IM_SRC_FILES
+    ${IM_SOURCE_DIR}/helix.cc
+    ${IM_SOURCE_DIR}/jaffe.cc
+    ${IM_SOURCE_DIR}/regularjf12.cc
+    ${IM_SOURCE_DIR}/ymw16.cc
+    ${IM_SOURCE_DIR}/sun.cc
+    ${IM_SOURCE_DIR}/wmap.cc
+    ${IM_SOURCE_DIR}/stanevbss.cc
+    ${IM_SOURCE_DIR}/fauvet.cc
+    ${IM_SOURCE_DIR}/tinyakovtkachev.cc
+    ${IM_SOURCE_DIR}/hararimollerachroulet.cc   
+)
 
 if(FFTW_FOUND)
     set(IM_SRC_FILES
         ${IM_SRC_FILES}
-        ${IM_SRC_DIR}/gaussianscalar.cc
-        ${IM_SRC_DIR}/lognormal.cc
-        ${IM_SRC_DIR}/randomjf12.cc
-        ${IM_SRC_DIR}/ensslinsteininger.cc
+        ${IM_SOURCE_DIR}/gaussianscalar.cc
+        ${IM_SOURCE_DIR}/lognormal.cc
+        ${IM_SOURCE_DIR}/randomjf12.cc
+        ${IM_SOURCE_DIR}/ensslinsteininger.cc
     )
 endif()
 
@@ -32,8 +42,13 @@ target_include_directories(ImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModels)
 if (FFTW_FOUND)
     target_include_directories(ImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModelsRandom)
 endif()
-
 target_link_libraries(ImagineModels PUBLIC ${LIBRARIES})
+if (autodiff_FOUND) 
+    target_include_directories(ImagineModels PUBLIC /usr/local/include/autodiff)
+    target_include_directories(ImagineModels PUBLIC /usr/include/eigen3)
+    target_link_libraries(ImagineModels PUBLIC autodiff::autodiff)
+endif()
+
 set_target_properties(ImagineModels PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION}

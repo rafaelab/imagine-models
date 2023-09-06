@@ -2,34 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(_ImagineModels DESCRIPTION "A Python module for Galactic models.")
 
-FIND_PACKAGE(autodiff)
-
-message(autodiff_FOUND="${autodiff_FOUND}")
-
-CONFIGURE_FILE( ${CMAKE_SOURCE_DIR}/c_library/headers/autodiff.hh.in ${CMAKE_SOURCE_DIR}/c_library/headers/autodiff.hh )
-
-
-if (autodiff_FOUND)     
-    set(autodiff_INCLUDE_DIRS /usr/include/eigen3)
-    target_include_directories(_ImagineModels PUBLIC /usr/include/eigen3)
-    find_package(Eigen3 REQUIRED NO_MODULE)
-    message(Eigen3_FOUND="${Eigen3_FOUND}")
-
-    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-    foreach(dir ${dirs})
-        message(STATUS "dir='${dir}'")
-    endforeach()
-    target_link_libraries(_ImagineModels PUBLIC autodiff::autodiff Eigen3::Eigen)
-
-
-                
-endif()
-
-
-                
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/c_library/findFFTW")
-
-                        )
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
@@ -37,6 +9,29 @@ set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 include(CTest)
 include(FetchContent)
 include(GNUInstallDirs)
+
+find_package(autodiff)
+
+if (autodiff_FOUND)         
+    message("-- autodiff library found: attempting to find Eigen3.")
+    set(autodiff_INCLUDE_DIRS /usr/include/eigen3)
+    
+    find_package(Eigen3 REQUIRED NO_MODULE)
+
+    if(NOT Eigen3_FOUND)
+        message("-- Could not find the Eigen3 library! Autodifferention disabled.")
+    else()
+        message("-- Eigen3 library found: Autodifferention enabled.")
+        # set(LIBRARIES ${LIBRARIES})
+    endif()
+else()
+    message("-- Could not find the autodiff library! Autodifferention disabled.")
+endif()
+
+add_compile_definitions(autodiff_FOUND=${autodiff_FOUND})
+                
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/c_library/findFFTW")
+
 # find_package(PkgConfig REQUIRED)
 
 # Activating the findFFTW cmake package
@@ -54,6 +49,7 @@ if(FFTW_FOUND)
 else()
     message("-- FFTW libraries not found: random field generation disabled.")
 endif()
+
 add_compile_definitions(FFTW_FOUND=${FFTW_FOUND})
 # pkg_search_module(autodiff QUIET)
 
@@ -80,7 +76,13 @@ if(Python3_FOUND)
         target_include_directories(_ImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModelsRandom)
         target_include_directories(_ImagineModels PUBLIC ${FFTW_INCLUDE_DIRS})
     endif()
+    if (autodiff_FOUND) 
+        target_include_directories(_ImagineModels PUBLIC /usr/local/include/autodiff)
+        target_include_directories(_ImagineModels PUBLIC /usr/include/eigen3)
+    endif()
+
     target_link_libraries(_ImagineModels PUBLIC ImagineModels ${LIBRARIES})
+    target_link_libraries(_ImagineModels PUBLIC ImagineModels autodiff::autodiff)
     # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
     # define (VERSION_INFO) here.
     target_compile_definitions(_ImagineModels PRIVATE VERSION_INFO=${PROJECT_VERSION})
