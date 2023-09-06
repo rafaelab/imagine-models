@@ -26,5 +26,5 @@ class WMAPMagneticField : public RegularVectorField  {
         bool anti = false;
 
 
-        std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const;
+        vector at_position (const double &x, const double &y, const double &z) const;
  };

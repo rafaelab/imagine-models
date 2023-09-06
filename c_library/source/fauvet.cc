@@ -7,13 +7,13 @@
 
 // ??????, implementation from Hammurabi (old)
 
-std::array<double, 3>  FauvetMagneticField::at_position(const double &x, const double &y, const double &z) const { 
+vector FauvetMagneticField::at_position(const double &x, const double &y, const double &z) const { 
     
-    std::array<double, 3>  B_vec3;
+    vector B_vec3{{0, 0, 0}};
     double r = sqrt(x*x + y*y);
 
     if (r > b_r_max || r < b_r_min) { 
-        return {0, 0, 0};
+        return B_vec3;
     }
 
 	double phi = atan2(y, x);
@@ -21,9 +21,9 @@ std::array<double, 3>  FauvetMagneticField::at_position(const double &x, const d
     double beta=1./tan(b_p*(M_PI/180.));
 
     // B-field in cylindrical coordinates:
-    std::array<double, 3> B_cyl{b_b0 * cos(phi + beta * log(r/b_r0)) * sin(b_p*(M_PI/180.)) * cos(chi_z),
-                               -b_b0 * cos(phi + beta * log(r/b_r0)) * cos(b_p*(M_PI/180.)) * cos(chi_z), 
-                                b_b0 * sin(chi_z)};
+    vector B_cyl{{b_b0 * cos(phi + beta * log(r/b_r0)) * sin(b_p*(M_PI/180.)) * cos(chi_z),
+                 -b_b0 * cos(phi + beta * log(r/b_r0)) * cos(b_p*(M_PI/180.)) * cos(chi_z), 
+                  b_b0 * sin(chi_z)}};
   
 
     // Taking into account the halo field

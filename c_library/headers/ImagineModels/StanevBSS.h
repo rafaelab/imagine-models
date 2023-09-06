@@ -22,6 +22,5 @@ class StanevBSSMagneticField : public RegularVectorField  {
         double b_b0 = 6.; // muG
         double b_phi0 = M_PI; // radians
 
-
-        std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const;
+        vector at_position (const double &x, const double &y, const double &z) const;
  };

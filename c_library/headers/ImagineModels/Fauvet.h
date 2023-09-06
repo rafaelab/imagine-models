@@ -28,6 +28,6 @@ class FauvetMagneticField : public RegularVectorField  {
         double h_z1b = .4; // kpc
         double h_r0 = 4.; // kpc
 
-        std::array<double, 3>  at_position (const double &x, const double &y, const double &z) const;
+        vector at_position (const double &x, const double &y, const double &z) const;
  
 };
