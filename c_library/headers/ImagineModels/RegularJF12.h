@@ -52,7 +52,7 @@ class JF12MagneticField : public RegularVectorField {
         return _at_position(x, y, z, this->param);
   }
 
-  #if defined autodiff_FOUND
+  #if autodiff_FOUND
     Eigen::MatrixXd _derivative(const double &x, const double &y, const double &z,  JF12RegularParams &p) {
         vector out;
         Eigen::MatrixXd deriv = ad::jacobian([&](auto _x, auto _y, auto _z, auto _p) {return this->_at_position(_x, _y, _z, _p);}, ad::wrt(p.b_arm_1, p.b_arm_2, p.b_arm_3, p.b_arm_4, p.b_arm_5, p.b_arm_6, p.b_arm_7,

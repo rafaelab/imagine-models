@@ -4,7 +4,7 @@
 //#include "param.h"
 #include "Field.h"
 #include "RegularField.h"
-#include "autodiff.hh"
+
 #include "param.h"
 
 
@@ -37,7 +37,7 @@ class HelixMagneticField : public RegularVectorField  {
         }
         
 
-        #if defined autodiff_FOUND
+        #if autodiff_FOUND
             Eigen::MatrixXd _derivative(const double &x, const double &y, const double &z,  HelixParams &p) {
                 vector out;
                 Eigen::MatrixXd deriv = ad::jacobian([&](auto _x, auto _y, auto _z, auto _p) {return this->_at_position(_x, _y, _z, _p);}, ad::wrt(p.ampx, p.ampy, p.ampz), ad::at(x, y, z, p), out);  

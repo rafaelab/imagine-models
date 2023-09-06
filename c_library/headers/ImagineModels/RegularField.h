@@ -11,9 +11,9 @@
 
 #include "exceptions.h"
 #include "Field.h"
-#include "autodiff.hh"
 
-#if defined autodiff_FOUND
+#if autodiff_FOUND
+    // #include "autodiff.hh"
     #include <autodiff/forward/real.hpp>
     #include <autodiff/forward/dual.hpp>
     #include <autodiff/forward/real/eigen.hpp>
