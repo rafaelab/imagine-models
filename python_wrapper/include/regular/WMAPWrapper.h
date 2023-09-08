@@ -14,8 +14,6 @@ void WMAP(py::module_ &m) {
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def("at_position", &WMAPMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-
         .def_readwrite("b_b0", &WMAPMagneticField::b_b0)
         .def_readwrite("b_r0", &WMAPMagneticField::b_r0)
         .def_readwrite("b_r_max", &WMAPMagneticField::b_r_max)
@@ -26,7 +24,13 @@ void WMAP(py::module_ &m) {
         .def_readwrite("b_psi0", &WMAPMagneticField::b_psi0)
         .def_readwrite("b_psi1", &WMAPMagneticField::b_psi1)
         .def_readwrite("b_xsi0", &WMAPMagneticField::b_xsi0)
-        .def_readwrite("b_anti", &WMAPMagneticField::anti);
+        .def_readwrite("b_anti", &WMAPMagneticField::anti)
+
+        .def("at_position", [](WMAPMagneticField &self, double x, double y, double z)  {
+            vector f = self.at_position(x, y, z);
+            auto tp = std::make_tuple(f[0], f[1], f[2]);
+            return tp;},
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
 }
 
 #endif
