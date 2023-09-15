@@ -1,22 +1,22 @@
 #ifndef REGULAR_TRAMPOLINE_H
 #define REGULAR_TRAMPOLINE_H
 
-#include "../../c_library/headers/hamunits.h"
-#include "../../c_library/headers/Field.h"
+#include "hamunits.h"
+#include "Field.h"
 
-#include "../../c_library/headers/RegularField.h"
+#include "RegularField.h"
 
 #include <iostream>
 
-using Array3Type = std::array<double, 3>;
+//using Array3Type = std::array<double, 3>;
 using Array3PointerType = std::array<double*, 3>; // Only for PYBIND11_OVERRIDE_PURE macro, else gets confused by commas 
 
 // These classes are necessary to override virtual functions when binding abstract c++ classes
 
-class PyScalarFieldBase: public Field<double, double*> {
+class PyScalarFieldBase: public Field<number, double*> {
 public:
-    using Field<double, double*>:: Field; // Inherit constructors
-    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, Field, at_position, x, y, z); }
+    using Field<number, double*>:: Field; // Inherit constructors
+    number at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(number, Field, at_position, x, y, z); }
 
     double* on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, seed); }
     
@@ -32,10 +32,10 @@ public:
 };
 
 
-class PyVectorFieldBase: public Field<std::array<double, 3>, std::array<double*, 3>> {
+class PyVectorFieldBase: public Field<vector, std::array<double*, 3>> {
 public:
-    using Field<std::array<double, 3>, std::array<double*, 3>>:: Field; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(Array3Type, Field, at_position, x, y, z); }
+    using Field<vector, std::array<double*, 3>>:: Field; // Inherit constructors
+    vector at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(vector, Field, at_position, x, y, z); }
 
     std::array<double*, 3> on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, seed); }
     
@@ -54,7 +54,7 @@ public:
 class PyRegularVectorField: public RegularVectorField {
 public:
     using RegularVectorField:: RegularVectorField; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(Array3Type, RegularVectorField, at_position, x, y, z); }
+    vector at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(vector, RegularVectorField, at_position, x, y, z); }
 
     std::array<double*, 3> on_grid(int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RegularVectorField, on_grid, seed); }
     
@@ -68,7 +68,7 @@ public:
 class PyRegularScalarField : public RegularScalarField {
 public:
     using RegularScalarField:: RegularScalarField; // Inherit constructors
-    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, RegularScalarField, at_position, x, y, z); }
+    number at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(number, RegularScalarField, at_position, x, y, z); }
     
     double* on_grid(const int seed=0) override {PYBIND11_OVERRIDE_PURE(double*, RegularScalarField, on_grid,  seed); }
 

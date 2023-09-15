@@ -1,5 +1,6 @@
 _build/
 _generate/
+extern/
 
 venv_imagine
 env_imagine_develop
@@ -13,6 +14,7 @@ c_library/include/config/autodiff.hh
 python_wrapper/playground*
 YouriJF12
 *.out
+*.pc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -153,3 +155,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 demos/cpp/example
+c_library/headers/autodiff.hh
+c_library/headers/fftw.hh
+extern/pybind11

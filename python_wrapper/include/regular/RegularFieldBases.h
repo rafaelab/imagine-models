@@ -10,7 +10,7 @@ namespace py = pybind11;
 using namespace pybind11::literals;
 
 void RegularFieldBases(py::module_ &m) {
-        py::class_<RegularVectorField, Field<std::array<double, 3>, std::array<double*, 3>>, PyRegularVectorField>(m, "RegularVectorField")
+        py::class_<RegularVectorField, Field<vector, std::array<double*, 3>>, PyRegularVectorField>(m, "RegularVectorField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
@@ -50,7 +50,7 @@ void RegularFieldBases(py::module_ &m) {
         
 
 // Regular Scalar Base Class
-    py::class_<RegularScalarField, Field<double, double*>, PyRegularScalarField>(m, "RegularScalarField")
+    py::class_<RegularScalarField, Field<number, double*>, PyRegularScalarField>(m, "RegularScalarField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())

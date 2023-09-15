@@ -1,6 +1,9 @@
+#ifndef WMAPWRAPPER_H
+#define WMAPWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
-#include "../../../c_library/headers/WMAP.h"
+#include "WMAP.h"
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -10,8 +13,6 @@ void WMAP(py::module_ &m) {
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
-
-        .def("at_position", &WMAPMagneticField::at_position,  "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
 
         .def_readwrite("b_b0", &WMAPMagneticField::b_b0)
         .def_readwrite("b_r0", &WMAPMagneticField::b_r0)
@@ -23,6 +24,21 @@ void WMAP(py::module_ &m) {
         .def_readwrite("b_psi0", &WMAPMagneticField::b_psi0)
         .def_readwrite("b_psi1", &WMAPMagneticField::b_psi1)
         .def_readwrite("b_xsi0", &WMAPMagneticField::b_xsi0)
-        .def_readwrite("b_anti", &WMAPMagneticField::anti);
-    
+        .def_readwrite("b_anti", &WMAPMagneticField::anti)
+#if autodiff_FOUND
+        .def_readwrite("active_diff", &WMAPMagneticField::active_diff)
+        .def_readonly("all_diff", &WMAPMagneticField::all_diff)
+
+        .def("derivative", [](WMAPMagneticField &self, double x, double y, double z)
+            { return self.derivative(x, y, z); },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+#endif
+        .def("at_position", [](WMAPMagneticField &self, double x, double y, double z)  
+            {
+                vector f = self.at_position(x, y, z);
+                return std::make_tuple(f[0], f[1], f[2]);
+            },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
 }
+
+#endif

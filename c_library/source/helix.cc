@@ -1,48 +1,31 @@
 #include <cmath>
-#include "../headers/hamunits.h"
-#include "../headers/Helix.h"
+#include "hamunits.h"
+#include "Helix.h"
 
-// Create helical magnetic field from rmin to rmax with form (bx cos(phi), by
-// sin(phi), bz phi)
-std::array<double, 3>  HelixMagneticField::at_position(const double &x, const double &y, const double &z) const {
-  const double r{sqrt(x*x + y*y)}; // radius in cylindrical coordinates
-  const double phi{atan2(y, x) + M_PI / 2.0}; // azimuthal angle in cylindrical coordinates#
-  std::array<double, 3> b{0.0, 0.0, 0.0};
-  if ((r > rmin) && (r < rmax)) {
-    b = std::array<double, 3>{ampx * std::cos(phi), ampy * std::sin(phi), ampz};
-    }
+vector HelixMagneticField::_at_position(const double &x, const double &y, const double &z, const HelixMagneticField &p) const
+{
+
+  const double phi = std::atan2(y, x);         // azimuthal angle in cylindrical coordinates
+  const double r = std::sqrt(x * x + y * y); // radius in cylindrical coordinates
+  vector b{{0.0, 0.0, 0.0}};
+  if ((r > rmin) && (r < rmax))
+  {
+    b[0] = std::cos(phi) * p.ampx;
+    b[1] = std::sin(phi) * p.ampy;
+    b[2] = p.ampz;
+  }
   return b;
+}
+
+#if autodiff_FOUND
+
+Eigen::MatrixXd HelixMagneticField::_jac(const double &x, const double &y, const double &z, HelixMagneticField &p) const
+{
+  vector out;
+  Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, HelixMagneticField &_p)
+                                        { return _p._at_position(_x, _y, _z, _p); },
+                                        ad::wrt(p.ampx, p.ampy, p.ampz), ad::at(x, y, z, p), out);
+  return _filter_diff(_deriv);
 };
-/*
-std::vector<double>  HelixMagneticField::_dampx_at_pos(const std::vector<double> &pos) const {
-  const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])}; // radius in cylindrical coordinates
-  const double phi{atan2(pos[1], pos[0]) + M_PI / 2.0}; // azimuthal angle in cylindrical coordinates
 
-  std::vector<double> dampx =  std::vector<double>{0.0, 0.0, 0.0};
-  if ((r > rmin) && (r < rmax)) {
-    dampx = std::vector<double>{std::cos(phi), 0., 0.};
-  }
-  return dampx;
-}
-
-std::vector<double>  HelixMagneticField::_dampy_at_pos(const std::vector<double> &pos) const {
-  const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])}; // radius in cylindrical coordinates
-  const double phi{atan2(pos[1], pos[0]) + M_PI / 2.0}; // azimuthal angle in cylindrical coordinates
-
-  std::vector<double> dampy =  std::vector<double>{0.0, 0.0, 0.0};
-  if ((r > rmin) && (r < rmax)) {
-    dampy = std::vector<double>{0., std::sin(phi), 0.};
-  }
-  return dampy;
-}
-
-std::vector<double>  HelixMagneticField::_dampz_at_pos(const std::vector<double> &pos) const {
-  const double r{sqrt(pos[0] * pos[0] + pos[1] * pos[1])}; // radius in cylindrical coordinates
-
-  std::vector<double> dampz =  std::vector<double>{0.0, 0.0, 0.0};
-  if ((r > rmin) && (r < rmax)) {
-    dampz = std::vector<double>{0., 0., 1.};
-  }
-  return dampz;
-}
-*/
+#endif

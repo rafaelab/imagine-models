@@ -237,5 +237,8 @@ int main() {
 
   // Evaluate model again
   //std::vector<double> jf12_val2 = jf12.getField(position_dict.at("pos_on_xy_plane"));
+
+  HelixMagneticField helix = HelixMagneticField();
+  std::cout << helix._derivative(1.9, -2.9, 0., helix.param) << std::endl;
   return 0;
 }
