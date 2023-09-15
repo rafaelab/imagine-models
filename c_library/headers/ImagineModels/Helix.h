@@ -24,10 +24,10 @@ public:
     number ampy = 1.;
     number ampz = 1.;
 
-#if autodiff_FOUND
-    const std::set<std::string> all_diff{"ampx", "ampy", "ampz"};
-    std::set<std::string> active_diff{"ampx", "ampy", "ampz"};
-#endif
+    #if autodiff_FOUND
+        const std::set<std::string> all_diff{"ampx", "ampy", "ampz"};
+        std::set<std::string> active_diff{"ampx", "ampy", "ampz"};
+    #endif
 
     // non_differentiable parameters
     double rmax = 20.;
