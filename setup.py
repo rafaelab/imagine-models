@@ -105,10 +105,9 @@ class CMakeBuild(build_ext):
             if hasattr(self, "parallel") and self.parallel:
                 # CMake 3.12+ only.
                 build_args += [f"-j{self.parallel}"]
-
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-
+        print("CMAKE ", cmake_args)
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
         )

@@ -1,13 +1,23 @@
+#include <iostream>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 #include <pybind11/stl_bind.h>
-#include <iostream>
+#include <pybind11/eigen.h>
+
+namespace py = pybind11;
+using namespace pybind11::literals;
+
 
 //PYBIND11_MAKE_OPAQUE(std::vector<double>);
 //PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
 //PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
+
+#if autodiff_FOUND
+  #include "include/autodiff_wrapper.h"
+#endif
 
 #include "include/FieldBases.h"
 
@@ -22,6 +32,8 @@
 #include "include/regular/YMW16Wrapper.h"
 #include "include/regular/HelixWrapper.h"
 #include "include/regular/JaffeWrapper.h"
+#include "include/regular/HarariMollerachRouletWrapper.h"
+#include "include/regular/TinyakovTkachevWrapper.h"
 #include "include/regular/RegularJF12Wrapper.h"
 
 #if FFTW_FOUND
@@ -31,10 +43,6 @@
   #include "include/random/GaussianScalarWrapper.h"
   #include "include/random/LogNormalWrapper.h"
 #endif
-
-
-namespace py = pybind11;
-using namespace pybind11::literals;
 
 void FieldBases(py::module_ &);
 void RegularFieldBases(py::module_ &);

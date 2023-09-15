@@ -1,3 +1,6 @@
+#ifndef YMWWRAPPER_H
+#define YMWWRAPPER_H
+
 #include <pybind11/pybind11.h>
 
 #include "YMW.h"
@@ -10,9 +13,6 @@ void YMW(py::module_ &m) {
         .def(py::init<>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
-
-        .def("at_position", &YMW16::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
-
         .def_readwrite("r_warp", &YMW16::r_warp)
         .def_readwrite("r0", &YMW16::r0)
         .def_readwrite("t0_gamma_w", &YMW16::t0_gamma_w)
@@ -68,5 +68,20 @@ void YMW(py::module_ &m) {
         .def_readwrite("t7_rli", &YMW16::t7_rli)
         .def_readwrite("t7_wli", &YMW16::t7_wli)
         .def_readwrite("t7_detthetali", &YMW16::t7_detthetali)
-        .def_readwrite("t7_thetali", &YMW16::t7_thetali);
+        .def_readwrite("t7_thetali", &YMW16::t7_thetali)
+#if autodiff_FOUND
+        .def_readwrite("active_diff", &YMW16::active_diff)
+        .def_readonly("all_diff", &YMW16::all_diff)
+
+        .def("derivative", [](YMW16 &self, double x, double y, double z)
+            { return self.derivative(x, y, z); },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+#endif
+
+        .def("at_position", &YMW16::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move);
+        
+
+
 }
+
+#endif

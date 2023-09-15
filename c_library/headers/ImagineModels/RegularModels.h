@@ -6,5 +6,6 @@
 #include "Uniform.h"
 #include "Sun.h"
 #include "TinyakovTkachev.h"
+#include "HarariMollerachRoulet.h"
 
 #include "YMW.h"

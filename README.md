@@ -5,7 +5,7 @@ The library is (mostly) written C++, but can be accessed via both C++ and Python
 Some (non-essential) elements are written in pure Python, which presently cannot be accessed in the C++ version of the library.
 A full list of implemented models can be found [here](#list-of-models).
 
-## <ins>Installation (Python)</ins>
+## <ins>Installation</ins>
 
 ### Requirements
 
@@ -21,6 +21,7 @@ Python Libraries:
 Optional:
 
 - [FFTW3](http://fftw.org/) (>3.3, necessary for random models)
+- [autodiff](https://autodiff.github.io/) (>1.0, necessary for building gradients w.r.t. to model parameters)
 
 Optional (Developers):
 
@@ -30,14 +31,13 @@ Note that pybind is included in the current repository, so in the current state 
 This may change in the future.  
 
 
-#### Installation procedure
+### Installation (Python)
 
 Easiest via
 
     pip3 install --user git+https://github.com/IMAGINE-Consortium/imagine-models.git
 
 If you install the library in a virtual environment, remove the --user tag
-
 
 If you want to specify a branch, you can do so by adding @branch-name to the above command.
 
@@ -49,12 +49,12 @@ The `--recursive` flag makes sure that also the pybind module is cloned (to the 
 
 The package can then be installed with
 
-    pip3 install folder/where/setup/py/is/
+    python3 -m pip install folder/where/setup/py/is/
 
 
-## Installation (C++)
+### Installation (C++)
 
-To install the C++ library (Debian only until now)
+To install the C++ library (tested only under Debian until now):
  
 ```
 cd ./c_library  #important
@@ -63,10 +63,6 @@ cd build
 cmake ..
 sudo make install 
 ```
-
-Other systems have not been tested yet.
-
-Note that we build within the `c_library` directory to avoid with the build of the Python package, which is 
 
 ## Examples
 

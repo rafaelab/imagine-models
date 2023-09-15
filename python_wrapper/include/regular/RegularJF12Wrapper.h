@@ -1,18 +1,17 @@
+#ifndef REGULARJF12WRAPPER_H
+#define REGULARJF12WRAPPER_H
 
 #include <pybind11/pybind11.h>
 
 #include "RegularJF12.h"
 
-namespace py = pybind11;
-using namespace pybind11::literals;
-
-void RegularJF12(py::module_ &m) {
+void RegularJF12(py::module_ &m)
+{
     py::class_<JF12MagneticField, RegularVectorField>(m, "JF12RegularField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def("at_position", &JF12MagneticField::at_position, "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
         .def_readwrite("b_arm_1", &JF12MagneticField::b_arm_1)
         .def_readwrite("b_arm_2", &JF12MagneticField::b_arm_2)
         .def_readwrite("b_arm_3", &JF12MagneticField::b_arm_3)
@@ -32,5 +31,22 @@ void RegularJF12(py::module_ &m) {
         .def_readwrite("B0_X", &JF12MagneticField::B0_X)
         .def_readwrite("Xtheta_const", &JF12MagneticField::Xtheta_const)
         .def_readwrite("rpc_X", &JF12MagneticField::rpc_X)
-        .def_readwrite("r0_X", &JF12MagneticField::r0_X);
+        .def_readwrite("r0_X", &JF12MagneticField::r0_X)
+#if autodiff_FOUND
+        .def_readwrite("active_diff", &JF12MagneticField::active_diff)
+        .def_readonly("all_diff", &JF12MagneticField::all_diff)
+
+        .def("derivative", [](JF12MagneticField &self, double x, double y, double z)
+            { return self.derivative(x, y, z); },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+#endif
+
+        .def("at_position", [](JF12MagneticField &self, double x, double y, double z)
+            {
+            vector f = self.at_position(x, y, z);
+            return std::make_tuple(f[0], f[1], f[2]); 
+            },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
 }
+
+#endif

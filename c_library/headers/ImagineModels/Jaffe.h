@@ -1,71 +1,103 @@
+#ifndef JAFFE_H
+#define JAFFE_H
+
 #include <cmath>
 #include <vector>
 #include <iostream>
 
 #include "Field.h"
 #include "RegularField.h"
+#include "param.h"
 
-class JaffeMagneticField : public RegularVectorField {
-    protected:
-      bool DEBUG = false;
-    public:
+class JaffeMagneticField : public RegularVectorField
+{
+protected:
+    vector _at_position(const double &x, const double &y, const double &z, const JaffeMagneticField &p) const;
 
-    using RegularVectorField :: RegularVectorField;
+#if autodiff_FOUND
+    Eigen::MatrixXd _jac(const double &x, const double &y, const double &z, JaffeMagneticField &p) const;
+#endif
 
-      bool quadruple = false; // quadruple pattern in halo
-      bool bss = false; // bi-symmetric
+public:
+    using RegularVectorField ::RegularVectorField;
 
-      double disk_amp = 0.167;  // disk amplitude, microG
-      double disk_z0 = 0.1; // disk height scale, kpc
-      double halo_amp = 1.38; // halo amplitude, microG
-      double halo_z0 = 3.0; // halo height scale, kpc
-      double r_inner = 0.5; // inner R scale, kpc
-      double r_scale = 20.; // R scale, kpc
-      double r_peak = 0.; // R peak, kpc
+    bool quadruple = false; // quadruple pattern in halo
+    bool bss = false;       // bi-symmetric
 
-      bool ring = false; // molecular ring
-      bool bar = true; // elliptical bar
-       // either ring or bar!
-      double ring_amp = 0.023; // ring field amplitude, microG
-      double ring_r = 5.0; // ring radius, kpc
-      double bar_amp = 0.023; // bar field amplitude, microG
-      double bar_a = 5.0; // major scale, kpc
-      double bar_b = 3.0; // minor scale, kpc
-      double bar_phi0 = 45.0; // bar major direction
+    number disk_amp = 0.167; // disk amplitude, microG
+    number disk_z0 = 0.1;    // disk height scale, kpc
+    number halo_amp = 1.38;  // halo amplitude, microG
+    number halo_z0 = 3.0;    // halo height scale, kpc
+    number r_inner = 0.5;    // inner R scale, kpc
+    number r_scale = 20.;    // R scale, kpc
+    number r_peak = 0.;      // R peak, kpc
 
-      int arm_num = 4; // # of spiral arms
-      double arm_r0 = 7.1; // arm ref radius, kpc
-      double arm_z0 = 0.1; // arm heigth scale, kpc
-      double arm_phi1 = 70; //arm ref angles, deg
-      double arm_phi2 = 160;
-      double arm_phi3 = 250;
-      double arm_phi4 = 340;
-      double arm_amp1 = 2; //  arm field amplitudes, microG
-      double arm_amp2 = 0.133;
-      double arm_amp3 = -3.78;
-      double arm_amp4 = 0.32;
-      double arm_pitch = 11.5; // pitch angle, deg
+    bool ring = false;       // molecular ring
+    bool bar = true;         // elliptical bar
+                             // either ring or bar!
+    number ring_amp = 0.023; // ring field amplitude, microG
+    number ring_r = 5.0;     // ring radius, kpc
+    number bar_amp = 0.023;  // bar field amplitude, microG
+    number bar_a = 5.0;      // major scale, kpc
+    number bar_b = 3.0;      // minor scale, kpc
+    number bar_phi0 = 45.0;  // bar major direction
 
-      double comp_c = 0.5; // compress factor
-      double comp_d = 0.3; // arm cross-sec scale, kpc
-      double comp_r = 12; // radial cutoff scale, kpc
-      double comp_p = 3; //cutoff power
+    int arm_num = 4;      // # of spiral arms
+    number arm_r0 = 7.1;  // arm ref radius, kpc
+    number arm_z0 = 0.1;  // arm heigth scale, kpc
+    number arm_phi1 = 70; // arm ref angles, deg
+    number arm_phi2 = 160;
+    number arm_phi3 = 250;
+    number arm_phi4 = 340;
+    number arm_amp1 = 2; //  arm field amplitudes, microG
+    number arm_amp2 = 0.133;
+    number arm_amp3 = -3.78;
+    number arm_amp4 = 0.32;
+    number arm_pitch = 11.5; // pitch angle, deg
 
-    std::array<double, 3> at_position(const double &x, const double &y, const double &z) const;
+    number comp_c = 0.5; // compress factor
+    number comp_d = 0.3; // arm cross-sec scale, kpc
+    number comp_r = 12;  // radial cutoff scale, kpc
+    number comp_p = 3;   // cutoff power
 
-    std::array<double, 3> orientation(const double &x, const double &y, const double &z) const;
+#if autodiff_FOUND
+    const std::set<std::string> all_diff{"disk_amp", "disk_z0", "halo_amp", "halo_z0", "r_inner", "r_scale", "r_peak",
+                                         "ring_amp", "ring_r", "bar_amp", "bar_a", "bar_b", "bar_phi0",
+                                         "arm_r0", "arm_z0", "arm_phi1", "arm_phi2", "arm_phi3", "arm_phi4",
+                                         "arm_amp1", "arm_amp2", "arm_amp3", "arm_amp4", "arm_pitch",
+                                         "comp_c", "comp_d", "comp_r", "comp_p"};
+    std::set<std::string> active_diff{"disk_amp", "disk_z0", "halo_amp", "halo_z0", "r_inner", "r_scale", "r_peak",
+                                      "ring_amp", "ring_r", "bar_amp", "bar_a", "bar_b", "bar_phi0",
+                                      "arm_r0", "arm_z0", "arm_phi1", "arm_phi2", "arm_phi3", "arm_phi4",
+                                      "arm_amp1", "arm_amp2", "arm_amp3", "arm_amp4", "arm_pitch",
+                                      "comp_c", "comp_d", "comp_r", "comp_p"};
 
-    double radial_scaling(const double &x, const double &y) const;
+    Eigen::MatrixXd derivative(const double &x, const double &y, const double &z)
+    {
+        return _jac(x, y, z, *this);
+    }
+#endif
 
-    std::vector<double> arm_compress(const double &x, const double &y,  const double &z) const;
+    vector at_position(const double &x, const double &y, const double &z) const
+    {
+        return _at_position(x, y, z, *this);
+    }
 
-    std::vector<double> arm_compress_dust(const double &x, const double &y, const double &z) const;
+    vector orientation(const double &x, const double &y, const double &z, const JaffeMagneticField &p) const;
 
-    std::vector<double> dist2arm(const double &x, const double &y) const;
+    number radial_scaling(const double &x, const double &y, const JaffeMagneticField &p) const;
 
-    double arm_scaling(const double &z) const;
+    vector arm_compress(const double &x, const double &y, const double &z, const JaffeMagneticField &p) const;
 
-    double disk_scaling(const double &z) const;
+    vector arm_compress_dust(const double &x, const double &y, const double &z, const JaffeMagneticField &p) const;
 
-    double halo_scaling(const double &z) const;
+    vector dist2arm(const double &x, const double &y, const JaffeMagneticField &p) const;
+
+    number arm_scaling(const double &z, const JaffeMagneticField &p) const;
+
+    number disk_scaling(const double &z, const JaffeMagneticField &p) const;
+
+    number halo_scaling(const double &z, const JaffeMagneticField &p) const;
 };
+
+#endif

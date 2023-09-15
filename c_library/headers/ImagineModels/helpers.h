@@ -5,8 +5,8 @@
 #include <array>
 
 
-inline std::array<double, 3> Cyl2Cart(double phi, std::array<double, 3>  invec){
-	std::array<double, 3>  outvec;
+inline vector Cyl2Cart(double phi, vector invec){
+	vector outvec;
 	double cosphi = std::cos(phi);
 	double sinphi = std::sin(phi);
 	outvec[0] = cosphi * invec[0] - sinphi * invec[1];
