@@ -17,6 +17,7 @@ protected:
 #if autodiff_FOUND
     Eigen::MatrixXd _jac(const double &x, const double &y, const double &z, FauvetMagneticField &p) const;
 #endif
+
 public:
     using RegularVectorField ::RegularVectorField;
 

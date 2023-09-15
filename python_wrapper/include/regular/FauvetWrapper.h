@@ -32,17 +32,17 @@ void Fauvet(py::module_ &m)
         .def_readwrite("active_diff", &FauvetMagneticField::active_diff)
         .def_readonly("all_diff", &FauvetMagneticField::all_diff)
 
-    .def("derivative", [](FauvetMagneticField &self, double x, double y, double z)
-        { return self.derivative(x, y, z); },
-        "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+        .def("derivative", [](FauvetMagneticField &self, double x, double y, double z)
+            { return self.derivative(x, y, z); },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
 #endif
 
-    .def("at_position", [](FauvetMagneticField &self, double x, double y, double z)
-        {
-            vector f = self.at_position(x, y, z);
-            return std::make_tuple(f[0], f[1], f[2]);
-        },
-        "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
+        .def("at_position", [](FauvetMagneticField &self, double x, double y, double z)
+            {
+                vector f = self.at_position(x, y, z);
+                return std::make_tuple(f[0], f[1], f[2]);
+            },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
 }
 
 #endif
