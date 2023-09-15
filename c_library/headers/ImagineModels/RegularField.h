@@ -8,6 +8,7 @@
 #include <functional>
 #include <iostream>
 #include <algorithm>
+#include <set>
 
 #include "exceptions.h"
 #include "Field.h"
@@ -121,6 +122,11 @@ public:
   // Fields
 
   const int ndim = 3;
+
+  #if autodiff_FOUND
+      const std::set<std::string> all_diff;
+      std::set<std::string> active_diff;
+  # endif
   // Methods
 
   std::array<double*, 3> on_grid(int seed = 0) {
@@ -145,12 +151,32 @@ public:
     return grid_eval;
   }
 
- std::array<double*, 3> on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_reference_point, const std::array<double, 3> &grid_increment, int seed = 0) {
+  std::array<double*, 3> on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_reference_point, const std::array<double, 3> &grid_increment, int seed = 0) {
     std::array<double*, 3> grid_eval = allocate_memory(grid_shape);
     evaluate_function_on_grid<vector>(grid_eval, grid_shape, grid_reference_point, grid_increment,
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return grid_eval;
   }
+
+  #if autodiff_FOUND
+
+  Eigen::MatrixXd _filter_diff(Eigen::MatrixXd inp) const {
+    if (active_diff.size() != all_diff.size()) {
+        std::vector<int> i_to_keep;
+        for (std::string s : active_diff) {
+            if (auto search = all_diff.find(s); search != all_diff.end()) {
+                int index = std::distance(all_diff.begin(), search);
+                i_to_keep.push_back(index);
+                }
+        }
+        return inp(Eigen::all, i_to_keep);
+    }
+    return inp;
+
+  }
+
+  #endif
+
 
 };
 
