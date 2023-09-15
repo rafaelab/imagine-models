@@ -47,6 +47,10 @@ public:
 
   // Fields
   const int ndim = 1;
+    #if autodiff_FOUND
+      const std::set<std::string> all_diff;
+      std::set<std::string> active_diff;
+  # endif
   // Methods
 
   double* on_grid(int seed = 0) {
@@ -77,6 +81,25 @@ public:
       [this](double xx, double yy, double zz) {return at_position(xx, yy, zz);});
     return grid_eval;
   }
+
+  #if autodiff_FOUND
+
+  Eigen::VectorXd _filter_diff(Eigen::VectorXd inp) const {
+    if (active_diff.size() != all_diff.size()) {
+        std::vector<int> i_to_keep;
+        for (std::string s : active_diff) {
+            if (auto search = all_diff.find(s); search != all_diff.end()) {
+                int index = std::distance(all_diff.begin(), search);
+                i_to_keep.push_back(index);
+                }
+        }
+        return inp(Eigen::all, i_to_keep);
+    }
+    return inp;
+
+  }
+
+  #endif
 
 };
 

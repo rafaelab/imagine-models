@@ -5,13 +5,22 @@
 #include <vector>
 #include <stdexcept>
 #include <functional>
-#include <cassert> 
+#include <cassert>
 
 #include "Field.h"
 #include "RegularField.h"
 
+class YMW16 : public RegularScalarField
+{
+protected:
+  number _at_position(const double &x, const double &y, const double &z, const YMW16 &p) const;
 
-struct YMWParams : Params {
+#if autodiff_FOUND
+  Eigen::VectorXd _jac(const double &x, const double &y, const double &z, YMW16 &p) const;
+#endif
+public:
+  using RegularScalarField ::RegularScalarField;
+
   double r_warp = 8.4;
   number r0 = 8.3;
   double t0_gamma_w = 0.14;
@@ -76,47 +85,41 @@ struct YMWParams : Params {
   number t7_wli = 15.;
   number t7_detthetali = 30.0;
   number t7_thetali = 40.0;
+#if autodiff_FOUND
+  const std::set<std::string> all_diff{
+      "r0", "t1_ad", "t1_bd", "t1_n1", "t1_h1", "t2_a2", "t2_b2", "t2_n2", "t2_k2",
+      "t3_b2s", "t3_ka", "t3_aa", "t3_ncn", "t3_wcn", "t3_thetacn", "t3_nsg", "t3_wsg", "t3_thetasg",
+      "t4_ngc", "t4_agc", "t4_hgc", "t5_kgn", "t5_ngn", "t5_wgn", "t5_agn", "t6_j_lb", "t6_nlb1",
+      "t6_detlb1", "t6_wlb1", "t6_hlb1", "t6_thetalb1", "t6_nlb2", "t6_detlb2", "t6_wlb2", "t6_hlb2", "t6_thetalb2",
+      "t7_nli", "t7_rli", "t7_wli", "t7_detthetali", "t7_thetali"};
+  std::set<std::string> active_diff{
+      "r0", "t1_ad", "t1_bd", "t1_n1", "t1_h1", "t2_a2", "t2_b2", "t2_n2", "t2_k2",
+      "t3_b2s", "t3_ka", "t3_aa", "t3_ncn", "t3_wcn", "t3_thetacn", "t3_nsg", "t3_wsg", "t3_thetasg",
+      "t4_ngc", "t4_agc", "t4_hgc", "t5_kgn", "t5_ngn", "t5_wgn", "t5_agn", "t6_j_lb", "t6_nlb1",
+      "t6_detlb1", "t6_wlb1", "t6_hlb1", "t6_thetalb1", "t6_nlb2", "t6_detlb2", "t6_wlb2", "t6_hlb2", "t6_thetalb2",
+      "t7_nli", "t7_rli", "t7_wli", "t7_detthetali", "t7_thetali"};
 
-  };
-
-
-
-class YMW16 : public RegularScalarField {
-protected:
-  bool DEBUG = false;
-  number _at_position(const double &x, const double &y, const double &z, const YMWParams &p) const;
-public:
-  using RegularScalarField :: RegularScalarField;
-
-  number at_position(const double &x, const double &y, const double &z) const {
-        return _at_position(x, y, z, this->param);
+  Eigen::VectorXd derivative(const double &x, const double &y, const double &z)
+  {
+    return _jac(x, y, z, *this);
   }
+#endif
 
-  YMWParams param;
-
-  number thick(const double &zz, const double &rr, const YMWParams &p) const;
-  number thin(const double &zz, const double &rr, const YMWParams &p) const;
+  number thick(const double &zz, const double &rr, const YMW16 &p) const;
+  number thin(const double &zz, const double &rr, const YMW16 &p) const;
   number spiral(const double &xx, const double &yy, const double &zz,
-                const double &rr, const YMWParams &p) const;
-  number galcen(const double &xx, const double &yy, const double &zz, const YMWParams &p) const;
-  number gum(const double &xx, const double &yy, const double &zz, const YMWParams &p) const;
+                const double &rr, const YMW16 &p) const;
+  number galcen(const double &xx, const double &yy, const double &zz, const YMW16 &p) const;
+  number gum(const double &xx, const double &yy, const double &zz, const YMW16 &p) const;
   number localbubble(const double &xx, const double &yy,
-                    const double &zz, const double &ll,
-                    const double &Rlb, const YMWParams &p) const;
-  number nps(const double &xx, const double &yy, const double &zz, const YMWParams &p) const;
-    
-  #if autodiff_FOUND
-  Eigen::VectorXd _derivative(const double &x, const double &y, const double &z,  YMWParams &p) {
-      number out;
-      Eigen::VectorXd deriv = ad::gradient([&](auto _x, auto _y, auto _z, auto _p) {return this->_at_position(_x, _y, _z, _p);}, ad::wrt(p.t1_h1, p.t1_n1), ad::at(x, y, z, p), out);  
-      return deriv;
-  }
+                     const double &zz, const double &ll,
+                     const double &Rlb, const YMW16 &p) const;
+  number nps(const double &xx, const double &yy, const double &zz, const YMW16 &p) const;
 
-  Eigen::VectorXd derivative(const double &x, const double &y, const double &z) {
-      return _derivative(x, y, z, this->param);
+  number at_position(const double &x, const double &y, const double &z) const
+  {
+    return _at_position(x, y, z, *this);
   }
-  #endif
-
 };
 
 #endif
