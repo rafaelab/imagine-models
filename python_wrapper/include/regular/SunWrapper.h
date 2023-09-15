@@ -5,7 +5,8 @@
 
 #include "Sun.h"
 
-void Sun2008(py::module_ &m) {
+void Sun2008(py::module_ &m)
+{
     py::class_<SunMagneticField, RegularVectorField>(m, "SunMagneticField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
@@ -32,10 +33,12 @@ void Sun2008(py::module_ &m) {
             { return self.derivative(x, y, z); },
             "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
 #endif
-        .def("at_position", [](SunMagneticField &self, double x, double y, double z)  {
+        .def(
+            "at_position", [](SunMagneticField &self, double x, double y, double z)
+            {
             vector f = self.at_position(x, y, z);
-            auto tp = std::make_tuple(f[0], f[1], f[2]);
-            return tp;},
+            return std::make_tuple(f[0], f[1], f[2]); 
+            },
             "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
 }
 
