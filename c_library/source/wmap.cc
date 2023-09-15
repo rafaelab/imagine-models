@@ -7,7 +7,7 @@
 
 // ??????, implementation from Hammurabi (old)
 
-vector WMAPMagneticField::at_position(const double &x, const double &y, const double &z) const { 
+vector WMAPMagneticField::_at_position(const double &x, const double &y, const double &z, const WMAPMagneticField &p) const { 
     
     vector B_vec3{{0, 0, 0}};
     double r = sqrt(x*x + y*y);
@@ -18,12 +18,12 @@ vector WMAPMagneticField::at_position(const double &x, const double &y, const do
 
 	double phi = atan2(y, x);
 
-    double psi_r = b_psi0*(M_PI/180.) + b_psi1*(M_PI/180.) * log(r/b_r0);
-    double xsi_z = b_xsi0*(M_PI/180.) * tanh(z/b_z0);
+    auto psi_r = p.b_psi0*(M_PI/180.) + p.b_psi1*(M_PI/180.) * log(r/p.b_r0);
+    auto xsi_z = p.b_xsi0*(M_PI/180.) * tanh(z/p.b_z0);
     
-    vector B_cyl{{b_b0 * sin(psi_r) * cos(xsi_z), 
-                  b_b0 * cos(psi_r) * cos(xsi_z), 
-                  b_b0 * sin(xsi_z) }
+    vector B_cyl{{p.b_b0 * sin(psi_r) * cos(xsi_z), 
+                  p.b_b0 * cos(psi_r) * cos(xsi_z), 
+                  p.b_b0 * sin(xsi_z) }
                 };
 
     B_vec3 = Cyl2Cart(phi, B_cyl);
@@ -38,3 +38,16 @@ vector WMAPMagneticField::at_position(const double &x, const double &y, const do
         }
     return B_vec3;
 }
+
+#if autodiff_FOUND
+
+Eigen::MatrixXd WMAPMagneticField::_jac(const double &x, const double &y, const double &z, WMAPMagneticField &p) const
+{
+  vector out;
+  Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, WMAPMagneticField &_p)
+                                        { return _p._at_position(_x, _y, _z, _p); },
+                                        ad::wrt(p.b_Rsun, p.b_b0, p.b_z0, p.b_r0, p.b_psi0, p.b_psi1, p.b_xsi0), ad::at(x, y, z, p), out);
+  return _filter_diff(_deriv);
+};
+
+#endif

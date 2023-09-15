@@ -25,11 +25,19 @@ void WMAP(py::module_ &m) {
         .def_readwrite("b_psi1", &WMAPMagneticField::b_psi1)
         .def_readwrite("b_xsi0", &WMAPMagneticField::b_xsi0)
         .def_readwrite("b_anti", &WMAPMagneticField::anti)
+#if autodiff_FOUND
+        .def_readwrite("active_diff", &WMAPMagneticField::active_diff)
+        .def_readonly("all_diff", &WMAPMagneticField::all_diff)
 
-        .def("at_position", [](WMAPMagneticField &self, double x, double y, double z)  {
-            vector f = self.at_position(x, y, z);
-            auto tp = std::make_tuple(f[0], f[1], f[2]);
-            return tp;},
+        .def("derivative", [](WMAPMagneticField &self, double x, double y, double z)
+            { return self.derivative(x, y, z); },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+#endif
+        .def("at_position", [](WMAPMagneticField &self, double x, double y, double z)  
+            {
+                vector f = self.at_position(x, y, z);
+                return std::make_tuple(f[0], f[1], f[2]);
+            },
             "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
 }
 
