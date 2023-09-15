@@ -8,7 +8,8 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-void StanevBSS(py::module_ &m) {
+void StanevBSS(py::module_ &m)
+{
     py::class_<StanevBSSMagneticField, RegularVectorField>(m, "StanevBSSMagneticField")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
@@ -22,14 +23,21 @@ void StanevBSS(py::module_ &m) {
         .def_readwrite("b_Rsun", &StanevBSSMagneticField::b_Rsun)
         .def_readwrite("b_z0", &StanevBSSMagneticField::b_z0)
         .def_readwrite("b_p", &StanevBSSMagneticField::b_p)
+#if autodiff_FOUND
+        .def_readwrite("active_diff", &StanevBSSMagneticField::active_diff)
+        .def_readonly("all_diff", &StanevBSSMagneticField::all_diff)
 
+        .def("derivative", [](StanevBSSMagneticField &self, double x, double y, double z)
+            { return self.derivative(x, y, z); },
+            "x"_a, "y"_a, "z"_a, py::return_value_policy::move)
+#endif
 
-        .def("at_position", [](StanevBSSMagneticField &self, double x, double y, double z)  {
+        .def("at_position", [](StanevBSSMagneticField &self, double x, double y, double z)
+            {
             vector f = self.at_position(x, y, z);
-            auto tp = std::make_tuple(f[0], f[1], f[2]);
-            return tp;},
+            return std::make_tuple(f[0], f[1], f[2]); 
+            },
             "x"_a, "y"_a, "z"_a, py::return_value_policy::take_ownership);
-    
 }
 
 #endif
