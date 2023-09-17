@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "exceptions.h"
-#include "param.h"
 
 #if autodiff_FOUND
     #include <autodiff/forward/real.hpp>
@@ -33,7 +32,6 @@ protected:
   bool initialized_with_grid;
   bool regular_grid;
   
-  Params param; // parameters
 
   // -----CONSTRUCTORS-----
 
