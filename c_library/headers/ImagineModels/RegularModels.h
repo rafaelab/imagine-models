@@ -5,6 +5,7 @@
 #include "Helix.h"
 #include "Uniform.h"
 #include "Sun.h"
+#include "Han.h"
 #include "TinyakovTkachev.h"
 #include "HarariMollerachRoulet.h"
 

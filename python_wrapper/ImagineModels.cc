@@ -23,6 +23,7 @@ using namespace pybind11::literals;
 
 #include "include/regular/RegularFieldBases.h"
 #include "include/regular/SunWrapper.h"
+#include "include/regular/HanWrapper.h"
 #include "include/regular/WMAPWrapper.h"
 #include "include/regular/StanevBSSWrapper.h"
 #include "include/regular/FauvetWrapper.h"
@@ -52,6 +53,7 @@ void Helix(py::module_ &);
 void Uniform(py::module_ &);
 void Jaffe(py::module_ &);
 void Sun2008(py::module_ &);
+void Han2018(py::module_ &);
 void StanevBSS(py::module_ &);
 void TinyakovTkachev(py::module_ &);
 void HarariMollerachRoulet(py::module_ &);
@@ -79,6 +81,7 @@ PYBIND11_MODULE(_ImagineModels, m) {
     Jaffe(m);
     Uniform(m);
     Sun2008(m);
+    Han2018(m);
     StanevBSS(m);
     Helix(m);
     TinyakovTkachev(m);
