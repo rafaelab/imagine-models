@@ -37,7 +37,7 @@ Easiest via
 
     pip3 install --user git+https://github.com/IMAGINE-Consortium/imagine-models.git
 
-If you install the library in a virtual environment, remove the --user tag
+If you install the library in a virtual environment, remove the `--user` tag.
 
 If you want to specify a branch, you can do so by adding @branch-name to the above command.
 
@@ -50,6 +50,10 @@ The `--recursive` flag makes sure that also the pybind module is cloned (to the 
 The package can then be installed with
 
     python3 -m pip install folder/where/setup/py/is/
+
+The installer will automatically figure out which of the optional dependencies you have installed. 
+
+If you want to disable those, you can do so by defining the `USE_AUTODIFF` and `USE_FFTW` environment variables BEFORE you run pip. 
 
 
 ### Installation (C++)
@@ -91,8 +95,11 @@ Binding a C++ model to Python is a bit more involved. For the simplest case, a t
 | Uniform             | &#x2714;    | &#x2714;    |              | used for unit tests |                         |
 | Helix               | &#x2714;    | &#x2714;    |              |                     |                         |
 | Axissymetric spiral | &#x2714;    | &#x2718;    | Pelgrims, V. |                     |  Pelgrims, V.           |
+| Archimedean spiral | &#x2714;    | &#x2714;    |  |                     |   [CRPRopa](https://github.com/CRPropa/CRPropa3/tree/master)        |
+| Local Bubble | &#x2714;    | &#x2718;    | Pelgrims, V. |   Only defined on ...                   |  Pelgrims, V.           |
 | Jaffe               | &#x2714;    | &#x2714;    | [Jaffe et al. (2010)](https://ui.adsabs.harvard.edu/abs/2010MNRAS.401.1013J/abstract)        |             | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)  |
 | Sun2008               | &#x2714;    | &#x2714;    | [Sun et al. (2008)](https://www.aanda.org/articles/aa/abs/2008/02/aa8671-07/aa8671-07.html)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/)  |
+| Han2018               | &#x2714;    | &#x2714;    | [Han et al. (2018)](https://iopscience.iop.org/article/10.3847/1538-4365/aa9c45)        |             |  |
 | HMR              | &#x2714;    | &#x2714;    | [Harari et al. (1999)](https://arxiv.org/abs/astro-ph/9906309)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/) and [Kachelrieß (2007)](https://arxiv.org/pdf/astro-ph/0510444.pdf )  |
 | TT              | &#x2714;    | &#x2714;    | [Tinyakov and Tkachev (2001)](https://arxiv.org/abs/astro-ph/0102101)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/) and [Kachelrieß (2007)](https://arxiv.org/pdf/astro-ph/0510444.pdf )  |
 | Fauvet              | &#x2714;    | &#x2714;    | [Fauvet et al. (2012)](https://arxiv.org/abs/1201.5742)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/)  |
