@@ -5,6 +5,43 @@ import sys
 
 from setuptools import Extension, setup, find_packages
 from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install
+
+
+# first a couple of custom options for the use of autodiff
+
+disable_outdiff = 0
+
+if "--disable_autodiff" in sys.argv:
+    # Get the index of the custom option
+    index = sys.argv.index("--disable_autodiff")
+    sys.argv.pop(index)
+
+    disable_outdiff = 1
+    
+    
+
+class InstallCommand(install):
+
+    user_options = install.user_options + [
+        ('disable_autodiff', None, None), # a 'flag' option
+        #('someval=', None, None) # an option that takes a value
+    ]
+
+    def initialize_options(self):
+        install.initialize_options(self)
+        self.disable_outdiff = None
+        #self.someval = None
+
+    def finalize_options(self):
+        #print("value of someopt is", self.someopt)
+        install.finalize_options(self)
+
+    def run(self):
+        global disable_outdiff
+        disable_outdiff = self.disable_outdiff # will be 1 or None
+        install.run(self)
+    
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
@@ -47,6 +84,16 @@ class CMakeBuild(build_ext):
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
         ]
+        
+        
+        use_autodiff = os.environ.get("USE_AUTODIFF", "")
+        if len(use_autodiff) > 1:
+            cmake_args.append("-DUSE_AUTODIFF={}".format(use_autodiff))
+            
+        use_fftw = os.environ.get("USE_FFTW", "")
+        if len(use_fftw) > 1:
+            cmake_args.append("-DUSE_FFTW={}".format(use_fftw))
+        
         build_args = []
         # Adding CMake arguments set as environment variable
         # (needed e.g. to build for ARM OSx on conda-forge)
@@ -124,7 +171,7 @@ setup(
     description="IMAGINE Model Library",
     long_description="",
     ext_modules=[CMakeExtension("_ImagineModels")],
-    cmdclass={"build_ext": CMakeBuild},
+    cmdclass={"build_ext": CMakeBuild, 'install': InstallCommand,},
     packages=find_packages(),
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
