@@ -1,4 +1,4 @@
-project(ImagineModels VERSION 0.1 DESCRIPTION "A library for Galactic models.")
+project(ImagineModels VERSION 0.2 DESCRIPTION "A library for Galactic models.")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,6 +19,7 @@ set(IM_SRC_FILES
     ${IM_SOURCE_DIR}/regularjf12.cc
     ${IM_SOURCE_DIR}/ymw16.cc
     ${IM_SOURCE_DIR}/sun.cc
+    ${IM_SOURCE_DIR}/han.cc
     ${IM_SOURCE_DIR}/wmap.cc
     ${IM_SOURCE_DIR}/stanevbss.cc
     ${IM_SOURCE_DIR}/fauvet.cc

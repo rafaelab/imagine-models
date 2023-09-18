@@ -72,7 +72,7 @@ vector JaffeMagneticField::orientation(const double &x, const double &y, const d
   if (r < 0.5) // forbidden region
     return tmp;
   if (z > p.disk_z0)
-    quadruple = (1 - 2 * quadruple);
+    quadruple = (1 - 2 * p.quadruple);
   // molecular ring
   if (p.ring)
   {
@@ -94,8 +94,14 @@ vector JaffeMagneticField::orientation(const double &x, const double &y, const d
   {
     const auto cos_phi = cos(p.bar_phi0);
     const auto sin_phi = sin(p.bar_phi0);
-    const number x = cos_phi * x - sin_phi * y;
-    const number y = sin_phi * x + cos_phi * y;
+    auto new_x = cos_phi * x - sin_phi * y;
+    auto new_y = sin_phi * x + cos_phi * y;
+    double sgn_nx = 1.;
+    double sgn_ny = 1.;
+    if (new_x < 0)   // manual copysign, as autodiff runs into problems with std::copysign
+      sgn_nx = -1.; 
+    if (new_y != 0)
+      sgn_ny = -1;
     // inside spiral arm
     if (r > bar_lim)
     {
@@ -106,29 +112,26 @@ vector JaffeMagneticField::orientation(const double &x, const double &y, const d
     }
     // inside elliptical bar
     else
-    {
-      if (y != 0)
+    { if (new_y!= 0) 
       {
-        const auto new_x = copysign(1, x);
-        const auto new_y = copysign(1, y) * (x / y) *
-                           p.bar_b * p.bar_b /
-                           (p.bar_a * p.bar_a);
-        tmp[0] = (cos_phi * new_x + sin_phi * new_y) * (1 - 2 * p.bss);
-        tmp[1] = (-sin_phi * new_x + cos_phi * new_y) * (1 - 2 * p.bss);
+      new_x = sgn_ny;
+      new_y = -sgn_ny * (new_x / new_y) * p.bar_b * p.bar_b / (p.bar_a * p.bar_a);
+      tmp[0] = (cos_phi * new_x + sin_phi * new_y) * (1 - 2 * p.bss);
+      tmp[1] = (-sin_phi * new_x + cos_phi * new_y) * (1 - 2 * p.bss);
         // versor
-        auto tmp_length = sqrt(tmp[0] * tmp[0] + tmp[1] * tmp[1] + tmp[2] * tmp[2]);
-        if (tmp_length != 0.)
+      auto tmp_length = sqrt(tmp[0] * tmp[0] + tmp[1] * tmp[1] + tmp[2] * tmp[2]);
+      if (tmp_length != 0.)
+      {
+        for (int i = 0; i < tmp.size(); ++i)
         {
-          for (int i = 0; i < tmp.size(); ++i)
-          {
-            tmp[i] = tmp[i] / tmp_length;
-          }
+          tmp[i] = tmp[i] / tmp_length;
         }
+      }
       }
       else
       {
-        tmp[0] = (2 * p.bss - 1) * copysign(1, x) * sin_phi;
-        tmp[1] = (2 * p.bss - 1) * copysign(1, x) * cos_phi;
+        tmp[0] = (2 * p.bss - 1) * sgn_nx * sin_phi;
+        tmp[1] = (2 * p.bss - 1) * sgn_nx * cos_phi;
       }
     }
   }
