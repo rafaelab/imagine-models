@@ -2,7 +2,7 @@
 #include "hamunits.h"
 #include "Pshirkov.h"
 
-vector HelixMagneticField::_at_position(const double &x, const double &y, const double &z, const HelixMagneticField &p) const
+vector PshirkovMagneticField::_at_position(const double &x, const double &y, const double &z, const PshirkovMagneticField &p) const
 {
   const double phi = std::atan2(y, x);       // azimuthal angle in cylindrical coordinates
   const double r = std::sqrt(x * x + y * y); // radius in cylindrical coordinates
@@ -12,7 +12,7 @@ vector HelixMagneticField::_at_position(const double &x, const double &y, const 
 
   auto cos_pitch = cos(pitch);
 	auto sin_pitch = sin(pitch);
-	auto PHI = cos_pitch / sin_pitch * log1p(p.d / p.R_sun) - M_PI / 2;
+	auto PHI = cos_pitch / sin_pitch * log(1. + p.d / p.R_sun) - M_PI / 2;
 	auto cos_PHI = cos(PHI);
 
 	// disk field
@@ -39,8 +39,8 @@ vector HelixMagneticField::_at_position(const double &x, const double &y, const 
   	// ADAPTED CRPROPA COMMENT: flipped in eq above magnetic field direction, as B_{theta} and B_{phi} refering to 180 degree rotated field
 
 		auto bMag = cos(theta - cos_pitch / sin_pitch * log(r / p.R_sun) + PHI);
-		if (useASS)
-			bMag = fabs(bMag);
+		if ((useASS) and (bMag < 0))
+			bMag *= -1.;
 		bMag *= p.B0_D * p.R_sun / std::max(r, p.R_c) / cos_PHI * exp(-fabs(z) / p.z0_D);
 		b[0] *= bMag;
     b[1] *= bMag;
@@ -51,7 +51,7 @@ vector HelixMagneticField::_at_position(const double &x, const double &y, const 
 	if (useHalo) {
 		auto bMag = (z > 0 ? p.B0_Hn : - p.B0_Hs);
 		auto z1 = (fabs(z) < p.z0_H ? p.z11_H : p.z12_H);
-		bMag *= r / p.R0_H * exp(1 - r / p.R0_H) / (1 + pow((fabs(z) - p.z0_H) / p.z1, 2.));
+		bMag *= r / p.R0_H * exp(1 - r / p.R0_H) / (1 + pow((fabs(z) - p.z0_H) / z1, 2.));
     // CRPROPA COMMENT:
 		// equation (8) in paper: theta uses now the conventional azimuth definition in contrast to equation (3)
 		// cos(phi) = pos.x / r (phi going counter-clockwise)
@@ -66,12 +66,12 @@ vector HelixMagneticField::_at_position(const double &x, const double &y, const 
 
 #if autodiff_FOUND
 
-Eigen::MatrixXd HelixMagneticField::_jac(const double &x, const double &y, const double &z, HelixMagneticField &p) const
+Eigen::MatrixXd PshirkovMagneticField::_jac(const double &x, const double &y, const double &z, PshirkovMagneticField &p) const
 {
   vector out;
-  Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, HelixMagneticField &_p)
+  Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, PshirkovMagneticField &_p)
                                         { return _p._at_position(_x, _y, _z, _p); },
-                                        ad::wrt(p.pitch, p.d, p.R_sun, p.R_c, p.z0_D, p.B0_D, p.z0_H, p.R0_H, p.B0_Hn, p.B0_Hs, p.z11_H, p.z12_H), ad::at(x, y, z, p), out);
+                                        ad::wrt(p.pitch, p.d, p.R_sun, p.z0_D, p.B0_D, p.z0_H, p.R0_H, p.B0_Hn, p.B0_Hs, p.z11_H, p.z12_H), ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
 };
 

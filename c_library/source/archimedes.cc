@@ -38,6 +38,8 @@ vector ArchimedeanMagneticField::_at_position(const double &x, const double &y, 
 	B_cart[1] *= B_0;
 	B_cart[2] *= B_0;
 
+	return B_cart;
+
 };
 
 #if autodiff_FOUND
