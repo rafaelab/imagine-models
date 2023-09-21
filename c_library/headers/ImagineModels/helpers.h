@@ -16,4 +16,11 @@ inline vector Cyl2Cart(double phi, vector invec){
 	return outvec;
 }// Cyl2Cart
 
+
+inline void addVector(vector vec, vector vec2add){
+	vec[0] += vec2add[0];
+	vec[1] += vec2add[1];
+	vec[2] += vec2add[2];
+}// addVector
+
 #endif

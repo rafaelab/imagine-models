@@ -32,6 +32,7 @@ using namespace pybind11::literals;
 #include "include/regular/HarariMollerachRouletWrapper.h"
 #include "include/regular/UniformWrapper.h"
 #include "include/regular/YMW16Wrapper.h"
+#include "include/regular/TF17Wrapper.h"
 #include "include/regular/HelixWrapper.h"
 #include "include/regular/JaffeWrapper.h"
 #include "include/regular/HarariMollerachRouletWrapper.h"
@@ -56,6 +57,7 @@ void Jaffe(py::module_ &);
 void Archimedes(py::module_ &);
 void Pshirkov(py::module_ &);
 void Sun2008(py::module_ &);
+void TF17(py::module_ &);
 void Han2018(py::module_ &);
 void StanevBSS(py::module_ &);
 void TinyakovTkachev(py::module_ &);
@@ -85,6 +87,7 @@ PYBIND11_MODULE(_ImagineModels, m)
   Uniform(m);
   Sun2008(m);
   Han2018(m);
+  TF17(m);
   Archimedes(m);
   Pshirkov(m);
   StanevBSS(m);
