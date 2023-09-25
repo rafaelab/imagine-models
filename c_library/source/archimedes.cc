@@ -40,7 +40,7 @@ vector ArchimedeanMagneticField::_at_position(const double &x, const double &y, 
 
 	return B_cart;
 
-};
+}
 
 #if autodiff_FOUND
 
@@ -51,7 +51,7 @@ Eigen::MatrixXd ArchimedeanMagneticField::_jac(const double &x, const double &y,
                                         { return _p._at_position(_x, _y, _z, _p); },
                                         ad::wrt(p.R_0, p.Omega, p.v_w, p.B_0), ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif
 

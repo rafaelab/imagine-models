@@ -325,6 +325,6 @@ Eigen::MatrixXd JaffeMagneticField::_jac(const double &x, const double &y, const
                                                 p.comp_c, p.comp_d, p.comp_r, p.comp_p),
                                         ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif

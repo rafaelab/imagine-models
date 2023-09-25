@@ -73,6 +73,6 @@ Eigen::MatrixXd PshirkovMagneticField::_jac(const double &x, const double &y, co
                                         { return _p._at_position(_x, _y, _z, _p); },
                                         ad::wrt(p.pitch, p.d, p.R_sun, p.z0_D, p.B0_D, p.z0_H, p.R0_H, p.B0_Hn, p.B0_Hs, p.z11_H, p.z12_H), ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif

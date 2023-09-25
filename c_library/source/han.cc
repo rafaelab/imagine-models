@@ -33,9 +33,9 @@ vector HanMagneticField::_at_position(const double &x, const double &y, const do
   B_cyl[0] = B_r * sin(-p_ang);
   B_cyl[1] = B_r * cos(-p_ang);
 
-  vector B_vec3 = Cyl2Cart(phi, B_cyl);
+  vector B_vec3 = Cyl2Cart<vector>(phi, B_cyl);
   return B_vec3;
-};
+}
 
 #if autodiff_FOUND
 
@@ -46,6 +46,6 @@ Eigen::MatrixXd HanMagneticField::_jac(const double &x, const double &y, const d
                                         { return _p._at_position(_x, _y, _z, _p); },
                                         ad::wrt(p.B_p, p.A, p.H, p.B_s1, p.B_s2, p.B_s3, p.B_s4, p.B_s4, p.B_s5, p.B_s6), ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif

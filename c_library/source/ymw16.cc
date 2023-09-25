@@ -319,6 +319,6 @@ Eigen::VectorXd YMW16::_jac(const double &x, const double &y, const double &z, Y
                                             p.t7_nli, p.t7_rli, p.t7_wli, p.t7_detthetali, p.t7_thetali),
                                         ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif

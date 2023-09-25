@@ -8,41 +8,6 @@ from setuptools.command.build_ext import build_ext
 from setuptools.command.install import install
 
 
-# first a couple of custom options for the use of autodiff
-
-disable_outdiff = 0
-
-if "--disable_autodiff" in sys.argv:
-    # Get the index of the custom option
-    index = sys.argv.index("--disable_autodiff")
-    sys.argv.pop(index)
-
-    disable_outdiff = 1
-    
-    
-
-class InstallCommand(install):
-
-    user_options = install.user_options + [
-        ('disable_autodiff', None, None), # a 'flag' option
-        #('someval=', None, None) # an option that takes a value
-    ]
-
-    def initialize_options(self):
-        install.initialize_options(self)
-        self.disable_outdiff = None
-        #self.someval = None
-
-    def finalize_options(self):
-        #print("value of someopt is", self.someopt)
-        install.finalize_options(self)
-
-    def run(self):
-        global disable_outdiff
-        disable_outdiff = self.disable_outdiff # will be 1 or None
-        install.run(self)
-    
-
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
     "win32": "Win32",
@@ -171,7 +136,7 @@ setup(
     description="IMAGINE Model Library",
     long_description="",
     ext_modules=[CMakeExtension("_ImagineModels")],
-    cmdclass={"build_ext": CMakeBuild, 'install': InstallCommand,},
+    cmdclass={"build_ext": CMakeBuild,},
     packages=find_packages(),
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},

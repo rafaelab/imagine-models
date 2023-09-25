@@ -17,7 +17,7 @@ vector TFMagneticField::_at_position(const double &x, const double &y, const dou
     addVector(B_cart, getDiskField(r, z, phi, sinPhi, cosPhi, p));
     addVector(B_cart, getHaloField(r, z, phi, sinPhi, cosPhi, p));
     return B_cart;
-};
+}
 
 #if autodiff_FOUND
 
@@ -28,7 +28,7 @@ Eigen::MatrixXd TFMagneticField::_jac(const double &x, const double &y, const do
                                           { return _p._at_position(_x, _y, _z, _p); },
                                           ad::wrt(p.a_disk, p.z1_disk, p.r1_disk, p.B1_disk, p.L_disk, p.phi_star_disk, p.H_disk, p.a_halo, p.z1_halo, p.B1_halo, p.L_halo, p.phi_star_halo, p.p_0, p.H_p, p.L_p), ad::at(x, y, z, p), out);
     return _filter_diff(_deriv);
-};
+}
 
 #endif
 
@@ -117,7 +117,7 @@ vector TFMagneticField::getDiskField(const double &r, const double &z, const dou
     B_cart[1] = B_r * sinPhi + B_phi * cosPhi;
     B_cart[2] = B_z;
     return B_cart;
-};
+}
 
 vector TFMagneticField::getHaloField(const double &r, const double &z, const double &phi, const double &sinPhi, const double &cosPhi, const TFMagneticField &p) const
 {
@@ -156,7 +156,7 @@ vector TFMagneticField::getHaloField(const double &r, const double &z, const dou
     B_cart[2] = B_z;
 
     return B_cart;
-};
+}
 
 number TFMagneticField::azimuthalFieldComponent(const double &r, const double &z, const number &B_r, const number &B_z, const number &cp0, const TFMagneticField &p) const
 {
@@ -165,7 +165,7 @@ number TFMagneticField::azimuthalFieldComponent(const double &r, const double &z
     auto B_phi = cp0 / zscale(z, p) * rscale * B_r;
     B_phi = B_phi - 2 * z * r / (p.H_p * p.H_p) / zscale(z, p) * shiftedWindingFunction(r, z, cp0, p) * B_z;
     return B_phi;
-};
+}
 
 number TFMagneticField::radialFieldScale(const number &B1, const number &phi_star, const number &z1, const double &phi, const double &r, const double &z, const number &cp0, const TFMagneticField &p) const
 {
@@ -173,17 +173,17 @@ number TFMagneticField::radialFieldScale(const number &B1, const number &phi_sta
     auto phi_prime = phi - shiftedWindingFunction(r, z, cp0, p) - phi_star;
     // This term occures is parameterizations of models A and B always bisymmetric (m = 1)
     return B1 * exp(-abs(z1) / p.H_disk) * cos(phi_prime);
-};
+}
 
 number TFMagneticField::shiftedWindingFunction(const number &r, const double &z, const number &cp0, const TFMagneticField &p) const
 {
     return cp0 * log(1 - exp(-r / p.L_p) + p.epsilon) / zscale(z, p);
-};
+}
 
 number TFMagneticField::zscale(const double &z, const TFMagneticField &p) const
 {
     return 1 + z * z / p.H_p / p.H_p;
-};
+}
 
 void TFMagneticField::set_params(std::string dtype, std::string htype)
 {
@@ -208,6 +208,7 @@ void TFMagneticField::set_params(std::string dtype, std::string htype)
     activeDiskModel = dtype;
     activeHaloModel = htype;
 
+#if autodiff_FOUND
     if (isAd1andC0)
     {
         active_diff = {"a_disk", "r1_disk", "B1_disk", "phi_star_disk", "H_disk", "a_halo", "z1_halo", "B1_halo", "L_halo", "p_0", "H_p", "L_p"};
@@ -237,7 +238,7 @@ void TFMagneticField::set_params(std::string dtype, std::string htype)
     {
         active_diff = {"z1_disk", "B1_disk", "L_disk", "phi_star_disk", "a_halo", "z1_halo", "B1_halo", "L_halo", "phi_star_halo", "p_0", "H_p", "L_p"};
     }
-
+#endif
     // disk parameters
     a_disk = isAd1andC0 ? 0.9 : isAd1andC1 ? 0.031
                                            : 0.;
@@ -294,4 +295,4 @@ void TFMagneticField::set_params(std::string dtype, std::string htype)
                                        : 1.2;
 
     L_p = 50;
-};
+}

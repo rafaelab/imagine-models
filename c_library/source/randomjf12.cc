@@ -53,7 +53,7 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
 
       return (scaling_disk * scaling_disk + scaling_halo * scaling_halo);
 
-};
+}
 
 void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 
@@ -127,4 +127,4 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
 
   }
   //std::cout << "afterdivergence " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
-};
+}

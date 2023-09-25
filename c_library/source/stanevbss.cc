@@ -30,7 +30,7 @@ vector StanevBSSMagneticField::_at_position(const double &x, const double &y, co
                   -B_0 * cos(phi_prime - beta * log(r / p.b_r0)) * cos(p.b_p * (M_PI / 180.)) * exp(-std::abs(z) / p.b_z0),
                   0.}};
 
-    B_vec3 = Cyl2Cart(phi, B_cyl);
+    B_vec3 = Cyl2Cart<vector>(phi, B_cyl);
     return B_vec3;
 }
 
@@ -43,6 +43,6 @@ Eigen::MatrixXd StanevBSSMagneticField::_jac(const double &x, const double &y, c
                                           { return _p._at_position(_x, _y, _z, _p); },
                                           ad::wrt(p.b_Rsun, p.b_b0, p.b_z0, p.b_r0, p.b_p, p.b_phi0), ad::at(x, y, z, p), out);
     return _filter_diff(_deriv);
-};
+}
 
 #endif
