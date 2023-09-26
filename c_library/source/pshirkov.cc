@@ -4,20 +4,24 @@
 
 vector PshirkovMagneticField::_at_position(const double &x, const double &y, const double &z, const PshirkovMagneticField &p) const
 {
-  const double phi = std::atan2(y, x);       // azimuthal angle in cylindrical coordinates
-  const double r = std::sqrt(x * x + y * y); // radius in cylindrical coordinates
-  vector b{{0.0, 0.0, 0.0}};
+	const double phi = std::atan2(y, x);       // azimuthal angle in cylindrical coordinates
+	const double r = std::sqrt(x * x + y * y); // radius in cylindrical coordinates
+	vector b{{0.0, 0.0, 0.0}};
 
-  auto pitch = p.pitch * M_PI / 180;
+	if ((x == 0.) && (y == 0.)) {
+		return b;
+	}
 
-  auto cos_pitch = cos(pitch);
+	auto pitch = p.pitch * M_PI / 180;
+
+	auto cos_pitch = cos(pitch);
 	auto sin_pitch = sin(pitch);
 	auto PHI = cos_pitch / sin_pitch * log(1. + p.d / p.R_sun) - M_PI / 2;
 	auto cos_PHI = cos(PHI);
 
 	// disk field
-	if ((useASS) or (useBSS)) {
-    // CRPROPA COMMENT:
+	if ((p.useASS) or (p.useBSS)) {
+	// CRPROPA COMMENT:
 		// PT11 paper has B_theta = B * cos(p) but this seems because they define azimuth clockwise, while we have anticlockwise.
 		// see Tinyakov 2002 APh 18,165: "local field points to l=90+p" so p=-5 deg gives l=85 and hence clockwise from above.
 		// so to get local B clockwise in our system, need minus (like Sun etal).
@@ -29,36 +33,36 @@ vector PshirkovMagneticField::_at_position(const double &x, const double &y, con
 		double cos_theta = - x / r;
 		double sin_theta = y / r;
 
-    // CRPROPA COMMENT:
+	// CRPROPA COMMENT:
 		// After some geometry calculations (on whiteboard) one finds:
 		// Bx = +cos(theta) * B_r - sin(theta) * B_{theta}
 		// By = -sin(theta) * B_r - cos(theta) * B_{theta}
 		// Use from paper: B_theta = B * cos(pitch)	and B_r = B * sin(pitch)
 		b[0] = - sin_pitch * cos_theta - cos_pitch * sin_theta;
 		b[1] = sin_pitch * sin_theta - cos_pitch * cos_theta;
-  	// ADAPTED CRPROPA COMMENT: flipped in eq above magnetic field direction, as B_{theta} and B_{phi} refering to 180 degree rotated field
+	// ADAPTED CRPROPA COMMENT: flipped in eq above magnetic field direction, as B_{theta} and B_{phi} refering to 180 degree rotated field
 
 		auto bMag = cos(theta - cos_pitch / sin_pitch * log(r / p.R_sun) + PHI);
-		if ((useASS) and (bMag < 0))
+		if ((p.useASS) and (bMag < 0))
 			bMag *= -1.;
 		bMag *= p.B0_D * p.R_sun / std::max(r, p.R_c) / cos_PHI * exp(-fabs(z) / p.z0_D);
 		b[0] *= bMag;
-    b[1] *= bMag;
-    b[2] *= bMag;
-	}
+		b[1] *= bMag;
+		b[2] *= bMag;
+		}
 
 	// halo field
-	if (useHalo) {
+	if (p.useHalo) {
 		auto bMag = (z > 0 ? p.B0_Hn : - p.B0_Hs);
 		auto z1 = (fabs(z) < p.z0_H ? p.z11_H : p.z12_H);
 		bMag *= r / p.R0_H * exp(1 - r / p.R0_H) / (1 + pow((fabs(z) - p.z0_H) / z1, 2.));
-    // CRPROPA COMMENT:
+	// CRPROPA COMMENT:
 		// equation (8) in paper: theta uses now the conventional azimuth definition in contrast to equation (3)
 		// cos(phi) = pos.x / r (phi going counter-clockwise)
 		// sin(phi) = pos.y / r
 		// unitvector of phi in polar coordinates: (-sin(phi), cos(phi), 0)
 		b[0] += -y / r * bMag;
-    b[1] += x / r * bMag;
+		b[1] += x / r * bMag;
 	}
 
 	return b;

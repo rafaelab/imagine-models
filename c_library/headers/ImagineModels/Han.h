@@ -45,8 +45,6 @@ class HanMagneticField : public RegularVectorField  {
     }
 #endif
         vector at_position(const double &x, const double &y, const double &z) const {
-              std::cout << " Hi " << std::endl;
-
             return _at_position(x, y, z, *this);
         }
  };

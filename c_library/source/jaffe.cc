@@ -32,6 +32,9 @@ vector JaffeMagneticField::_at_position(const double &x, const double &y, const 
     btot[i] = bhat[i] * scaling;
   }
 
+  
+
+
   // compress factor for each arm or for ring/bar
   std::vector<number> arm = arm_compress(x, y, z, p);
   // only inner region
@@ -42,6 +45,8 @@ vector JaffeMagneticField::_at_position(const double &x, const double &y, const 
       btot[i] += bhat[i] * arm[0] * inner_b;
     }
   }
+ // return btot;}
+
   // spiral arm region
   else
   {
@@ -57,15 +62,22 @@ vector JaffeMagneticField::_at_position(const double &x, const double &y, const 
   return btot;
 }
 
+
+
 vector JaffeMagneticField::orientation(const double &x, const double &y, const double &z, const JaffeMagneticField &p) const
 {
+  if (x == 0. && y == 0.)
+  {
+    return vector{{0., 0., 0.}};
+  }
 
   const double r{
       sqrt(x * x + y * y)}; // cylindrical frame
   const auto r_lim = p.ring_r;
   const auto bar_lim{p.bar_a + 0.5 * p.comp_d};
-  const auto cos_p = cos(p.arm_pitch);
-  const auto sin_p = sin(p.arm_pitch); // pitch angle
+  auto arm_pitch = p.arm_pitch * M_PI /180;
+  const auto cos_p = cos(arm_pitch);
+  const auto sin_p = sin(arm_pitch); // pitch angle
 
   vector tmp{{0., 0., 0.}};
   number quadruple{1.};
@@ -144,7 +156,7 @@ number JaffeMagneticField::radial_scaling(const double &x, const double &y, cons
   // separate into 3 parts for better view
   const auto s1{1. - exp(-r2 / (p.r_inner * p.r_inner))};
   const auto s2{exp(-r2 / (p.r_scale * p.r_scale))};
-  const auto s3{exp(-r2 * r2 / (p.r_peak * p.r_peak * p.r_peak * p.r_peak))};
+  const auto s3 = p.r_peak == 0 ? 1. : exp(-r2 * r2 / (p.r_peak * p.r_peak * p.r_peak * p.r_peak));
   return s1 * (s2 + s3);
 }
 
@@ -153,6 +165,7 @@ std::vector<number> JaffeMagneticField::arm_compress(const double &x, const doub
   const auto r{sqrt(x * x + y * y) / p.comp_r};
   const auto c0{1. / p.comp_c - 1.};
   std::vector<number> a0 = dist2arm(x, y, p);
+
   const auto r_scaling{radial_scaling(x, y, p)};
   const auto z_scaling{arm_scaling(z, p)};
   // for saving computing time
@@ -209,8 +222,9 @@ std::vector<number> JaffeMagneticField::dist2arm(const double &x, const double &
   const double r{sqrt(x * x + y * y)};
   const auto r_lim{p.ring_r};
   const auto bar_lim{p.bar_a + 0.5 * p.comp_d};
-  const auto cos_p{cos(p.arm_pitch)};
-  const auto sin_p{sin(p.arm_pitch)}; // pitch angle
+  auto arm_pitch = p.arm_pitch * M_PI /180;
+  const auto cos_p = cos(arm_pitch);
+  const auto sin_p = sin(arm_pitch); // pitch angle
   const auto beta_inv{-sin_p / cos_p};
   auto theta{atan2(y, x)};
 
@@ -250,7 +264,7 @@ std::vector<number> JaffeMagneticField::dist2arm(const double &x, const double &
       std::vector<number> arm_phi{p.arm_phi1, p.arm_phi2, p.arm_phi3, p.arm_phi4};
       for (int i = 0; i < p.arm_num; ++i)
       {
-        auto d_ang{arm_phi[i] - theta};
+        auto d_ang{arm_phi[i]*M_PI/180 - theta};
         auto d_rad{
             abs(p.arm_r0 * exp(d_ang * beta_inv) - r)};
         auto d_rad_p{
@@ -258,35 +272,39 @@ std::vector<number> JaffeMagneticField::dist2arm(const double &x, const double &
         auto d_rad_m{
             abs(p.arm_r0 * exp((d_ang - 2 * M_PI) * beta_inv) -
                 r)};
-        d[i] = std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p;
+        d.push_back(std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p);
       }
     }
   }
   // if elliptical bar
-  else if (p.bar)
-  {
-    const auto cos_tmp{cos(p.bar_phi0) * x / r - sin(p.bar_phi0) * y / r};
-    // cos(phi)cos(phi0) - sin(phi)sin(phi0)
-    const auto sin_tmp{cos(p.bar_phi0) * y / r + sin(p.bar_phi0) * x / r};
-    // sin(phi)cos(phi0) + cos(phi)sin(phi0)
-    // in bar, return single element vector
-    if (r < bar_lim)
-    {
-      d[0] = abs(p.bar_a * p.bar_b / sqrt(p.bar_a * p.bar_a * sin_tmp * sin_tmp + p.bar_b * p.bar_b * cos_tmp * cos_tmp) - r);
+  else if (p.bar) {
+    if (r == 0.) {
+      d.push_back(0.);
     }
-    // in spiral arm, return vector with arm_num elements
-    else
-    {
-      // loop through arms
-      std::vector<number> arm_phi{p.arm_phi1, p.arm_phi2, p.arm_phi3, p.arm_phi4};
-      for (int i = 0; i < p.arm_num; ++i)
+    else {
+      const auto cos_tmp{cos(p.bar_phi0) * x / r - sin(p.bar_phi0) * y / r};
+      // cos(phi)cos(phi0) - sin(phi)sin(phi0)
+      const auto sin_tmp{cos(p.bar_phi0) * y / r + sin(p.bar_phi0) * x / r};
+      // sin(phi)cos(phi0) + cos(phi)sin(phi0)
+      // in bar, return single element vector
+      if (r < bar_lim)
       {
-        auto d_ang{arm_phi[i] - theta};
-        auto d_rad{abs(p.arm_r0 * exp(d_ang * beta_inv) - r)};
-        auto d_rad_p{abs(p.arm_r0 * exp((d_ang + M_PI) * beta_inv) - r)};
-        auto d_rad_m{abs(p.arm_r0 * exp((d_ang - 2 * M_PI) * beta_inv) -
-                         r)};
-        d[i] = std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p;
+        d.push_back(abs(p.bar_a * p.bar_b / sqrt(p.bar_a * p.bar_a * sin_tmp * sin_tmp + p.bar_b * p.bar_b * cos_tmp * cos_tmp) - r));
+      }
+      // in spiral arm, return vector with arm_num elements
+      else
+      {
+        // loop through arms
+        std::vector<number> arm_phi{p.arm_phi1, p.arm_phi2, p.arm_phi3, p.arm_phi4};
+        for (int i = 0; i < p.arm_num; ++i)
+        {
+          auto d_ang{arm_phi[i]*M_PI/180 - theta};
+          auto d_rad{abs(p.arm_r0 * exp(d_ang * beta_inv) - r)};
+          auto d_rad_p{abs(p.arm_r0 * exp((d_ang + M_PI) * beta_inv) - r)};
+          auto d_rad_m{abs(p.arm_r0 * exp((d_ang - 2 * M_PI) * beta_inv) -
+                          r)};
+          d.push_back(std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p);
+        }
       }
     }
   }

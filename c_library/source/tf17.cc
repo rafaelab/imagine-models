@@ -5,7 +5,7 @@
 
 vector TFMagneticField::_at_position(const double &x, const double &y, const double &z, const TFMagneticField &p) const
 {
-    vector B_cart{{0., 0., 0.}};
+    //vector B_cart{{0., 0., 0.}};
     const double r = sqrt(x * x + y * y);
     double phi = M_PI - std::atan2(y, x);
 
@@ -14,8 +14,10 @@ vector TFMagneticField::_at_position(const double &x, const double &y, const dou
     // double sinPhi = pos.y / r;
     double sinPhi = sin(phi);
 
-    addVector(B_cart, getDiskField(r, z, phi, sinPhi, cosPhi, p));
-    addVector(B_cart, getHaloField(r, z, phi, sinPhi, cosPhi, p));
+    vector df = getDiskField(r, z, phi, sinPhi, cosPhi, p);
+    vector hf = getHaloField(r, z, phi, sinPhi, cosPhi, p);
+
+    vector B_cart = addVector<vector>({df, hf});
     return B_cart;
 }
 
