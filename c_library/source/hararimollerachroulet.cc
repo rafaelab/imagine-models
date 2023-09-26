@@ -33,6 +33,8 @@ vector HMRMagneticField::_at_position(const double &x, const double &y, const do
   return B_vec3;
 }
 
+#if autodiff_FOUND
+
 Eigen::MatrixXd HMRMagneticField::_jac(const double &x, const double &y, const double &z, HMRMagneticField &p) const
 {
   vector out;
@@ -41,3 +43,5 @@ Eigen::MatrixXd HMRMagneticField::_jac(const double &x, const double &y, const d
                                         ad::wrt(p.b_Rsun, p.b_z1, p.b_z2, p.b_r1, p.b_p, p.b_epsilon0), ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
 };
+
+#endif
