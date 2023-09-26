@@ -14,7 +14,6 @@ set(INCLUDE_INSTALL_DIR
 # CACHE PATH "The directory relative to CMAKE_INSTALL_PREFIX where ImagineModel header files are installed"
 
 
-message("--setting source files list.")
 set(IM_SRC_FILES
   #  ${IM_SOURCE_DIR}/helpers.cc
     ${IM_SOURCE_DIR}/helix.cc

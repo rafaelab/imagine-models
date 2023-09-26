@@ -50,7 +50,6 @@ if (USE_FFTW)
         message(FATAL_ERROR "The findFFTW submodule was not initialized! Please run 'git submodule update --init'." )
     endif()
     find_package(FFTW QUIET COMPONENTS DOUBLE_LIB)
-
     if(FFTW_FOUND)
         message("-- FFTW libraries found: ${FFTW_DOUBLE_LIB}; will include random field generation routines.")
             include_directories(${FFTW_INCLUDE_DIRS})
@@ -63,8 +62,11 @@ else()
     message("-- fftw library manually disabled")
 endif()
 
-
-add_compile_definitions(FFTW_FOUND=${FFTW_FOUND})
+if (FFTW_FOUND)
+    add_compile_definitions(FFTW_FOUND=1)
+else()
+    add_compile_definitions(FFTW_FOUND=0)
+endif()
 # pkg_search_module(autodiff QUIET)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/c_library)
