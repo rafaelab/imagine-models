@@ -52,6 +52,7 @@ public:
   number Xtheta_const = 49;
   number rpc_X = 4.8;
   number r0_X = 2.9;
+  
 #if autodiff_FOUND
   const std::set<std::string> all_diff{"b_arm_1", "b_arm_2", "b_arm_3", "b_arm_4", "b_arm_5", "b_arm_6", "b_arm_7", "b_ring", "h_disk", "w_disk", "Bn", "Bs", "rn", "rs", "wh", "z0", "B0_X", "Xtheta_const", "rpc_X", "r0_X"};
   std::set<std::string> active_diff{"b_arm_1", "b_arm_2", "b_arm_3", "b_arm_4", "b_arm_5", "b_arm_6", "b_arm_7", "b_ring", "h_disk", "w_disk", "Bn", "Bs", "rn", "rs", "wh", "z0", "B0_X", "Xtheta_const", "rpc_X", "r0_X"};

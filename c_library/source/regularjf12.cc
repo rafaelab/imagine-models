@@ -172,6 +172,6 @@ Eigen::MatrixXd JF12MagneticField::_jac(const double &x, const double &y, const 
                                                 p.B0_X, p.Xtheta_const, p.rpc_X, p.r0_X),
                                         ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif

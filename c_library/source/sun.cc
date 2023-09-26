@@ -80,10 +80,10 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
 
   vector B_vec3;
 
-  B_vec3 = Cyl2Cart(phi, B_cyl);
+  B_vec3 = Cyl2Cart<vector>(phi, B_cyl);
 
   return B_vec3;
-};
+}
 
 #if autodiff_FOUND
 
@@ -94,6 +94,6 @@ Eigen::MatrixXd SunMagneticField::_jac(const double &x, const double &y, const d
                                         { return _p._at_position(_x, _y, _z, _p); },
                                         ad::wrt(p.b_B0, p.b_Bc, p.b_R0, p.b_Rc, p.b_z0, p.b_Rsun, p.bH_B0, p.bH_R0, p.bH_z0, p.bH_z1a, p.bH_z1b), ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif

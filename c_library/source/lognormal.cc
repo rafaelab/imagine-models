@@ -16,7 +16,7 @@ void LogNormalScalarField::_on_grid(double* val, const std::array<int, 3> &shp, 
       int gs = grid_size(shp);
       for (int s = 0; s < gs; ++s)
         val[s] = std::exp(val[s]/std::sqrt(gs) + log_mean);  
-};
+}
 
 
 double LogNormalScalarField::calculate_fourier_sigma(const double &abs_k) const {
