@@ -11,7 +11,7 @@ using namespace pybind11::literals;
 
 void RandomFieldBases(py::module_ &m) {
     // Random Vector Base Class
-    py::class_<RandomVectorField, RandomField<std::array<double, 3>, std::array<double*, 3>>, PyRandomVectorField>(m, "RandomVectorField")
+    py::class_<RandomVectorField, RandomField<vector, std::array<double*, 3>>, PyRandomVectorField>(m, "RandomVectorField")
       .def(py::init<>())
       .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
@@ -42,7 +42,7 @@ void RandomFieldBases(py::module_ &m) {
           py::return_value_policy::take_ownership);
 
 // Random Scalar Base Class
-    py::class_<RandomScalarField, RandomField<double, double*>, PyRandomScalarField>(m, "RandomScalarField")
+    py::class_<RandomScalarField, RandomField<number, double*>, PyRandomScalarField>(m, "RandomScalarField")
       .def(py::init<>())
       .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
