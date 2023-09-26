@@ -23,7 +23,7 @@ public:
     std::string activeDiskModel = "Ad1";
     const std::array<std::string, 3> possibleDiskModels{"Ad1", "Bd1", "Dd1"};
     std::string activeHaloModel = "C0";
-    const std::array<std::string, 3> possibleHaloModels{"C0", "C1"};
+    const std::array<std::string, 2> possibleHaloModels{"C0", "C1"};
 
     // disk parameters
     number a_disk = 0.9;         // kp**-2; not relevant for: Bd1, Dd1
