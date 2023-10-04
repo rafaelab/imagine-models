@@ -19,7 +19,7 @@ void GaussianScalarField::_on_grid(double* val, const std::array<int, 3> &shp, c
       for (int s = 0; s < gs_padded; ++s) {
         val[s] = val[s]/std::sqrt(gs) + mean;  
       }
-};
+}
 
 
 double GaussianScalarField::calculate_fourier_sigma(const double &abs_k) const {

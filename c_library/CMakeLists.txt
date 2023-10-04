@@ -13,12 +13,18 @@ set(INCLUDE_INSTALL_DIR
 "${CMAKE_INSTALL_INCLUDEDIR}/ImagineModels")
 # CACHE PATH "The directory relative to CMAKE_INSTALL_PREFIX where ImagineModel header files are installed"
 
+
 set(IM_SRC_FILES
+  #  ${IM_SOURCE_DIR}/helpers.cc
     ${IM_SOURCE_DIR}/helix.cc
     ${IM_SOURCE_DIR}/jaffe.cc
     ${IM_SOURCE_DIR}/regularjf12.cc
     ${IM_SOURCE_DIR}/ymw16.cc
+    ${IM_SOURCE_DIR}/tf17.cc
     ${IM_SOURCE_DIR}/sun.cc
+    ${IM_SOURCE_DIR}/pshirkov.cc
+    ${IM_SOURCE_DIR}/archimedes.cc
+    ${IM_SOURCE_DIR}/han.cc
     ${IM_SOURCE_DIR}/wmap.cc
     ${IM_SOURCE_DIR}/stanevbss.cc
     ${IM_SOURCE_DIR}/fauvet.cc

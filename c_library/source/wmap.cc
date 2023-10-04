@@ -26,7 +26,7 @@ vector WMAPMagneticField::_at_position(const double &x, const double &y, const d
                   p.b_b0 * sin(xsi_z) }
                 };
 
-    B_vec3 = Cyl2Cart(phi, B_cyl);
+    B_vec3 = Cyl2Cart<vector>(phi, B_cyl);
     
     // Antisymmetric, swap the signs.  The way my pitch angle is defined,
     // it seems this has to be swapped this way.  <------ hammurabi comment
@@ -48,6 +48,6 @@ Eigen::MatrixXd WMAPMagneticField::_jac(const double &x, const double &y, const 
                                         { return _p._at_position(_x, _y, _z, _p); },
                                         ad::wrt(p.b_Rsun, p.b_b0, p.b_z0, p.b_r0, p.b_psi0, p.b_psi1, p.b_xsi0), ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
-};
+}
 
 #endif

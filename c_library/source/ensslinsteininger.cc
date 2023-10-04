@@ -8,13 +8,13 @@
 double ESRandomField::calculate_fourier_sigma(const double &abs_k) const {
   double sigma = simple_spectrum(abs_k, spectral_amplitude, spectral_offset, spectral_slope);
   return sigma;
-};
+}
 
 double ESRandomField::spatial_profile(const double &x, const double &y, const double &z) const {
       const double r_cyl{std::sqrt(x * x + y * y)};
       const double zz{std::fabs(z)};
   return std::exp(-r_cyl / r0) * std::exp(-zz / z0);
-};
+}
 
 
 void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
@@ -60,4 +60,4 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
           (val[i])[s] /= gs;  
       }
 
-};
+}

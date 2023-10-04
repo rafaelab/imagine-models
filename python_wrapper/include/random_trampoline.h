@@ -15,10 +15,10 @@ using Array3PointerType = std::array<double*, 3>; // Only for PYBIND11_OVERRIDE_
 // These classes are necessary to override virtual functions when binding abstract c++ classes
 
 
-class PyScalarRandomFieldBase: public RandomField<double, double*> {
+class PyScalarRandomFieldBase: public RandomField<number, double*> {
 public:
-    using RandomField<double, double*>:: RandomField; // Inherit constructors
-    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, RandomField, at_position, x, y, z); }
+    using RandomField<number, double*>:: RandomField; // Inherit constructors
+    number at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(number, RandomField, at_position, x, y, z); }
 
     double* on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(double*, RandomField, on_grid, seed); }
     
@@ -37,10 +37,10 @@ public:
 };
 
 
-class PyVectorRandomFieldBase: public RandomField<std::array<double, 3>, std::array<double*, 3>> {
+class PyVectorRandomFieldBase: public RandomField<vector, std::array<double*, 3>> {
 public:
-    using RandomField<std::array<double, 3>, std::array<double*, 3>>:: RandomField; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(Array3Type, Field, at_position, x, y, z); }
+    using RandomField<vector, std::array<double*, 3>>:: RandomField; // Inherit constructors
+    vector at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(vector, Field, at_position, x, y, z); }
 
     std::array<double*, 3> on_grid(int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, RandomField, on_grid, seed); }
     
@@ -63,7 +63,7 @@ public:
 class PyRandomVectorField: public RandomVectorField {
 public:
     using RandomVectorField:: RandomVectorField; // Inherit constructors
-    std::array<double, 3> at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(Array3Type, RandomVectorField, at_position, x, y, z); }
+    vector at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(vector, RandomVectorField, at_position, x, y, z); }
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomVectorField, spatial_profile, x, y, z); }
 
@@ -80,7 +80,7 @@ public:
 class PyRandomScalarField: public RandomScalarField {
 public:
     using RandomScalarField:: RandomScalarField; // Inherit constructors
-    double at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(double, RandomScalarField, at_position, x, y, z); }
+    number at_position(const double& x, const double& y, const double& z) const override {PYBIND11_OVERRIDE_PURE(number, RandomScalarField, at_position, x, y, z); }
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomScalarField, spatial_profile, x, y, z); }
 

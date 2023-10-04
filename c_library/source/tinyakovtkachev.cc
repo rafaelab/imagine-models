@@ -55,10 +55,10 @@ vector TTMagneticField::_at_position(const double &x, const double &y, const dou
                   B_r_phi * cos(p.b_p) * f_z,
                   0.}};
 
-    B_vec3 = Cyl2Cart(phi, B_cyl);
+    B_vec3 = Cyl2Cart<vector>(phi, B_cyl);
 
     return B_vec3;
-};
+}
 
 #if autodiff_FOUND
 
@@ -69,6 +69,6 @@ Eigen::MatrixXd TTMagneticField::_jac(const double &x, const double &y, const do
                                           { return _p._at_position(_x, _y, _z, _p); },
                                           ad::wrt(p.b_Rsun, p.b_b0, p.b_d, p.b_z0, p.b_p), ad::at(x, y, z, p), out);
     return _filter_diff(_deriv);
-};
+}
 
 #endif
