@@ -5,19 +5,14 @@
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 #include <pybind11/stl_bind.h>
-#include <pybind11/eigen.h>
+
+#if autodiff_FOUND
+  #include <pybind11/eigen.h>
+  #include "include/autodiff_wrapper.h"
+#endif
 
 namespace py = pybind11;
 using namespace pybind11::literals;
-
-
-//PYBIND11_MAKE_OPAQUE(std::vector<double>);
-//PYBIND11_MAKE_OPAQUE(std::array<double, 3>);
-//PYBIND11_MAKE_OPAQUE(std::array<int, 3>);
-
-#if autodiff_FOUND
-  #include "include/autodiff_wrapper.h"
-#endif
 
 #include "include/FieldBases.h"
 
