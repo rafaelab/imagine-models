@@ -37,7 +37,7 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
   number D1;
   if (r > p.b_Rc)
   {
-    D1 = p.b_B0 * exp(-((r - p.b_Rsun) / p.b_R0) - (abs(z) / p.b_z0));
+    D1 = p.b_B0 * exp(-((r - p.b_Rsun) / p.b_R0) - (std::abs(z) / p.b_z0));
   }
   else // if(r <= b_Rc)
   {
@@ -55,7 +55,7 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
 
   // [ORIGINAL HAMMURABI COMMENT]  for better overview
   number b3H_z1_actual;
-  if (abs(z) < p.bH_z0)
+  if (std::abs(z) < p.bH_z0)
   {
     b3H_z1_actual = p.bH_z1a;
   }
@@ -63,7 +63,7 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
   {
     b3H_z1_actual = p.bH_z1b;
   }
-  auto hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (abs(z) - p.bH_z0) * (abs(z) - p.bH_z0));
+  auto hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (std::abs(z) - p.bH_z0) * (std::abs(z) - p.bH_z0));
   auto hf_piece2 = exp(-(r - p.bH_R0) / (p.bH_R0));
 
   halo_field = p.bH_B0 * hf_piece1 * (r / p.bH_R0) * hf_piece2;

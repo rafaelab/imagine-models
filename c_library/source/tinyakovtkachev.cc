@@ -34,7 +34,7 @@ vector TTMagneticField::_at_position(const double &x, const double &y, const dou
     {
         sign = -1.;
     }
-    auto f_z = sign * exp(-(abs(z) / p.b_z0));
+    auto f_z = sign * exp(-(std::abs(z) / p.b_z0));
 
     // there is a factor 1/cos(phase) difference between
     // the original TT and Kachelriess. <-- hammurabi comment

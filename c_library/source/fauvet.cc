@@ -26,7 +26,7 @@ vector FauvetMagneticField::_at_position(const double &x, const double &y, const
 
     // Taking into account the halo field
     number h_z1;
-    if (abs(z) < p.h_z0)
+    if (std::abs(z) < p.h_z0)
     {
         h_z1 = p.h_z1a;
     }
@@ -35,7 +35,7 @@ vector FauvetMagneticField::_at_position(const double &x, const double &y, const
         h_z1 = p.h_z1b;
     }
 
-    auto hf_piece1 = (h_z1 * h_z1) / (h_z1 * h_z1 + (abs(z) - p.h_z0) * (abs(z) - p.h_z0));
+    auto hf_piece1 = (h_z1 * h_z1) / (h_z1 * h_z1 + (std::abs(z) - p.h_z0) * (std::abs(z) - p.h_z0));
     auto hf_piece2 = exp(-(r - p.h_r0) / (p.h_r0));
 
     auto halo_field = p.h_b0 * hf_piece1 * (r / p.b_r0) * hf_piece2;

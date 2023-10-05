@@ -28,7 +28,7 @@ vector HanMagneticField::_at_position(const double &x, const double &y, const do
     }
   }
 
-  number B_r = B_0 * exp(-r / p.A) * exp(-abs(z) / p.H);
+  number B_r = B_0 * exp(-r / p.A) * exp(-std::abs(z) / p.H);
 
   B_cyl[0] = B_r * sin(-p_ang);
   B_cyl[1] = B_r * cos(-p_ang);

@@ -49,7 +49,7 @@ public:
   number z0 = 5.3;
   // X-field parameters
   number B0_X = 4.6;
-  number Xtheta_const = 49;
+  number Xtheta_const = 49.;
   number rpc_X = 4.8;
   number r0_X = 2.9;
   

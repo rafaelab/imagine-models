@@ -20,6 +20,7 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
       sqrt(x * x + y * y + z * z)};
   const double phi{atan2(y, x)};
 
+
   // define boundaries for where magnetic field is zero (outside of galaxy)
   if (r > Rmax || rho < rho_GC)
   {
@@ -33,7 +34,7 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
   const double B0 = (rmin / r); //
   // the logistic equation, to be multiplied to the toroidal halo field and
   // (1-zprofile) multiplied to the disk:
-  const auto zprofile{1. / (1 + exp(-2. / p.w_disk * (abs(z) - p.h_disk)))};
+  const auto zprofile{1. / (1 + exp(-2. / p.w_disk * (std::abs(z) - p.h_disk)))};
 
   // printf("%g, %g \n", z, zprofile);
   number B_cyl_disk[3] = {0, 0, 0}; // the disk field in cylindrical coordinates
@@ -103,7 +104,7 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
   }
 
   B_h = b1 * (1. - 1. / (1. + exp(-2. / p.wh * (r - rh)))) *
-        exp(-(abs(z)) / (p.z0)); // vertical exponential fall-off
+        exp(-(std::abs(z)) / (p.z0)); // vertical exponential fall-off
   const number B_cyl_h[3] = {0., B_h * zprofile, 0.};
 
   //------------------------------------------------------------------------
@@ -120,15 +121,13 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
 
   // dividing line between region with constant elevation angle, and the
   // interior:
-  number rc_X = p.rpc_X + abs(z) / tan(p.Xtheta_const);
-
+  number rc_X = p.rpc_X + std::abs(z) / tan(p.Xtheta_const * M_PI /180.);
   if (r < rc_X)
   { // interior region, with varying elevation angle
     rp_X = r * p.rpc_X / rc_X;
     B_X = p.B0_X * pow(p.rpc_X / rc_X, 2.) * exp(-rp_X / p.r0_X);
-    Xtheta = atan(abs(z) /
+    Xtheta = atan(std::abs(z) /
                   (r - rp_X)); // modified elevation angle in interior region
-    // printf("Xtheta %g at z %g , r %g , rc_X %g \n",Xtheta, z,r,rc_X);
     if (z == 0.)
     {
       Xtheta = M_PI / 2.;
@@ -136,8 +135,8 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
   }
   else
   { // exterior region with constant elevation angle
-    Xtheta = p.Xtheta_const;
-    rp_X = r - abs(z) / tan(Xtheta);
+    Xtheta = p.Xtheta_const * M_PI /180.;
+    rp_X = r - std::abs(z) / tan(Xtheta);
     B_X = p.B0_X * rp_X / r * exp(-rp_X / p.r0_X);
   }
 
@@ -155,7 +154,6 @@ vector JF12MagneticField::_at_position(const double &x, const double &y, const d
   B_cart[0] = B_cyl[0] * cos(phi) - B_cyl[1] * sin(phi);
   B_cart[1] = B_cyl[0] * sin(phi) + B_cyl[1] * cos(phi);
   B_cart[2] = B_cyl[2];
-
   return B_cart;
 }
 
