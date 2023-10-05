@@ -59,7 +59,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
         coord2 = [i for i in range(shp[dims[1]])][::5]
         B1 = np.squeeze(array[dims[0]][slices])[::5, ::5]
         B2 = np.squeeze(array[dims[1]][slices])[::5, ::5]
-        plt.quiver(coord1, coord1, B1.T, B2.T, pivot='mid')
+        plt.quiver(coord1, coord2, B1.T, B2.T, pivot='mid')
     
     slice_dim_label = dims_label[slice_dim]
     dims_label.remove(slice_dim_label)
@@ -78,8 +78,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
         ax.set_xlabel(r"$%s$ / kpc" % dims_label[0])
         keyword = '%s = %.1f kpc' % (slice_dim_label, rfp[slice_dim]+cut_index*inc[slice_dim]) 
         keyword = field_name + ', ' + keyword if field_name is not None else keyword
-        ax.text(0, 1, keyword,
-                va='bottom', transform = ax.transAxes)
+        ax.text(0, 1, keyword, va='bottom', transform = ax.transAxes)
     else:
         plt.axis('off')
 
