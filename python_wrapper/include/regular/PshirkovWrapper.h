@@ -12,6 +12,10 @@ void Pshirkov(py::module_ &m)
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
+        .def_readwrite("useASS", &PshirkovMagneticField::useASS)
+        .def_readwrite("useBSS", &PshirkovMagneticField::useBSS)
+        .def_readwrite("useHalo", &PshirkovMagneticField::useHalo)
+
         .def_readwrite("pitch", &PshirkovMagneticField::pitch)
         .def_readwrite("d", &PshirkovMagneticField::d)
         .def_readwrite("R_sun", &PshirkovMagneticField::R_sun)
