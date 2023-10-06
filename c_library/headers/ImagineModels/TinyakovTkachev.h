@@ -7,7 +7,7 @@
 #include "Field.h"
 #include "RegularField.h"
 
-// Tinyakov and Tkachev (TT) https://arxiv.org/abs/astro-ph/0102101, implementation of https://arxiv.org/pdf/astro-ph/0510444.pdf (Kachelriess et al.)
+// Tinyakov and Tkachev (TT) https://arxiv.org/abs/astro-ph/0111305, implementation of https://arxiv.org/pdf/astro-ph/0510444.pdf (Kachelriess et al.)
 class TTMagneticField : public RegularVectorField
 {
 protected:

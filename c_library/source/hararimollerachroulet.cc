@@ -21,7 +21,8 @@ vector HMRMagneticField::_at_position(const double &x, const double &y, const do
 
   auto b_r = (3. * p.b_Rsun / r) * tanh(r / p.b_r1) * tanh(r / p.b_r1) * tanh(r / p.b_r1);
 
-  auto B_r_phi = b_r * cos(phi - ((1. / tan(p.b_p * (M_PI / 180.))) * log(r / p.b_epsilon0)));
+  // BSS model (eq. 2.2 of https://arxiv.org/abs/astro-ph/9906309)
+  auto B_r_phi = b_r * cos(-phi - ((1. / tan(p.b_p * (M_PI / 180.))) * log(r / p.b_epsilon0)));
 
   // B-field in cylindrical coordinates:
   vector B_cyl{{B_r_phi * sin(p.b_p * (M_PI / 180.)) * f_z,
