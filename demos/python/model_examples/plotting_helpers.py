@@ -76,7 +76,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
         ax.set_ylabel(r"$%s$ / kpc" % dims_label[1])
         ax.set_xticks(xticks_loc, labels=xticks_label)
         ax.set_xlabel(r"$%s$ / kpc" % dims_label[0])
-        keyword = '%s = %.1f kpc' % (slice_dim_label, rfp[slice_dim]+cut_index*inc[slice_dim]) 
+        keyword = '%s = %.3f kpc' % (slice_dim_label, rfp[slice_dim]+cut_index*inc[slice_dim]) 
         keyword = field_name + ', ' + keyword if field_name is not None else keyword
         ax.text(0, 1, keyword, va='bottom', transform = ax.transAxes)
     else:
