@@ -9,9 +9,9 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
 {
 
   double r = sqrt(x * x + y * y);
-  double phi = atan2(y, z);
+  double phi = atan2(y, x);
 
-  // first we set D2
+  // first we set D2 (ASS+RING model, eq. 8)
   // ------------------------------------------------------------
   double D2;
   if (r > 7.5)
@@ -32,7 +32,7 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
   }
   // ------------------------------------------------------------
 
-  // now we set D1
+  // now we set D1 (eq. 7)
   // ------------------------------------------------------------
   number D1;
   if (r > p.b_Rc)
@@ -46,7 +46,7 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
   // ------------------------------------------------------------
 
   auto p_ang = p.b_p * M_PI / 180.;
-  vector B_cyl{{D1 * D2 * sin(p_ang),
+  vector B_cyl{{D1 * D2 * sin(p_ang),  // eq. 6
                 -D1 * D2 * cos(p_ang),
                 0.}};
 
@@ -66,10 +66,10 @@ vector SunMagneticField::_at_position(const double &x, const double &y, const do
   auto hf_piece1 = (b3H_z1_actual * b3H_z1_actual) / (b3H_z1_actual * b3H_z1_actual + (std::abs(z) - p.bH_z0) * (std::abs(z) - p.bH_z0));
   auto hf_piece2 = exp(-(r - p.bH_R0) / (p.bH_R0));
 
-  halo_field = p.bH_B0 * hf_piece1 * (r / p.bH_R0) * hf_piece2;
+  halo_field = p.bH_B0 * hf_piece1 * (r / p.bH_R0) * hf_piece2;  // eq. 10
 
-  // [ORIGINAL HAMMURABI COMMENT] Flip north.  Not sure how Sun did this.  This is his code with no
-  // flip though the paper says it's flipped, but without this mod,
+  // [ORIGINAL HAMMURABI COMMENT] Flip north.  Not sure how Sun did this. This is his code with no
+  // flip though the paper says it's flipped but without this mod,
   // there is no antisymmetry across the disk.  However, it doesn't seem to work.
   if (z > 0 && r >= 5.)
   {
