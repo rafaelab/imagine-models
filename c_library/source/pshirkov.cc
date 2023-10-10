@@ -4,8 +4,8 @@
 
 vector PshirkovMagneticField::_at_position(const double &x, const double &y, const double &z, const PshirkovMagneticField &p) const
 {
-	const double phi = std::atan2(y, x);       // azimuthal angle in cylindrical coordinates
 	const double r = std::sqrt(x * x + y * y); // radius in cylindrical coordinates
+	const double phi = atan2(y, x);
 	vector b{{0.0, 0.0, 0.0}};
 
 	if ((x == 0.) && (y == 0.)) {
@@ -28,7 +28,7 @@ vector PshirkovMagneticField::_at_position(const double &x, const double &y, con
 		// Ps base their system on Han and Qiao 1994 A&A 288,759 which has a diagram with azimuth clockwise, hence confirmed.
 		// PT11 paper define Earth position at (+8.5, 0, 0) kpc; but usual convention is (-8.5, 0, 0)
 		// thus we have to rotate our position by 180 degree in azimuth
-		auto theta = M_PI - PHI;  // // CRPROPA COMMENT: azimuth angle theta: PT11 paper uses opposite convention for azimuth
+		auto theta = M_PI - phi;  // // CRPROPA COMMENT: azimuth angle theta: PT11 paper uses opposite convention for azimuth
 		// // CRPROPA COMMENT: the following is equivalent to sin(pi - phi) and cos(pi - phi) which is computationally slower
 		double cos_theta = - x / r;
 		double sin_theta = y / r;
@@ -38,17 +38,17 @@ vector PshirkovMagneticField::_at_position(const double &x, const double &y, con
 		// Bx = +cos(theta) * B_r - sin(theta) * B_{theta}
 		// By = -sin(theta) * B_r - cos(theta) * B_{theta}
 		// Use from paper: B_theta = B * cos(pitch)	and B_r = B * sin(pitch)
-		b[0] = - sin_pitch * cos_theta - cos_pitch * sin_theta;
-		b[1] = sin_pitch * sin_theta - cos_pitch * cos_theta;
+		b[0] = - sin_pitch * cos_theta + cos_pitch * sin_theta;
+		b[1] = sin_pitch * sin_theta + cos_pitch * cos_theta;
 	// ADAPTED CRPROPA COMMENT: flipped in eq above magnetic field direction, as B_{theta} and B_{phi} refering to 180 degree rotated field
 
-		auto bMag = cos(theta - cos_pitch / sin_pitch * log(r / p.R_sun) + PHI);
+		auto bMag = cos(theta - cos_pitch / sin_pitch * log(r / p.R_sun) + PHI);  // eq. 3 / 4
 		if ((p.useASS) and (bMag < 0))
 			bMag *= -1.;
-		bMag *= p.B0_D * p.R_sun / std::max(r, p.R_c) / cos_PHI * exp(-fabs(z) / p.z0_D);
+		bMag *= p.B0_D * p.R_sun / std::max(r, p.R_c) / cos_PHI * exp(-fabs(z) / p.z0_D);  // eq. 5, eq. 4
 		b[0] *= bMag;
 		b[1] *= bMag;
-		b[2] *= bMag;
+		b[2] *= bMag; // does not do anything as b[2] was zero
 		}
 
 	// halo field
