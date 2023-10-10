@@ -25,7 +25,7 @@ public:
     number b_Rsun = 8.5; // kpc
     number b_b0 = 1.4;   // muG
     number b_d = -0.5;   // kpc
-    number b_z0 = 1.5;   // kpc
+    number b_z0 = 1.5;   // kpc, called h in original publication
     number b_p = -8;     // degree
 
 #if autodiff_FOUND
