@@ -102,18 +102,18 @@ Binding a C++ model to Python is a bit more involved. For the simplest case, a t
 | Uniform             | &#x2714;    | &#x2714;    |              | used for unit tests |                         |
 | Helix               | &#x2714;    | &#x2714;    |              |                     |                         |
 | Axissymetric spiral | &#x2714;    | &#x2718;    | Pelgrims, V. |                     |  Pelgrims, V.           |
-| Archimedean spiral | &#x2714;    | &#x2714;    |  |                     |   [CRPRopa](https://github.com/CRPropa/CRPropa3/tree/master)        |
+| Archimedean spiral | &#x2714;    | &#x2714;    |  |                     |   [CRPropa](https://github.com/CRPropa/CRPropa3/tree/master)        |
 | Local Bubble | &#x2714;    | &#x2718;    | [Pelgrims et al.](https://www.aanda.org/articles/aa/full_html/2020/04/aa37157-19/aa37157-19.html) |   Only defined on the shell                   |  Pelgrims, V.           |
 | Jaffe               | &#x2714;    | &#x2714;    | [Jaffe et al. (2010)](https://ui.adsabs.harvard.edu/abs/2010MNRAS.401.1013J/abstract)        |             | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)  |
 | Sun2007              | &#x2714;    | &#x2714;    | [Sun et al. (2007)](https://www.aanda.org/articles/aa/abs/2008/02/aa8671-07/aa8671-07.html), updated halo parameter in [Sun et al. (2010)](https://iopscience.iop.org/article/10.1088/1674-4527/10/12/009)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/)  |
 | Han2018               | &#x2714;    | &#x2714;    | [Han et al. (2018)](https://iopscience.iop.org/article/10.3847/1538-4365/aa9c45)        |             |  |
-| Pshirkov | &#x2714;    | &#x2714;    | [Pshirkov et al.](https://iopscience.iop.org/article/10.1088/0004-637X/738/2/192)  |                     |   [CRPRopa](https://github.com/CRPropa/CRPropa3/tree/master)        |
+| Pshirkov | &#x2714;    | &#x2714;    | [Pshirkov et al.](https://iopscience.iop.org/article/10.1088/0004-637X/738/2/192)  |                     |   [CRPropa](https://github.com/CRPropa/CRPropa3/tree/master)        |
 | HMR              | &#x2714;    | &#x2714;    | [Harari et al. (1999)](https://arxiv.org/abs/astro-ph/9906309)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/) and [Kachelrieß (2007)](https://arxiv.org/pdf/astro-ph/0510444.pdf )  |
 | TT              | &#x2714;    | &#x2714;    | [Tinyakov and Tkachev (2017)](https://arxiv.org/abs/astro-ph/0111305)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/) and [Kachelrieß (2007)](https://arxiv.org/pdf/astro-ph/0510444.pdf )  |
-| TF              | &#x2714;    | &#x2714;    | [Terral and Ferriere (2017)](https://arxiv.org/abs/1611.10222)        |             | [CRPRopa](https://github.com/CRPropa/CRPropa3/tree/master)        | |
+| TF              | &#x2714;    | &#x2714;    | [Terral and Ferriere (2017)](https://arxiv.org/abs/1611.10222)        |             | [CRPropa](https://github.com/CRPropa/CRPropa3/tree/master)        | |
 | Fauvet              | &#x2714;    | &#x2714;    | [Fauvet et al. (2012)](https://arxiv.org/abs/1201.5742)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/)  |
 | Stanev            | &#x2714;    | &#x2714;    | [Stanev (1996)](https://arxiv.org/abs/astro-ph/9607086)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/)  |
-| WMAP              | &#x2714;    | &#x2714;    | [Page et al. (2006)](https://arxiv.org/pdf/astro-ph/0603450.pdf)        |             | [Hammurabi (old)](https://sourceforge.net/projects/hammurabicode/)  |
+| WMAP              | &#x2714;    | &#x2714;    | [Page et al. (2007)](https://iopscience.iop.org/article/10.1086/513699)  |
 | Jansson Farrar      | &#x2714;    | &#x2714;    | [Jansson & Farrar (2012)](https://ui.adsabs.harvard.edu/abs/2012ApJ...757...14J/abstract)        |             | [Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)   |
 | **Random models**   |             |             |              |                     |                         |
 | Jansson Farrar      | &#x2714;    |&#x2714;     | [Jansson & Farrar (2012)](https://ui.adsabs.harvard.edu/abs/2012ApJ...761L..11J/abstract)        | depends on the JF12 regular model   |[Hammurabi X](https://github.com/hammurabi-dev/hammurabiX)    |

@@ -23,11 +23,11 @@ public:
     double b_r_max = 20.; // kpc
     double b_r_min = 3.;  // kpc
 
-    number b_Rsun = 8.5; // kpc
+    number b_Rsun = 8.; // kpc
     number b_b0 = 6.;    // muG
     number b_z0 = 1.;    // kpc
     number b_r0 = 8.;    // kpc
-    number b_psi0 = 27;  // degree
+    number b_psi0 = 35;  // degree
     number b_psi1 = 0.9; // degree
     number b_xsi0 = 25;  // degree
 
