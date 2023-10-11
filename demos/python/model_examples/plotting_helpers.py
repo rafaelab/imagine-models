@@ -11,7 +11,7 @@ except ImportError:
 plt.ion()
 
 def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=True, show_labels=True,
-               save_fig=False, field_name=None, quiver=False):
+               save_fig=False, field_name=None, quiver=False, plot_earth=True):
     """
     produces a plot showing a slice through GMF model. The slice goes throgh the middle of array in the respective dimension slice_dim
 
@@ -28,6 +28,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
     :param save_fig: saves figure automatically
     :param field_name: if not None: displays name of field in plot
     :param quiver: adds field vectors displayed as arrows to plot
+    :param plot_earth: adds a marker on Earth's position
     """
    
     if has_cmasher:
@@ -63,6 +64,12 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
     
     slice_dim_label = dims_label[slice_dim]
     dims_label.remove(slice_dim_label)
+
+    if plot_earth:
+        earth = [-8.5, 0, 0]
+        plt.scatter((abs(rfp[dims[0]]-earth[dims[0]])) / (inc[dims[0]]*shp[dims[0]]) * shp[dims[0]],
+                    (abs(rfp[dims[1]]-earth[dims[1]])) / (inc[dims[1]]*shp[dims[1]]) * shp[dims[1]],
+                    marker='o', s=20, c='0.5')
     
     if rfp[dims[0]] / float(int(rfp[dims[0]])) - 1 < 1e-3:
         xticks_label = [int(rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]

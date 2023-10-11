@@ -15,7 +15,7 @@ vector HanMagneticField::_at_position(const double &x, const double &y, const do
   number B_0 = 0.;
 
   auto p_ang = p.B_p * M_PI / 180.;
-  const double phi_han = -(phi - M_PI / 2.); // nneeded to fix different coordinate system convention
+  const double phi_han = -(phi + M_PI); // nneeded to fix different coordinate system convention
   
   number R_0 = r * exp(phi_han * tan(p_ang));  // eq. 4 is wrong, need to change psi and phi!
 
