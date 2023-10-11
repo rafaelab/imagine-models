@@ -10,7 +10,7 @@ vector TTMagneticField::_at_position(const double &x, const double &y, const dou
     double phi = atan2(y, x);
 
     vector B_vec3{{0, 0, 0}};
-    if (r <= b_r_min)
+    if (r > b_r_max)
     {
         return B_vec3;
     }
@@ -30,12 +30,16 @@ vector TTMagneticField::_at_position(const double &x, const double &y, const dou
     {
         sign = -1.;
     }
-    auto f_z = sign * exp(-(std::abs(z) / p.b_z0));  // eq. 5
+    auto f_z = sign * exp(-(std::abs(z) / p.b_z0));  // eq. 5 -> dipole model implememted
 
     // there is a factor 1/cos(phase) difference between
     // the original TT and Kachelriess. <-- hammurabi comment
     // double b_r=b_b0*(b_Rsun/(r));
-    auto b_r = p.b_b0 * (p.b_Rsun / (r * cos(phase)));
+    auto b_r = p.b_b0 * (p.b_Rsun / (b_r_min * cos(phase)));
+    if (r > b_r_min)
+    {
+        b_r = p.b_b0 * (p.b_Rsun / (r * cos(phase)));
+    }
 
     // if(r<b5_r_min) {b_r=b5_b0*(b5_Rsun/(b5_r_min));} <-- hammurabi comment
     if (r < b_r_min)
@@ -43,7 +47,8 @@ vector TTMagneticField::_at_position(const double &x, const double &y, const dou
         b_r = p.b_b0 * (p.b_Rsun / (b_r_min * cos(phase)));  // eq. 3
     }
 
-    auto B_r_phi = b_r * cos(phi - beta * log(r / p.b_Rsun) + phase);
+    // added + pi/2 because coordinate system / Earth position is rotated by pi/2 in TT paper
+    auto B_r_phi = b_r * cos(-phi - beta * log(r / p.b_Rsun) + phase + M_PI / 2.);  // eq. 1
     //  if(r<1.e-26){B_r_phi = b_r*std::cos(phi+phase);} <-- hammurabi comment
 
     // B-field in cylindrical coordinates: <-- hammurabi comment
