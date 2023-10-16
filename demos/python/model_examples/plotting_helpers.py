@@ -34,7 +34,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
     if has_cmasher:
         cmap = getattr(cm, "prinsenvlag") 
     else:
-        cmap = "RdBu_r"
+        cmap = "PuOr_r"
     fig, ax = plt.subplots()
     
     slices = [slice(0, shp[0], None), slice(0, shp[1], None), slice(0, shp[2], None)]
@@ -45,22 +45,43 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
     slices[slice_dim] = slice(cut_index, cut_index +1, 1)
     slices = tuple(slices)
 
+    sliced_at = rfp[slice_dim]+cut_index*inc[slice_dim]
+
     dims = [0, 1, 2]
     dims.remove(slice_dim)
     dims_label = ['x', 'y', 'z']
+
+    coord1 = [i for i in range(shp[dims[0]])]
+    coord2 = [i for i in range(shp[dims[1]])]
+
     try:
         comp_label = dims_label[vec_dim] + '_component'
         ax.imshow(np.squeeze(array[vec_dim][slices]).T, cmap=cmap, origin='lower', vmin=vmin, vmax=vmax)
     except IndexError:
         comp_label = 'amplitude'
-        ax.imshow(np.squeeze(np.linalg.norm(array, axis=0)[slices]).T, cmap='Reds', origin='lower', vmin=0, vmax=vmax)
+
+        cmap = 'RdBu_r'
+        x1 = np.array(coord1)*inc[dims[0]] + rfp[dims[0]] + inc[dims[0]] / 2.
+        x2 = np.array(coord2)*inc[dims[1]] + rfp[dims[1]] + inc[dims[1]] / 2.
+        vec1, vec2 = np.meshgrid(x1, x2)
+        vec = np.zeros((3, np.shape(vec1)[0], np.shape(vec1)[1]))
+        vec[dims[0], :, :] = vec1
+        vec[dims[1], :, :] = vec2
+        vec[slice_dim, :, :] = sliced_at
+
+        B1 = np.squeeze(array[0][slices])  # need Bx and By to calculate Bphi
+        B2 = np.squeeze(array[1][slices])
+        # calculate cross product between vec(position) and vec(B_horizontal) to get direction of Bphi 
+        cross = np.cross(np.array([B1.T, B2.T, np.zeros_like(B1.T)]), vec, axis=0)
+        sign = np.sign(cross[-1, :, :])
+
+        ax.imshow(np.squeeze(np.linalg.norm(array, axis=0)[slices]).T*np.squeeze(sign), cmap=cmap, origin='lower', vmin=vmin, vmax=vmax)
     
     if quiver:  # add arrows indicating B-field direction
-        coord1 = [i for i in range(shp[dims[0]])][::5]  # only every fifth cell gets an arrow for better overview
-        coord2 = [i for i in range(shp[dims[1]])][::5]
-        B1 = np.squeeze(array[dims[0]][slices])[::5, ::5]
-        B2 = np.squeeze(array[dims[1]][slices])[::5, ::5]
-        plt.quiver(coord1, coord2, B1.T, B2.T, pivot='mid')
+        # only every fifth cell gets an arrow for better overview
+        B1 = np.squeeze(array[dims[0]][slices])
+        B2 = np.squeeze(array[dims[1]][slices])
+        plt.quiver(coord1[::5], coord2[::5], B1[::5, ::5].T, B2[::5, ::5].T, pivot='mid')
     
     slice_dim_label = dims_label[slice_dim]
     dims_label.remove(slice_dim_label)
@@ -89,7 +110,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
         ax.set_ylabel(r"$%s$ / kpc" % dims_label[1])
         ax.set_xticks(xticks_loc, labels=xticks_label)
         ax.set_xlabel(r"$%s$ / kpc" % dims_label[0])
-        keyword = '%s = %.3f kpc' % (slice_dim_label, rfp[slice_dim]+cut_index*inc[slice_dim]) 
+        keyword = '%s = %.3f kpc' % (slice_dim_label, sliced_at) 
         keyword = field_name + ', ' + keyword if field_name is not None else keyword
         ax.text(0, 1, keyword, va='bottom', transform = ax.transAxes)
     else:
@@ -100,7 +121,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
         cbar = fig.colorbar(ax.images[0], orientation="horizontal", shrink=0.5, aspect=30)
         if show_labels:
             if comp_label == 'amplitude':
-                cbar.set_label(r'$B$ / $\mu$G')
+                cbar.set_label(r'$|B|$ sign($B_\phi$) / $\mu$G')
             else:
                 cbar.set_label(r'$B_%s$ / $\mu$G' % comp_label[0])
     plt.tight_layout()

@@ -24,7 +24,7 @@ public:
     double b_r_min = 3.;  // kpc
 
     number b_Rsun = 8.; // kpc
-    number b_b0 = 6.;    // muG
+    number b_b0 = 6.;    // muG  -> not given in original paper? Could also be 3 according to https://www.aanda.org/articles/aa/full_html/2010/14/aa12733-09/aa12733-09.html
     number b_z0 = 1.;    // kpc
     number b_r0 = 8.;    // kpc
     number b_psi0 = 35;  // degree

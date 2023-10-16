@@ -50,7 +50,7 @@ vector TFMagneticField::getDiskField(const double &r, const double &z, const dou
     { // ==========================================================
         if (r > r1_disk)
         {
-            auto z1_disk_z = (1. + a_disk * r1_disk * r1_disk) / (1. + a_disk * r * r); // z1_disk / z
+            auto z1_disk_z = (1. + a_disk * r1_disk * r1_disk) / (1. + a_disk * r * r); // z1_disk / z, eq. 4
             // B components in (r, phi, z)
             auto B_r0 = radialFieldScale(B1_disk, psd, z1_disk_z * z, phi, r, z, cot_p0, p);
             B_r = (r1_disk / r) * z1_disk_z * B_r0;
