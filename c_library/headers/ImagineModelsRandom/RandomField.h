@@ -47,6 +47,8 @@ public:
     throw NotImplementedException();
   }
 
+  void remove_padding(GRIDTYPE val, const std::array<int, 3> &shp, const int pad);
+
   double simple_spectrum(const double &abs_k, const double &A, const double &k0, const double &s) const {
       double pi = 3.141592653589793;
       const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
@@ -134,7 +136,7 @@ public:
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], grid_eval, grid_eval_comp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], grid_eval_comp, grid_eval, FFTW_MEASURE);
     //save wisdom
-    const char *filename = "ImagineModelsRandomFieldVector";
+    const char *filename = "ImagineModelsRandomScalarField";
     int fftw_export_wisdom_to_filename(*filename);
     //destroy wisdom
     has_fftw_wisdom = true;
@@ -165,6 +167,7 @@ public:
   double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
+    std::cout << "header,  shape[2]:  " << shp[2] << std::endl;
     double* grid_eval = allocate_memory(shp);
     _on_grid(grid_eval, shp, rpt, inc, seed);
     return grid_eval;
@@ -174,7 +177,7 @@ public:
     if (not initialized_with_grid) 
       throw GridException();
     double* grid_eval = allocate_memory(shape);
-    const char *filename = "ImagineModelsRandomField";
+    const char *filename = "ImagineModelsRandomScalarField";
     int fftw_import_wisdom_from_filename(*filename);
     _on_grid(grid_eval, shape, reference_point, increment, seed);
     return grid_eval;
@@ -252,7 +255,7 @@ public:
     fftw_plan r2c_temp = fftw_plan_dft_r2c_3d(shape[0], shape[1], shape[2], val_temp, val_temp_comp, FFTW_MEASURE);
     fftw_plan c2r_temp = fftw_plan_dft_c2r_3d(shape[0], shape[1], shape[2], val_temp_comp, val_temp,  FFTW_MEASURE);
     //save wisdom
-    const char *filename = "ImagineModelsRandomField";
+    const char *filename = "ImagineModelsRandomVectorField";
     int fftw_export_wisdom_to_filename(*filename);
     has_fftw_wisdom = true;
     fftw_free(val_temp);
@@ -296,6 +299,8 @@ public:
     if (not initialized_with_grid) 
       throw GridException();
     std::array<double*, 3> grid_eval = allocate_memory(shape);
+    const char *filename = "ImagineModelsRandomVectorField";
+    int fftw_import_wisdom_from_filename(*filename);
     _on_grid(grid_eval, shape, reference_point, increment, seed);
     return grid_eval;
   }
