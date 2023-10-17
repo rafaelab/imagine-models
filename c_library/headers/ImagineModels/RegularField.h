@@ -72,8 +72,8 @@ public:
 
   double *on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, const int seed = 0)
   {
-    double *grid_eval = allocate_memory(shape);
-    // auto grid_eval = std::make_shared<double>();
+    std::array<int, 3> grid_shape = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
+    double *grid_eval = allocate_memory(grid_shape);
     evaluate_function_on_grid<number>(grid_eval, grid_x, grid_y, grid_z,
                                       [this](double xx, double yy, double zz)
                                       { return at_position(xx, yy, zz); });
@@ -82,7 +82,7 @@ public:
 
   double *on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_reference_point, const std::array<double, 3> &grid_increment, const int seed = 0)
   {
-    double *grid_eval = allocate_memory(shape);
+    double *grid_eval = allocate_memory(grid_shape);
     evaluate_function_on_grid<number>(grid_eval, grid_shape, grid_reference_point, grid_increment,
                                       [this](double xx, double yy, double zz)
                                       { return at_position(xx, yy, zz); });

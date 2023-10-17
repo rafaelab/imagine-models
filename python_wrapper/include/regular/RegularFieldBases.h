@@ -64,7 +64,7 @@ void RegularFieldBases(py::module_ &m) {
           std::vector<double> grid_z_vec{grid_z.data(), grid_z.data() + sz}; 
           double* f = self.on_grid(grid_x_vec, grid_y_vec, grid_z_vec);
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, false);
-          arr.resize({sx, sy, sz});
+          //arr.resize({sx, sy, sz});
           return arr;},
           py::arg("grid_x").noconvert(), py::arg("grid_y").noconvert(), py::arg("grid_z").noconvert(), py::return_value_policy::take_ownership)
         
