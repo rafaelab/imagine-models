@@ -6,12 +6,11 @@
 number YMW16::_at_position(const double &x, const double &y, const double &z, const YMW16 &p) const
 {
   // YMW16 using a different Cartesian frame from our default one
-  std::vector<double> gc_pos{y, -x, z};
+  std::array<double, 3> gc_pos{y, -x, z};
   // cylindrical r
   double r_cyl{sqrt(gc_pos[0] * gc_pos[0] + gc_pos[1] * gc_pos[1])};
   // warp
-  if (r_cyl >= p.r_warp)
-  {
+  if (r_cyl >= p.r_warp) {
     double theta_warp{atan2(gc_pos[1], gc_pos[0])};
     gc_pos[2] -= p.t0_gamma_w * (r_cyl - p.r_warp) * cos(theta_warp);
   }
