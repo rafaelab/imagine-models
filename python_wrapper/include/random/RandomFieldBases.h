@@ -19,10 +19,8 @@ void RandomFieldBases(py::module_ &m) {
           std::array<double*, 3> f = self.on_grid(grid_shape, grid_reference_point, grid_increment, seed);
           size_t sx = grid_shape[0]; 
           size_t sy = grid_shape[1];
-          size_t sz = grid_shape[2] + 1; // catches fftw zeropad (uneven)
-          if (sz & 2) {
-            sz += 1; // catches fftw zeropad (even)
-          }
+          size_t sz = grid_shape[2];
+          
           auto lis = from_pointer_array_to_list_pyarray(f, sx, sy, sz, true);
           return lis;},
           py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"),  "seed"_a, 
@@ -32,11 +30,10 @@ void RandomFieldBases(py::module_ &m) {
           std::array<double*, 3> f = self.on_grid(seed);
           size_t sx = self.shape[0];
           size_t sy = self.shape[1];
-          size_t sz = self.shape[2] + 1; // catches fftw zeropad (uneven)
-          if (sz & 2) {
-            sz += 1; // catches fftw zeropad (even)
-          }
+          size_t sz = self.shape[2]; // catches fftw zeropad (uneven)
+
           auto arr = from_pointer_array_to_list_pyarray(f, sx, sy, sz, true);
+
           return arr;}, 
           "seed"_a, 
           py::return_value_policy::take_ownership);
@@ -50,13 +47,10 @@ void RandomFieldBases(py::module_ &m) {
           double* f = self.on_grid(grid_shape, grid_reference_point, grid_increment, seed);
           size_t sx = grid_shape[0];
           size_t sy = grid_shape[1];
-          size_t sz = grid_shape[2] + 1; // catches fftw zeropad (uneven)
-          if (sz & 2) {
-            sz += 1; // catches fftw zeropad (even)
-          }
-          std::cout<< "sz: " << sz << std::endl;
+          size_t sz = grid_shape[2];
+
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, true);
-          //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
+
           return arr;},
           py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"),  "seed"_a, 
           py::return_value_policy::take_ownership)
@@ -65,11 +59,10 @@ void RandomFieldBases(py::module_ &m) {
           double* f = self.on_grid(seed);
           size_t sx = self.shape[0];
           size_t sy = self.shape[1];
-          size_t sz = self.shape[2] + 1; // catches fftw zeropad (uneven)
-          if (sz & 2) {
-            sz += 1; // catches fftw zeropad (even)
-          }
+          size_t sz = self.shape[2]; // catches fftw zeropad (uneven)
+          
           auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz, true);
+          
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;}, 
           "seed"_a, 
