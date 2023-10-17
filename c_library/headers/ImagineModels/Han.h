@@ -23,7 +23,7 @@ class HanMagneticField : public RegularVectorField  {
         using RegularVectorField :: RegularVectorField;
 
         number B_p = 11; // pitch angle 
-        number A = 10.;
+        number A = 5.;
         number H = 0.4;
         number B_s1 = 4.5; 
         number B_s2 = -3.0;
@@ -34,7 +34,7 @@ class HanMagneticField : public RegularVectorField  {
 
         double R_min = 3.;
         double R_max = 15.;
-        std::array<double, 6> R_s{4.1, 4.9, 6.1, 7.5, 8.5, 10.5};
+        std::array<double, 7> R_s{3.0, 4.1, 4.9, 6.1, 7.5, 8.5, 10.5};
 #if autodiff_FOUND
     const std::set<std::string> all_diff{"B_p", "A", "H", "B_s1", "B_s2", "B_s3", "B_s4", "B_s5", "B_s6"};
     std::set<std::string> active_diff{"B_p", "A", "H", "B_s1", "B_s2", "B_s3", "B_s4", "B_s5", "B_s6"};

@@ -7,31 +7,45 @@ vector HanMagneticField::_at_position(const double &x, const double &y, const do
 {
   vector B_cyl{{0., 0., 0.}};
   const double r = sqrt(x * x + y * y);
+  const double phi = atan2(y, x);
 
   if (r < p.R_min || r > p.R_max)
     return B_cyl;
 
-  const double phi = atan2(y, z);
   number B_0 = 0.;
 
   auto p_ang = p.B_p * M_PI / 180.;
-  number R_0 = r * exp(-p_ang * tan(phi));
+  const double phi_han = -(phi + M_PI); // nneeded to fix different coordinate system convention
+  
+  number R_0 = r * exp(phi_han * tan(p_ang));  // eq. 4 is wrong, need to change psi and phi!
 
-  std::array<number, 6> B_s = {p.B_s1, p.B_s2, p.B_s3, p.B_s4, p.B_s5, p.B_s6};
+  std::array<number, 6> B_s = {p.B_s1, p.B_s2, p.B_s3, p.B_s4, p.B_s5, p.B_s6};  // table 5
+
+  if (R_0 < p.R_s[0])
+  {
+    R_0 = r * exp((phi_han + 2 * M_PI) * tan(p_ang));  // eq. 4
+  }
+  if (R_0 > p.R_s[6])
+  {
+    R_0 = r * exp((phi_han - 2 * M_PI) * tan(p_ang));  // eq. 4
+  }
 
   for (int i = 0; i < 6; i++)
   {
-    if (R_0 < p.R_s[i])
+    if (p.R_s[i] < R_0)
     { 
-      B_0 = B_s[i];
-      break;
+      if (R_0 < p.R_s[i+1])
+      {
+        B_0 = B_s[i];
+        break;
+      }
     }
   }
 
-  number B_r = B_0 * exp(-r / p.A) * exp(-std::abs(z) / p.H);
+  number B_r = B_0 * exp(-r / p.A) * exp(-std::abs(z) / p.H);  // eq. 3
 
-  B_cyl[0] = B_r * sin(-p_ang);
-  B_cyl[1] = B_r * cos(-p_ang);
+  B_cyl[0] = B_r * sin(p_ang);
+  B_cyl[1] = B_r * cos(p_ang);
 
   vector B_vec3 = Cyl2Cart<vector>(phi, B_cyl);
   return B_vec3;

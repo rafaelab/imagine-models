@@ -270,8 +270,7 @@ std::vector<number> JaffeMagneticField::dist2arm(const double &x, const double &
         auto d_rad_p{
             abs(p.arm_r0 * exp((d_ang + 2 * M_PI) * beta_inv) - r)};
         auto d_rad_m{
-            abs(p.arm_r0 * exp((d_ang - 2 * M_PI) * beta_inv) -
-                r)};
+            abs(p.arm_r0 * exp((d_ang - 2 * M_PI) * beta_inv) - r)};
         d.push_back(std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p);
       }
     }
@@ -300,9 +299,8 @@ std::vector<number> JaffeMagneticField::dist2arm(const double &x, const double &
         {
           auto d_ang{arm_phi[i]*M_PI/180 - theta};
           auto d_rad{abs(p.arm_r0 * exp(d_ang * beta_inv) - r)};
-          auto d_rad_p{abs(p.arm_r0 * exp((d_ang + M_PI) * beta_inv) - r)};
-          auto d_rad_m{abs(p.arm_r0 * exp((d_ang - 2 * M_PI) * beta_inv) -
-                          r)};
+          auto d_rad_p{abs(p.arm_r0 * exp((d_ang + 2* M_PI) * beta_inv) - r)};
+          auto d_rad_m{abs(p.arm_r0 * exp((d_ang - 2 * M_PI) * beta_inv) - r)};
           d.push_back(std::min(std::min(d_rad, d_rad_p), d_rad_m) * cos_p);
         }
       }
