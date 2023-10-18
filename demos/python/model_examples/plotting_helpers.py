@@ -10,19 +10,19 @@ except ImportError:
 
 plt.ion()
 
-def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=True, show_labels=True,
+def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar=True, show_labels=True,
                save_fig=False, field_name=None, quiver=False, amplitude=False, cut_index =None,  plot_earth=True):
     """
     produces a plot showing a slice through a IMAGINE model output. The slice goes throgh the middle of array in the respective dimension slice_dim
 
     :param array: vector or scalar field in grid form e.g. from on_grid()
-    :param vec_dim: which dimension of vec(B) to display, can be 0, 1, 2. No effect for scalar field or if amplitude=True
     :param slice_dim: dimension on which to slice, e.g. 0 will give a slice through the y-z plane
     :param shp: shape of the image to plot, given as a list containing number of cells in [x, y, z]
     :param rfp: reference point = location of the smallest coordinate value in each direction, as list [refx, refy, refz]
     :param inc: increment in each dimension = size of cells used for plot, as list [incx, incy, incz]
-    :param vmin: minimum value on color bar (magnetic field in muG)
-    :param vmax: maximum value on color bar (magnetic field in muG)
+    :param vmin: minimum value on color bar (magnetic field in muG or density in 1/cm^3)
+    :param vmax: maximum value on color bar (magnetic field in muG or density in 1/cm^3)
+    :param vec_dim: which dimension of vec(B) to display, can be 0, 1, 2. Necessary to plot vector field components, no effect for scalar field or if amplitude=True
     :param show_cbar: show color bar
     :param show_labels: show labels on plotted axes
     :param save_fig: saves figure automatically
@@ -36,8 +36,7 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
         is_vector = True 
    
     if amplitude:
-        cmap = "Reds"
-        vmin = 0 
+        cmap = 'RdBu_r'
     else:
         cmap = "PuOr_r"
     fig, ax = plt.subplots()
@@ -57,12 +56,12 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
     dims.remove(slice_dim)
     dims_label = ['x', 'y', 'z']
     
+    coord1 = [i for i in range(shp[dims[0]])]
+    coord2 = [i for i in range(shp[dims[1]])]
     
     if is_vector:
         if amplitude:
-            array = np.squeeze(np.linalg.norm(array, axis=0)[slices]).T
             comp_label = 'amplitude'
-            cmap = 'RdBu_r'
             x1 = np.array(coord1)*inc[dims[0]] + rfp[dims[0]] + inc[dims[0]] / 2.
             x2 = np.array(coord2)*inc[dims[1]] + rfp[dims[1]] + inc[dims[1]] / 2.
             vec1, vec2 = np.meshgrid(x1, x2)
@@ -73,40 +72,26 @@ def plot_slice(array, vec_dim, slice_dim, shp, rfp, inc, vmin, vmax, show_cbar=T
 
             B1 = np.squeeze(array[0][slices])  # need Bx and By to calculate Bphi
             B2 = np.squeeze(array[1][slices])
-            # calculate cross product between vec(position) and vec(B_horizontal) to get direction of Bphi 
+    
+            # calculat cross product between vec(position) and vec(B_horizontal) to get direction of Bphi 
             cross = np.cross(np.array([B1.T, B2.T, np.zeros_like(B1.T)]), vec, axis=0)
             sign = np.sign(cross[-1, :, :])
             array = np.squeeze(np.linalg.norm(array, axis=0)[slices]).T*np.squeeze(sign)
         else:
             comp_label = dims_label[vec_dim] + '_component'
-            array = array[vec_dim]
+            if quiver:
+                B1 = np.squeeze(array[dims[0]][slices])
+                B2 = np.squeeze(array[dims[1]][slices])
+            array = np.squeeze(array[vec_dim][slices]).T
+    else:
+        array = np.squeeze(array[slices]).T
         
-    ax.imshow(np.squeeze(array[slices]).T, cmap=cmap, origin='lower', vmin=vmin, vmax=vmax)
+    ax.imshow(array, cmap=cmap, origin='lower', vmin=vmin, vmax=vmax)
 
-    if is_vector:
+    if is_vector:    
         if quiver:  # add arrows indicating B-field direction
-            coord1 = [i for i in range(shp[dims[0]])][::5]  # only every fifth cell gets an arrow for better overview
-            coord2 = [i for i in range(shp[dims[1]])][::5]
-            B1 = np.squeeze(array[dims[0]][slices])[::5, ::5]
-            B2 = np.squeeze(array[dims[1]][slices])[::5, ::5]
-            plt.quiver(coord1, coord2, B1.T, B2.T, pivot='mid')
-
-    coord1 = [i for i in range(shp[dims[0]])]
-    coord2 = [i for i in range(shp[dims[1]])]
-
-    try:
-        comp_label = dims_label[vec_dim] + '_component'
-        ax.imshow(np.squeeze(array[vec_dim][slices]).T, cmap=cmap, origin='lower', vmin=vmin, vmax=vmax)
-    except IndexError:
-        comp_label = 'amplitude'
-
-
-    
-    if quiver:  # add arrows indicating B-field direction
-        # only every fifth cell gets an arrow for better overview
-        B1 = np.squeeze(array[dims[0]][slices])
-        B2 = np.squeeze(array[dims[1]][slices])
-        plt.quiver(coord1[::5], coord2[::5], B1[::5, ::5].T, B2[::5, ::5].T, pivot='mid')
+            # only every fifth cell gets an arrow for better overview
+            plt.quiver(coord1[::5], coord2[::5], B1[::5, ::5].T, B2[::5, ::5].T, pivot='mid')
     
     slice_dim_label = dims_label[slice_dim]
     dims_label.remove(slice_dim_label)
