@@ -73,25 +73,24 @@ def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar
             B1 = np.squeeze(array[0][slices])  # need Bx and By to calculate Bphi
             B2 = np.squeeze(array[1][slices])
     
-            # calculat cross product between vec(position) and vec(B_horizontal) to get direction of Bphi 
+            # calculate cross product between vec(position) and vec(B_horizontal) to get direction of Bphi 
             cross = np.cross(np.array([B1.T, B2.T, np.zeros_like(B1.T)]), vec, axis=0)
             sign = np.sign(cross[-1, :, :])
-            array = np.squeeze(np.linalg.norm(array, axis=0)[slices]).T*np.squeeze(sign)
+            array_plot = np.squeeze(np.linalg.norm(array, axis=0)[slices]).T*np.squeeze(sign)
         else:
             comp_label = dims_label[vec_dim] + '_component'
-            if quiver:
-                B1 = np.squeeze(array[dims[0]][slices])
-                B2 = np.squeeze(array[dims[1]][slices])
-            array = np.squeeze(array[vec_dim][slices]).T
+            array_plot = np.squeeze(array[vec_dim][slices]).T
     else:
-        array = np.squeeze(array[slices]).T
+        array_plot = np.squeeze(array[slices]).T
         
-    ax.imshow(array, cmap=cmap, origin='lower', vmin=vmin, vmax=vmax)
+    ax.imshow(array_plot, cmap=cmap, origin='lower', vmin=vmin, vmax=vmax)
 
     if is_vector:    
         if quiver:  # add arrows indicating B-field direction
             # only every fifth cell gets an arrow for better overview
-            plt.quiver(coord1[::5], coord2[::5], B1[::5, ::5].T, B2[::5, ::5].T, pivot='mid')
+            B1_quiv = np.squeeze(array[dims[0]][slices])
+            B2_quiv = np.squeeze(array[dims[1]][slices])
+            plt.quiver(coord1[::5], coord2[::5], B1_quiv[::5, ::5].T, B2_quiv[::5, ::5].T, pivot='mid')
     
     slice_dim_label = dims_label[slice_dim]
     dims_label.remove(slice_dim_label)
