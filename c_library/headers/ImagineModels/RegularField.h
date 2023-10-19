@@ -70,7 +70,7 @@ public:
     return grid_eval;
   }
 
-  double *on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, const int seed = 0)
+  double *on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, int seed = 0)
   {
     std::array<int, 3> grid_shape = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
     double *grid_eval = allocate_memory(grid_shape);
@@ -80,7 +80,7 @@ public:
     return grid_eval;
   }
 
-  double *on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_reference_point, const std::array<double, 3> &grid_increment, const int seed = 0)
+  double *on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_reference_point, const std::array<double, 3> &grid_increment, int seed = 0)
   {
     double *grid_eval = allocate_memory(grid_shape);
     evaluate_function_on_grid<number>(grid_eval, grid_shape, grid_reference_point, grid_increment,
