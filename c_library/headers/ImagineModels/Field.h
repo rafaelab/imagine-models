@@ -81,7 +81,7 @@ public:
 
    // Evaluate the model on a grid. 
    //The grid may be provided as three vectors containting the x, y and z coordinates (useful for irregular grids) or via providing the zeropoint, increment and number of pixels along each axis (thereby defining a regular grid). 
-   // Both options maybe provided in the initialization of the class (thereby potentially ) 
+   // Each of the options maybe provided in the initialization of the class (thereby potentially allowing precomputation) 
   
   virtual GRIDTYPE on_grid(const int seed = 0) = 0;
 
@@ -105,7 +105,7 @@ public:
         int n = j*size[1];
         for (int k=0; k < size[2]; k++) {
           FRTYPE v = eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
-          fval[m + n + k] = static_cast<double>(v);
+                    fval[m + n + k] = static_cast<double>(v);
         }   
       }   
     }
