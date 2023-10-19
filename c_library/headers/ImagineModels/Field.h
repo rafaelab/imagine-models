@@ -97,9 +97,9 @@ public:
   template <typename FRTYPE> 
   void evaluate_function_on_grid(double *fval, const std::array<int, 3> &size, const std::array<double, 3> &rpt,  const std::array<double, 3> &inc, std::function<FRTYPE(double, double, double)> eval) {
     for (int i=0; i < size[0]; i++) {
-      int m = i*size[0];
+      int m = i*size[1]*size[2];
       for (int j=0; j < size[1]; j++) {
-        int n = j*size[1];
+        int n = j*size[2];
         for (int k=0; k < size[2]; k++) {
           FRTYPE v = eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
                     fval[m + n + k] = static_cast<double>(v);
