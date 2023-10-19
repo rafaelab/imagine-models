@@ -35,15 +35,15 @@ protected:
 
   // -----CONSTRUCTORS-----
 
-  Field(std::array<int, 3> shp, std::array<double, 3>  rpt, std::array<double, 3>  inc) : shape(shp), reference_point(rpt), increment(inc) {
+  Field(std::array<int, 3> shape, std::array<double, 3>  ref_point, std::array<double, 3>  increment) : internal_shape(shape), internal_ref_point(ref_point), internal_increment(increment) {
     initialized_with_grid = true;
     regular_grid = true;
   };
 
-  Field(std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : grid_x(grid_x), grid_y(grid_y), grid_z(grid_z) {
+  Field(std::vector<double> grid_x, std::vector<double> grid_y, std::vector<double> grid_z) : internal_grid_x(grid_x), internal_grid_y(grid_y), internal_grid_z(grid_z) {
     initialized_with_grid = true;
     regular_grid = false;
-    shape = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
+    internal_shape = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
   };
 
   Field() {
@@ -58,21 +58,14 @@ public:
   ~Field() {};
   // -----FIELDS-----
 
-  std::array<int, 3> shape;
-  std::array<double, 3> reference_point;
-  std::array<double, 3> increment;
-  std::vector<double> grid_x;
-  std::vector<double> grid_y;
-  std::vector<double> grid_z;
+  std::array<int, 3> internal_shape;
+  std::array<double, 3> internal_ref_point;
+  std::array<double, 3> internal_increment;
+  std::vector<double> internal_grid_x;
+  std::vector<double> internal_grid_y;
+  std::vector<double> internal_grid_z;
 
   // -----METHODS-----
-
-  size_t grid_size(std::array<int, 3> shp) {
-      size_t gsz = 1;
-      for (const int &sh : shp) {
-        gsz = gsz*sh;}
-      return gsz;
-  }
 
   // -----Interface functions-----
 
@@ -87,14 +80,18 @@ public:
 
   virtual GRIDTYPE on_grid(const std::vector<double> &grid_x, const std::vector<double> &grid_y, const std::vector<double> &grid_z, const int seed = 0) = 0;
 
-  virtual GRIDTYPE on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed = 0) = 0;
-
-  // This is the interface function to CRPRopa
-  POSTYPE getField(const std::array<double, 3> &pos_arr) const {
-    return at_position(pos_arr[0], pos_arr[1], pos_arr[2]);
-  }
+  virtual GRIDTYPE on_grid(const std::array<int, 3> &shape, const std::array<double, 3> &ref_point, const std::array<double, 3> &increment, const int seed = 0) = 0;
   
   // -----Helper functions-----
+
+  // Get number of pixels
+  size_t grid_size(std::array<int, 3> shp) {
+      size_t gsz = 1;
+      for (const int &sh : shp) {
+        gsz = gsz*sh;}
+      return gsz;
+  }
+
 
   // Evaluate scalar valued functions on regular grids
   template <typename FRTYPE> 

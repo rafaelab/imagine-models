@@ -22,7 +22,7 @@ public:
     
     double* on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z, int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, grid_x, grid_y, grid_z, seed); }
 
-    double* on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+    double* on_grid(const std::array<int, 3>& shape, const std::array<double, 3>& zeropoint, const std::array<double, 3>& increment, int seed) override {PYBIND11_OVERRIDE_PURE(double*, Field, on_grid, shape, zeropoint, increment, seed); }
 
 
     double* allocate_memory(std::array<int, 3> shp) override {PYBIND11_OVERRIDE_PURE(double*, Field, allocate_memory, shp); }
@@ -41,7 +41,7 @@ public:
     
     std::array<double*, 3> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z, int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, grid_x, grid_y, grid_z, seed); }
 
-    std::array<double*, 3> on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+    std::array<double*, 3> on_grid(const std::array<int, 3>& shape, const std::array<double, 3>& zeropoint, const std::array<double, 3>& increment, int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, on_grid, shape, zeropoint, increment, seed); }
 
 
     std::array<double*, 3> allocate_memory(std::array<int, 3> shp) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, Field, allocate_memory, shp); }
@@ -60,7 +60,7 @@ public:
     
     std::array<double*, 3> on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z, int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RegularVectorField, on_grid, grid_x, grid_y, grid_z, seed); }
 
-    std::array<double*, 3> on_grid(const std::array<int, 3>& grid_shape, const std::array<double, 3>& grid_zeropoint, const std::array<double, 3>& grid_increment, int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RegularVectorField, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+    std::array<double*, 3> on_grid(const std::array<int, 3>& shape, const std::array<double, 3>& zeropoint, const std::array<double, 3>& increment, int seed) override {PYBIND11_OVERRIDE(Array3PointerType, RegularVectorField, on_grid, shape, zeropoint, increment, seed); }
     
 };
 
@@ -74,7 +74,7 @@ public:
 
     double* on_grid(const std::vector<double>& grid_x, const std::vector<double>& grid_y, const std::vector<double>& grid_z, int seed) override {PYBIND11_OVERRIDE_PURE(double*, RegularScalarField, on_grid, grid_x, grid_y, grid_z, seed); }
 
-    double* on_grid(const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, int seed) override {PYBIND11_OVERRIDE_PURE(double*, RegularScalarField, on_grid, grid_shape, grid_zeropoint, grid_increment, seed); }
+    double* on_grid(const std::array<int, 3> &shape, const std::array<double, 3> &zeropoint, const std::array<double, 3> &increment, int seed) override {PYBIND11_OVERRIDE_PURE(double*, RegularScalarField, on_grid, shape, zeropoint, increment, seed); }
     
 };
 
