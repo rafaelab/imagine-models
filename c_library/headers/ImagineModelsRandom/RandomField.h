@@ -47,7 +47,7 @@ public:
     throw NotImplementedException();
   }
 
-  void remove_padding(GRIDTYPE val, const std::array<int, 3> &shp, const int pad);
+  void remove_padding(double* val, const std::array<int, 3> &shp, const int pad);
 
   double simple_spectrum(const double &abs_k, const double &A, const double &k0, const double &s) const {
       double pi = 3.141592653589793;

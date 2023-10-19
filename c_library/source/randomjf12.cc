@@ -72,8 +72,8 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       int _ny = (int)((yy - rpt[1])/inc[1]);
       int _nz = (int)((zz - rpt[2])/inc[2]);
       int idx = _nz + shp[2]*(_ny + shp[1]*_nx);
-      vector b_reg_val = regular_base.at_position(xx, yy, zz);
-      double b_reg_x = static_cast<double>(b_reg_val[0]); //FIXME this must change if jf12 regular shall be inferrable as well
+      vector b_reg_val = regular_base.at_position(xx, yy, zz); //FIXME this must change if jf12 regular shall be inferrable as well
+      double b_reg_x = static_cast<double>(b_reg_val[0]); 
       double b_reg_y = static_cast<double>(b_reg_val[1]);
       double b_reg_z = static_cast<double>(b_reg_val[2]);
 
@@ -101,11 +101,11 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       return b_rand_val;
     };
 
-  //std::cout << "before apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
-  std::array<int, 3> padded_shape = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
-  int padded_size = padded_shape[0]*padded_shape[1]*padded_shape[2];
-  //evaluate_function_on_grid<vector>(val, padded_shape, rpt, inc, apply_profile);
-  //std::cout << "after apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
+  std::cout << "before apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
+  std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
+  int padded_size = padded_shp[0]*padded_shp[1]*padded_shp[2];
+  evaluate_function_on_grid<vector>(val, padded_shp, rpt, inc, apply_profile);
+  std::cout << "after apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   //std::cout << "grid_size " << grid_size << std::endl;
   for (int i =0; i<3; ++i) {
       for (int s = 0; s < padded_size; ++s)  {
@@ -124,7 +124,6 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       //}
       (val[i])[s] /= grid_size;  
     }
-    
     remove_padding(val[i], shp, pad);
   }
   std::cout << "afterdivergence " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
