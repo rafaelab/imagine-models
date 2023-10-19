@@ -101,16 +101,16 @@ def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar
                     (abs(rfp[dims[1]]-earth[dims[1]])) / (inc[dims[1]]*shp[dims[1]]) * shp[dims[1]],
                     marker='o', s=20, c='0.5')
     
-    if rfp[dims[0]] / float(int(rfp[dims[0]])) - 1 < 1e-3:
-        xticks_label = [int(rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
-    else:
-        xticks_label = ['%.2f' % (rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
+    xticks_label = ['%.2f' % (rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
+    if float(int(rfp[dims[0]])) != 0:
+        if rfp[dims[0]] / float(int(rfp[dims[0]])) - 1 < 1e-3:
+            xticks_label = [int(rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
     xticks_loc = [i*shp[dims[0]]/4 for i in range(5)]
 
-    if rfp[dims[1]] / float(int(rfp[dims[1]])) - 1 < 1e-3:
-        yticks_label = [int(rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
-    else:
-        yticks_label = ['%.2f' % (rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
+    yticks_label = ['%.2f' % (rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
+    if float(int(rfp[dims[1]])) != 0:
+        if rfp[dims[1]] / float(int(rfp[dims[1]])) - 1 < 1e-3:
+            yticks_label = [int(rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
     yticks_loc = [i*shp[dims[1]]/4 for i in range(5)]
         
 
