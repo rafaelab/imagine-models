@@ -85,9 +85,9 @@ public:
 
   // gum
   bool do_gum = true;
-  double lc = 264.; // degree, longitude of gum center
-  const double bc = -4.; // degree, latitude of gum center
-  const double dc = 0.450; // kpc, distance of gum center
+  double t5_lc = 264.; // degree, longitude of gum center
+  const double t5_bc = -4.; // degree, latitude of gum center
+  const double t5_dc = 0.450; // kpc, distance of gum center
   number t5_kgn = 1.4; // unitless, ellipsolloidal correction
   number t5_ngn = 1.84; // cm^{-3}, normalization, fitted by YMW
   number t5_wgn = 0.0151; // kpc, width of shell , fitted by YMW
@@ -142,7 +142,8 @@ public:
   }
 #endif
 
-  auto z_scaling(const double &rr, const number &k, const double &h0, const double &h1, const double &h2) const;
+  auto _z_scaling(const double &rr, const number &k, const double &h0, const double &h1, const double &h2) const;
+  auto _cosh_scaling(const double &s, const number &a, const number &b = 0. ) const;
 
   number thick(const double &zz, const double &rr, const YMW16 &p) const;
   number thin(const double &zz, const double &rr, const YMW16 &p) const;

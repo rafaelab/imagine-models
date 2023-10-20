@@ -89,43 +89,73 @@ number YMW16::_at_position(const double &x, const double &y, const double &z, co
              weight_gum * ne_comp[5]) +
         (weight_localbubble) * (ne_comp[6]);
     // assert(std::isfinite(ne));
+    #if !autodiff_FOUND
+    if (std::isnan(ne)) {
+      std::cout << "Found nan at: (x,y,z): ()" << x << ", " << y << ", " << z << ")" << std::endl;
+      if (std::isnan(ne_comp[1])) {
+        std::cout << "Nan in thick disc" << std::endl;
+      }
+      if (std::isnan(ne_comp[2])) {
+        std::cout << "Nan in thin disc" << std::endl;
+      } 
+      if (std::isnan(ne_comp[3])) {
+        std::cout << "Nan in spiral" << std::endl;
+      }
+      if (std::isnan(ne_comp[4])) {
+        std::cout << "Nan in galcen" << std::endl;
+      }
+      if (std::isnan(ne_comp[5])) {
+        std::cout << "Nan in gum" << std::endl;
+      }
+      if (std::isnan(ne_comp[6])) {
+        std::cout << "Nan in local bubble" << std::endl;
+      }
+      if (std::isnan(ne_comp[7])) {
+        std::cout << "Nan in loop" << std::endl;
+      }
+    }
+    #endif
     //std::cout << "ne: " << ne << std::endl;
     return ne;
   }
 }
 
-auto YMW16::z_scaling(const double &rr, const number &k, const double &h0, const double &h1, const double &h2) const {
+// convenience function
+
+auto YMW16::_z_scaling(const double &rr, const number &k, const double &h0, const double &h1, const double &h2) const {
 double rr_pc = rr * 1000;  // temporarily converting to pc, then back 
 return k * (h0  + h1 * rr_pc + h2 * rr_pc * rr_pc) * 0.001;
 }
 
+auto YMW16::_cosh_scaling(const double &s, const number &a, const number &b) const {
+  return pow(1. / cosh((s - b) / a), 2);
+}
+
 // thick disk
-number YMW16::thick(const double &zz, const double &rr, const YMW16 &p) const
-{
+number YMW16::thick(const double &zz, const double &rr, const YMW16 &p) const {
   if (zz > 10. * p.t1_h1)
     return 0.; // timesaving
-  number gd{1.};
-  if (rr > p.t1_bd)
-  {
-    gd = pow(1. / cosh((rr - p.t1_bd) / p.t1_ad), 2);
+  number gd = 1.;  
+  if (rr > p.t1_bd) {
+    gd = _cosh_scaling(rr, p.t1_bd, p.t1_ad);
   }
-  return p.t1_n1 * gd * pow(1. / cosh(zz / p.t1_h1), 2);
+  return p.t1_n1 * gd *_cosh_scaling(zz, p.t1_h1);
 }
 
 // thin disk
 number YMW16::thin(const double &zz, const double &rr, const YMW16 &p) const
 {
   // z scaling, K_2*h0 in ref
-  auto k2h = z_scaling(rr, p.t2_k2, p.h0, p.h1, p.h2); 
+  auto k2h = _z_scaling(rr, p.t2_k2, p.h0, p.h1, p.h2); 
   if (zz > 10. * k2h)
     return 0.; // timesaving
-  number gd{1.};
-  if (rr > p.t1_bd)
-  {
-    gd = pow(1. / cosh((rr - p.t1_bd) / p.t1_ad), 2);
+  number gd = 1.;  
+  if (rr > p.t1_bd) {
+    gd = _cosh_scaling(rr, p.t1_bd, p.t1_ad);
   }
-  return p.t2_n2 * gd * pow(1. / cosh((rr - p.t2_b2) / p.t2_a2), 2) *
-         pow(1. / cosh(zz / k2h), 2);
+  auto gd2 =  _cosh_scaling(rr, p.t2_a2,  p.t2_b2); // pow(1. / cosh((rr -  p.t2_b2) / p.t2_a2), 2);
+
+  return p.t2_n2 * gd * gd2 * _cosh_scaling(zz, k2h);
 }
 
 // spiral arms
@@ -133,56 +163,50 @@ number YMW16::spiral(const double &xx, const double &yy,
                      const double &zz, const double &rr, const YMW16 &p) const
 {
   // structure scaling
-  number scaling{1.};
-  if (rr > p.t1_bd)
-  {
-    if ((rr - p.t1_bd) > 10. * p.t1_ad)
-      return 0.;
-    scaling = pow(1. / cosh((rr - p.t1_bd) / p.t1_ad), 2);
+  number scaling = 1.;  
+  if (rr > p.t1_bd) {
+    scaling = _cosh_scaling(rr, p.t1_bd, p.t1_ad);
   }
   // z scaling, K_a*h0 in ref
-  auto k3h = z_scaling(rr, p.t3_ka, p.h0, p.h1, p.h2); 
+  auto k3h = _z_scaling(rr, p.t3_ka, p.h0, p.h1, p.h2); 
 
-  if (zz > 10. * k3h)
+  if (abs(zz) > 10. * k3h)
     return 0.; // timesaving
-  scaling *= pow(1. / cosh(zz / k3h), 2);
+  scaling *= _cosh_scaling(zz, k3h);
   if ((rr - p.t3_b2s) > 10. * p.t3_aa)
     return 0.; // timesaving
   // 2nd raidus scaling
-  scaling *= pow(1. / cosh((rr - p.t3_b2s) / p.t3_aa), 2);
+  scaling *= _cosh_scaling(rr, p.t3_aa, p.t3_b2s);
   number smin;
   double theta{atan2(yy, xx)};
   if (theta < 0)
     theta += 2 * M_PI;
   number ne3s{0.};
   // looping through arms
-  for (int i = 0; i < 5; ++i)
-  {
+  for (int i = 0; i < 5; ++i) { 
+    number phimin = p.t3_phimin[i] / 180 * M_PI;
+    number tpitch = tan(p.t3_tpitch[i] / 180 * M_PI);
     // get distance to arm center
-    if (i != 4)
-    {
-      number d_phi = theta - p.t3_phimin[i] / 180 * M_PI;
-      if (d_phi < 0)
-      {
+    if (i != 4) { 
+      number d_phi = theta - phimin;
+      if (d_phi < 0) {
         d_phi += 2. * M_PI;
       }
-      number d = abs(p.t3_rmin[i] * exp(d_phi * p.t3_tpitch[i] / 180 * M_PI) - rr);
-      number d_p = abs(p.t3_rmin[i] * exp((d_phi + 2. * M_PI) * p.t3_tpitch[i] / 180 * M_PI) - rr);
-      smin = std::min(d, d_p) * p.t3_tpitch[i] / 180 * M_PI;
+      number d = abs(p.t3_rmin[i] * exp(d_phi * tpitch) - rr);
+      number d_p = abs(p.t3_rmin[i] * exp((d_phi + 2. * M_PI) * tpitch) - rr);
+      // smin = std::min(d, d_p) * tpitch;
+      smin = std::min(d, d_p); // * tpitch;
     }
-    else if (i == 4 and theta >= p.t3_phimin[i] / 180 * M_PI and theta < 2)
-    { // Local arm
-      smin = abs(p.t3_rmin[i] * exp((theta + 2 * M_PI - p.t3_phimin[i] / 180 * M_PI) * p.t3_tpitch[i] / 180 * M_PI) - rr) * p.t3_tpitch[i] / 180 * M_PI;
+    else if (i == 4 and theta >= phimin and theta < (2 / 180 * M_PI)) { // Local arm
+      smin = abs(p.t3_rmin[i] * exp((theta + 2 * M_PI - phimin) * tpitch) - rr);
     }
-    else
-    {
+    else {
       continue;
     }
     if (smin > 10. * p.t3_warm[i])
       continue; // timesaving
     // accumulate density
-    if (i != 2)
-    {
+    if (i != 2) {
       ne3s += p.t3_narm[i] * scaling * pow(1. / cosh(smin / p.t3_warm[i]), 2);
     }
     else if (rr > 6 and
@@ -226,19 +250,22 @@ number YMW16::gum(const double &xx, const double &yy, const double &zz, const YM
     return 0.; // timesaving
   // center of Gum Nebula
 
-  const double xc{p.dc * cos(p.bc * M_PI / 180) * sin(p.lc * M_PI / 180)};
-  const double yc{p.r0 - dc * cos(p.bc * M_PI / 180) * cos(p.lc * M_PI / 180)};
-  const double zc{p.dc * sin(p.bc * M_PI / 180)};
+  const double xc{p.t5_dc * cos(p.t5_bc * M_PI / 180) * sin(p.t5_lc * M_PI / 180)};
+  const double yc{p.r0 - p.t5_dc * cos(p.t5_bc * M_PI / 180) * cos(p.t5_lc * M_PI / 180)};
+  const double zc{p.t5_dc * sin(p.t5_bc * M_PI / 180)};
   // theta is limited in I quadrant
   const double thetagum{
       atan2(abs(zz - zc),
             sqrt((xx - xc) * (xx - xc) + (yy - yc) * (yy - yc)))};
   const double tantheta = tan(thetagum);
   // zp is positive
-  double zp{(p.t5_agn * p.t5_kgn) /
-            sqrt(1. + p.t5_kgn * p.t5_kgn / (tantheta * tantheta))};
-  // xyp is positive
-  const double xyp{zp / tantheta};
+  number zp = 0;
+  number xyp = 0;
+  if (tantheta != 0.) {
+    zp +=  (p.t5_agn * p.t5_kgn)/sqrt(1. + p.t5_kgn * p.t5_kgn / (tantheta * tantheta));
+    // xyp is positive
+    xyp += zp / tantheta;
+  } 
   // alpha is positive
   const number xy_dist = {
       sqrt(p.t5_agn * p.t5_agn - xyp * xyp) *
@@ -261,12 +288,11 @@ number YMW16::localbubble(const double &xx, const double &yy, const double &zz, 
     return 0.; // timesaving
   number nel{0.};
   // r_LB in ref
-  const double rLB{
+  auto rLB{
       sqrt(pow(((yy - p.r0 - p.t6_offset) * p.t6_zyl1 - p.t6_zyl2 * zz), 2) + pow(xx, 2))};
   // l-l_LB1 in ref
-  const double dl1{
-      std::min(abs(ll + 360. - p.t6_thetalb1),
-               abs(p.t6_thetalb1 - (ll)))};
+
+  auto dl1 = std::min(abs(ll + 360. - p.t6_thetalb1), abs(p.t6_thetalb1 - ll));
   if (dl1 < 10. * p.t6_detlb1 or
       (rLB - Rlb) < 10. * p.t6_wlb1 or
       zz < 10. * p.t6_hlb1) // timesaving
@@ -275,8 +301,8 @@ number YMW16::localbubble(const double &xx, const double &yy, const double &zz, 
            pow(1. / cosh((rLB - Rlb) / p.t6_wlb1), 2) *
            pow(1. / cosh(zz / p.t6_hlb1), 2);
   // l-l_LB2 in ref
-  const double dl2{
-      std::min(abs(ll + 360 - p.t6_thetalb2),
+  auto dl2{
+      std::min(abs(ll + 360. - p.t6_thetalb2),
                abs(p.t6_thetalb2 - (ll)))};
   if (dl2 < 10. * p.t6_detlb2 or
       (rLB - Rlb) < 10. * p.t6_wlb2 or
