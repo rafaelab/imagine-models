@@ -29,6 +29,14 @@ public:
   const double rmin = 5.;  // outer boundary of the molecular ring region
   const double rcent = 3.; // inner boundary of the molecular ring region (field is
                            // zero within this region)
+  const number f[8] = {
+      0.130, 0.165, 0.094, 0.122,
+      0.13, 0.118, 0.084, 0.156}; // fractions of circumference spanned by each
+                                  // spiral, sums to unity
+  const double rc_B[8] = {
+      5.1, 6.3, 7.1, 8.3, 9.8,
+      11.4, 12.7, 15.5}; // the radii where the spiral arm boundaries cross the
+                         // negative x-axis
 
   number b_arm_1 = 0.1;
   number b_arm_2 = 3.0;
@@ -41,6 +49,7 @@ public:
   number h_disk = 0.40;
   number w_disk = 0.27;
   // toroidal halo parameters
+  bool do_halo = true;
   number Bn = 1.4;
   number Bs = -1.1;
   number rn = 9.22;
@@ -48,6 +57,7 @@ public:
   number wh = 0.20;
   number z0 = 5.3;
   // X-field parameters
+  bool do_X = true;
   number B0_X = 4.6;
   number Xtheta_const = 49.;
   number rpc_X = 4.8;
