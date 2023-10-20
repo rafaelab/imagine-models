@@ -176,10 +176,10 @@ public:
   double* on_grid(const int seed) {
     if (not initialized_with_grid) 
       throw GridException();
-    double* grid_eval = allocate_memory(shape);
+    double* grid_eval = allocate_memory(internal_shape);
     const char *filename = "ImagineModelsRandomScalarField";
     int fftw_import_wisdom_from_filename(*filename);
-    _on_grid(grid_eval, shape, reference_point, increment, seed);
+    _on_grid(grid_eval, internal_shape, internal_ref_point, internal_increment, seed);
     return grid_eval;
   }
 
@@ -298,10 +298,10 @@ public:
   std::array<double*, 3> on_grid(const int seed) {
     if (not initialized_with_grid) 
       throw GridException();
-    std::array<double*, 3> grid_eval = allocate_memory(shape);
+    std::array<double*, 3> grid_eval = allocate_memory(internal_shape);
     const char *filename = "ImagineModelsRandomVectorField";
     int fftw_import_wisdom_from_filename(*filename);
-    _on_grid(grid_eval, shape, reference_point, increment, seed);
+    _on_grid(grid_eval, internal_shape, internal_ref_point, internal_increment, seed);
     return grid_eval;
   }
 
