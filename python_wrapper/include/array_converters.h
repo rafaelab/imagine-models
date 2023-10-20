@@ -37,7 +37,7 @@ inline py::array_t<double> from_pointer_to_pyarray(double* data, size_t arr_size
 
 
 inline py::list from_pointer_array_to_list_pyarray(std::array<double*, 3> seq, size_t arr_size_x, size_t arr_size_y, size_t arr_size_z) {
-  size_t arr_size = arr_size_x*arr_size_y*arr_size_z;
+
   py::list li;
 
   for (int i = 0; i<3; ++i) {
