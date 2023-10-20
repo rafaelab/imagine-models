@@ -1,11 +1,9 @@
 template<typename POSTYPE, typename GRIDTYPE>
-void RandomField<POSTYPE, GRIDTYPE>::remove_padding(GRIDTYPE val, const std::array<int, 3> &shp, const int pad) {
+void RandomField<POSTYPE, GRIDTYPE>::remove_padding(double* val, const std::array<int, 3> &shp, const int pad) {
   int start = 0;
   int sz = shp[2];
   int n = shp[0]*shp[1];
-  std::cout << " remove the padding" << std::endl;
   for (int i = 1; i<n; i++) {
-      //std::cout << "val at i*(sz + pad)" << val[i*(sz + pad)] << std::endl;
       std::copy(val + i*(sz + pad), val + i*(sz + pad) + sz, val + i*sz);
   }
 }

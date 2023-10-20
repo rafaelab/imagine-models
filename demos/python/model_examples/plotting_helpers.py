@@ -11,7 +11,7 @@ except ImportError:
 plt.ion()
 
 def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar=True, show_labels=True,
-               save_fig=False, field_name=None, quiver=False, amplitude=False, cut_index =None,  plot_earth=True):
+               save_fig=False, field_name=None, quiver=False, amplitude=False, cut_index =None,  plot_earth=True, cmap=None):
     """
     produces a plot showing a slice through a IMAGINE model output. The slice goes throgh the middle of array in the respective dimension slice_dim
 
@@ -29,16 +29,21 @@ def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar
     :param field_name: if not None: displays name of field in plot
     :param quiver: adds field vectors displayed as arrows to plot, has no effect for scalar fields
     :param plot_earth: adds a marker on Earth's position
+    :param cmap: string to select a matplotlib colormap, the default
     """
    #
     is_vector = False
     if isinstance(array, list): 
         is_vector = True 
    
-    if amplitude:
-        cmap = 'RdBu_r'
-    else:
-        cmap = "PuOr_r"
+    if cmap is None:
+        cmap = "plasma"
+        if is_vector:
+            if amplitude:
+                cmap = 'RdBu_r'
+            else:
+                cmap = "PuOr_r"
+    
     fig, ax = plt.subplots()
     
     slices = [slice(0, shp[0], None), slice(0, shp[1], None), slice(0, shp[2], None)]
@@ -101,16 +106,16 @@ def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar
                     (abs(rfp[dims[1]]-earth[dims[1]])) / (inc[dims[1]]*shp[dims[1]]) * shp[dims[1]],
                     marker='o', s=20, c='0.5')
     
-    if rfp[dims[0]] / float(int(rfp[dims[0]])) - 1 < 1e-3:
-        xticks_label = [int(rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
-    else:
-        xticks_label = ['%.2f' % (rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
+    xticks_label = ['%.2f' % (rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
+    if float(int(rfp[dims[0]])) != 0:
+        if rfp[dims[0]] / float(int(rfp[dims[0]])) - 1 < 1e-3:
+            xticks_label = [int(rfp[dims[0]] + i*shp[dims[0]]/4*inc[dims[0]]) for i in range(5)]
     xticks_loc = [i*shp[dims[0]]/4 for i in range(5)]
 
-    if rfp[dims[1]] / float(int(rfp[dims[1]])) - 1 < 1e-3:
-        yticks_label = [int(rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
-    else:
-        yticks_label = ['%.2f' % (rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
+    yticks_label = ['%.2f' % (rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
+    if float(int(rfp[dims[1]])) != 0:
+        if rfp[dims[1]] / float(int(rfp[dims[1]])) - 1 < 1e-3:
+            yticks_label = [int(rfp[dims[1]] + i*shp[dims[1]]/4*inc[dims[1]]) for i in range(5)]
     yticks_loc = [i*shp[dims[1]]/4 for i in range(5)]
         
 
