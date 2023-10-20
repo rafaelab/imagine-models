@@ -11,7 +11,7 @@ except ImportError:
 plt.ion()
 
 def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar=True, show_labels=True,
-               save_fig=False, field_name=None, quiver=False, amplitude=False, cut_index =None,  plot_earth=True):
+               save_fig=False, field_name=None, quiver=False, amplitude=False, cut_index =None,  plot_earth=True, cmap=None):
     """
     produces a plot showing a slice through a IMAGINE model output. The slice goes throgh the middle of array in the respective dimension slice_dim
 
@@ -29,16 +29,21 @@ def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar
     :param field_name: if not None: displays name of field in plot
     :param quiver: adds field vectors displayed as arrows to plot, has no effect for scalar fields
     :param plot_earth: adds a marker on Earth's position
+    :param cmap: string to select a matplotlib colormap, the default
     """
    #
     is_vector = False
     if isinstance(array, list): 
         is_vector = True 
    
-    if amplitude:
-        cmap = 'RdBu_r'
-    else:
-        cmap = "PuOr_r"
+    if cmap is None:
+        cmap = "plasma"
+        if is_vector:
+            if amplitude:
+                cmap = 'RdBu_r'
+            else:
+                cmap = "PuOr_r"
+    
     fig, ax = plt.subplots()
     
     slices = [slice(0, shp[0], None), slice(0, shp[1], None), slice(0, shp[2], None)]
