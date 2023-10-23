@@ -35,6 +35,12 @@ class JF12RandomField : public RandomVectorField {
     double Rmax = 20.;
     double rho_GC = 1.;
 
+
+    const double rc_B[8] = {
+          5.1, 6.3,  7.1,  8.3,
+          9.8, 11.4, 12.7, 15.5}; // neg x crossings of spiral arms
+    const double inc = 11.5; // inclination, in degrees
+
     double spectral_amplitude = 1.; 
     double spectral_offset = 1.; 
     double spectral_slope = 2.;
