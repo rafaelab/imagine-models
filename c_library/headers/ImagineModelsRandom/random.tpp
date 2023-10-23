@@ -57,9 +57,9 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* v
         }
         
         
-        //const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
-        //double sigma = calculate_fourier_sigma(ks);
-        double sigma = 1.;
+        const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
+        double sigma = calculate_fourier_sigma(ks);
+        //double sigma = 1.;
         std::normal_distribution<double> nd{0, sigma};
 
         bool l_is_zero_or_nyquist = (l == 0 or l == nyquist_z);
