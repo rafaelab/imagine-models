@@ -32,5 +32,7 @@ void RandomJF12(py::module_ &m) {
         .def_readwrite("z0_spiral", &JF12RandomField::z0_spiral)
         .def_readwrite("rho_GC", &JF12RandomField::rho_GC)
         .def_readwrite("Rmax", &JF12RandomField::Rmax)
-        .def_readwrite("anisotropy_rho", &JF12RandomField::anisotropy_rho);
+        .def_readwrite("anisotropy_rho", &JF12RandomField::anisotropy_rho)
+
+        .def("spatial_profile", &JF12RandomField::spatial_profile, "x"_a, "y"_a, "z"_a, py::return_value_policy::move);
 }
