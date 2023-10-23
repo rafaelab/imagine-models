@@ -15,12 +15,7 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
       const double r{sqrt(x * x + y * y)};
       const double rho{
           sqrt(x*x + y*y + z*z)};
-      const double phi{atan2(y, z)};
-
-      const double rc_B[8] = {
-          5.1, 6.3,  7.1,  8.3,
-          9.8, 11.4, 12.7, 15.5}; // neg x crossings of spiral arms
-      const double inc = 11.5; // inclination, in degrees
+      const double phi{atan2(y, x)};
 
       const double b_arms[8] = {b0_1, b0_2, b0_3, b0_4, b0_5, b0_6, b0_7, b0_8};
 
@@ -49,7 +44,7 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
       }
 
       scaling_disk = scaling_disk * exp(-0.5 * z * z / (z0_spiral * z0_spiral));
-      scaling_halo = b0_halo * exp(-std::fabs(r / r0_halo)) * exp(-std::fabs(z / z0_halo));
+      scaling_halo = b0_halo * exp(-r / r0_halo) * exp(-0.5 * z * z / (z0_halo * z0_halo));
 
       return (scaling_disk * scaling_disk + scaling_halo * scaling_halo);
 
@@ -67,22 +62,21 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
     draw_random_numbers_complex(val_comp[i], shp, inc, sub_seed);
     fftw_execute(c2r[i]);
   }
-  auto apply_profile = [&](double xx, double yy, double zz) {
-      int _nx = (int)((xx - rpt[0])/inc[0]); 
-      int _ny = (int)((yy - rpt[1])/inc[1]);
-      int _nz = (int)((zz - rpt[2])/inc[2]);
-      int idx = _nz + shp[2]*(_ny + shp[1]*_nx);
+  auto apply_profile = [&](std::array<double, 3> &b_rand_val, const double xx, const double yy, const double zz) {
+      
+      double sp = std::sqrt(spatial_profile(xx, yy, zz));
+      // apply profile
+      b_rand_val[0] *= sp;
+      b_rand_val[1] *= sp;
+      b_rand_val[2] *= sp;
+      
       vector b_reg_val = regular_base.at_position(xx, yy, zz); //FIXME this must change if jf12 regular shall be inferrable as well
       double b_reg_x = static_cast<double>(b_reg_val[0]); 
       double b_reg_y = static_cast<double>(b_reg_val[1]);
       double b_reg_z = static_cast<double>(b_reg_val[2]);
 
       double b_reg_length = std::sqrt(std::pow(b_reg_x, 2) + std::pow(b_reg_y, 2) + std::pow(b_reg_z, 2));
-      double sp = std::sqrt(spatial_profile(xx, yy, zz));
-        // assemble b_Re
-      vector b_rand_val{{(val[0])[idx] * sp,
-                         (val[1])[idx] * sp,
-                         (val[2])[idx] * sp}};
+
       if (b_reg_length < 1e-10) // zero regular field, no prefered anisotropy
         return b_rand_val;
       // impose anisotropy
@@ -91,11 +85,11 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       b_reg_z /= b_reg_length;
       const double rho2 = anisotropy_rho * anisotropy_rho;
       const double rhonorm = 1. / std::sqrt(0.33333333 * rho2 + 0.66666667 / rho2);
-      number reg_dot_rand  = b_reg_x*b_rand_val[0] + b_reg_y*b_rand_val[1] + b_reg_z*b_rand_val[2];
+      double reg_dot_rand  = b_reg_x*b_rand_val[0] + b_reg_y*b_rand_val[1] + b_reg_z*b_rand_val[2];
 
       for (int ii=0; ii==3; ++ii) {
-        number b_rand_par = b_rand_val[ii] * reg_dot_rand;
-        number b_rand_perp = b_rand_val[ii]  - b_rand_par;
+        double b_rand_par = b_rand_val[ii] / reg_dot_rand;
+        double b_rand_perp = b_rand_val[ii]  - b_rand_par;
         b_rand_val[ii] = (b_rand_par * anisotropy_rho + b_rand_perp / anisotropy_rho) * rhonorm;
       }
       return b_rand_val;
@@ -104,20 +98,20 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
   std::cout << "before apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
   int padded_size = padded_shp[0]*padded_shp[1]*padded_shp[2];
-  evaluate_function_on_grid<vector>(val, padded_shp, rpt, inc, apply_profile);
-  std::cout << "after apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
+  apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shp, rpt, inc, apply_profile);
+  std::cout << "after apply " << (val[0])[0] << " " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   //std::cout << "grid_size " << grid_size << std::endl;
-  for (int i =0; i<3; ++i) {
-      for (int s = 0; s < padded_size; ++s)  {
-      (val[i])[s] /= grid_size;  
-    }
-    fftw_execute(r2c[i]);
-  }
+  //for (int i =0; i<3; ++i) {
+  //    for (int s = 0; s < padded_size; ++s)  {
+  //    (val[i])[s] /= grid_size;  
+  //  }
+  //  fftw_execute(r2c[i]);
+  //}
   
-  //divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], shp, inc);
+  divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], padded_shp, inc);
   int pad =  padded_shp[2] - shp[2];
   for (int i =0; i<3; ++i) {
-    fftw_execute(c2r[i]);
+  //  fftw_execute(c2r[i]);
     for (int s = 0; s < padded_size; ++s)  {
       //if (std::isnan((val[i])[s])) {
       //  std::cout << "found nan" << std::endl;

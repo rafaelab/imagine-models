@@ -31,22 +31,18 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
         fftw_execute(c2r[i]);
       }
 
-      auto multiply_profile = [&](double xx, double yy, double zz) {
-          int _nx = (int)((xx - zpt[0])/inc[0]); 
-          int _ny = (int)((yy - zpt[1])/inc[1]);
-          int _nz = (int)((zz - zpt[2])/inc[2]);
+      auto apply_profile = [&](std::array<double, 3> &b_rand_val, double xx, double yy, double zz) {
           double sp = spatial_profile(xx, yy, zz);
-          int idx = _nz + shp[2]*(_ny + shp[1]*_nx);
           std::array<double, 3> v = {
-            (val[0])[idx]*sp, 
-            (val[1])[idx]*sp, 
-            (val[2])[idx]*sp
+            b_rand_val[0]*sp, 
+            b_rand_val[1]*sp, 
+            b_rand_val[2]*sp
             };
           return v;
         };
       std::array<int, 3> padded_shape = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
       int padded_size = padded_shape[0]*padded_shape[1]*padded_shape[2];
-      evaluate_function_on_grid<std::array<double, 3>>(val, padded_shape, zpt, inc, multiply_profile);
+      apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shape, zpt, inc, apply_profile);
 
       for (int i =0; i<3; ++i) {
         fftw_execute(r2c[i]);
