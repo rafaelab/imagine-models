@@ -11,7 +11,8 @@ void GaussianScalar(py::module_ &m) {
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
         .def_readwrite("mean", &GaussianScalarField::mean)
-        .def_readwrite("spectral_amplitude", &GaussianScalarField::spectral_amplitude)
+        .def_readwrite("rms", &GaussianScalarField::rms)
+
         .def_readwrite("spectral_offset", &GaussianScalarField::spectral_offset)
         .def_readwrite("spectral_slope", &GaussianScalarField::spectral_slope);
 }

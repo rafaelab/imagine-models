@@ -13,7 +13,6 @@ void RandomJF12(py::module_ &m) {
 
         .def_readonly("regular_base", &JF12RandomField::regular_base)
 
-        .def_readwrite("spectral_amplitude", &JF12RandomField::spectral_amplitude)
         .def_readwrite("spectral_offset", &JF12RandomField::spectral_offset)
         .def_readwrite("spectral_slope", &JF12RandomField::spectral_slope)
 

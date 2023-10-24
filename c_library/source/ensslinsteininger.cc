@@ -5,8 +5,8 @@
 #include "EnsslinSteininger.h"
 
 
-double ESRandomField::calculate_fourier_sigma(const double &abs_k) const {
-  double sigma = simple_spectrum(abs_k, spectral_amplitude, spectral_offset, spectral_slope);
+double ESRandomField::calculate_fourier_sigma(const double &abs_k, const double &dk) const {
+  double sigma = simple_spectrum(abs_k, dk, spectral_offset, spectral_slope);
   return sigma;
 }
 

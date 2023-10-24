@@ -5,9 +5,9 @@
 #include "RandomJF12.h"
 
 
-double JF12RandomField::calculate_fourier_sigma(const double &abs_k) const {
-  double sigma = simple_spectrum(abs_k, spectral_amplitude, spectral_offset, spectral_slope);
-  return sigma;
+double JF12RandomField::calculate_fourier_sigma(const double &abs_k, const double &dk) const {
+  double var = simple_spectrum(abs_k, dk, spectral_offset, spectral_slope);
+  return std::sqrt(var);
 }
 
 double JF12RandomField::spatial_profile(const double &x, const double &y, const double &z) const {
@@ -101,17 +101,17 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
   apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shp, rpt, inc, apply_profile);
   std::cout << "after apply " << (val[0])[0] << " " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   //std::cout << "grid_size " << grid_size << std::endl;
-  //for (int i =0; i<3; ++i) {
-  //    for (int s = 0; s < padded_size; ++s)  {
-  //    (val[i])[s] /= grid_size;  
-  //  }
-  //  fftw_execute(r2c[i]);
-  //}
+  for (int i =0; i<3; ++i) {
+      for (int s = 0; s < padded_size; ++s)  {
+      (val[i])[s] /= grid_size;  
+    }
+    fftw_execute(r2c[i]);
+  }
   
   divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], padded_shp, inc);
   int pad =  padded_shp[2] - shp[2];
   for (int i =0; i<3; ++i) {
-  //  fftw_execute(c2r[i]);
+    fftw_execute(c2r[i]);
     for (int s = 0; s < padded_size; ++s)  {
       //if (std::isnan((val[i])[s])) {
       //  std::cout << "found nan" << std::endl;

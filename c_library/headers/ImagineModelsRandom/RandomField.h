@@ -24,6 +24,8 @@ protected:
   bool created_fftw_plans = false;
   bool has_fftw_wisdom = false;
 
+  bool apply_spectrum = true;
+
 public:
   // Constructors
   using Field<POSTYPE, GRIDTYPE> :: Field;
@@ -36,7 +38,7 @@ public:
   
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  virtual double calculate_fourier_sigma(const double &abs_k) const = 0;
+  virtual double calculate_fourier_sigma(const double &abs_k, const double &dk) const = 0;
 
     // This function is the place where the global routine should be implemented, i.e. how the spatial profile modifies the random field, and if divergence cleaning needs to be performed. 
   virtual void _on_grid(GRIDTYPE val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) = 0;
@@ -49,11 +51,10 @@ public:
 
   void remove_padding(double* val, const std::array<int, 3> &shp, const int pad);
 
-  double simple_spectrum(const double &abs_k, const double &A, const double &k0, const double &s) const {
-      double pi = 3.141592653589793;
-      const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
-      const double P = 1 / std::pow((abs_k + k0), s);
-      return P * A * unit;
+  double simple_spectrum(const double &abs_k, const double &dk, const double &k0, const double &s) const {
+      const double P = dk / std::pow(abs_k + k0, s);
+      double norm = 1. / ((s - 1.) * std::pow(k0, (s - 1)) ); // normalize to unity
+      return P / norm;
       }
 
   // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
