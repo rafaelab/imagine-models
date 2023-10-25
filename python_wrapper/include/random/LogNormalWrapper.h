@@ -10,6 +10,8 @@ void LogNormal(py::module_ &m) {
         .def(py::init<>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
+        .def_readwrite("apply_spectrum", &LogNormalScalarField::apply_spectrum)
+
         .def_readwrite("log_mean", &LogNormalScalarField::log_mean)
 
         .def_readwrite("spectral_offset", &LogNormalScalarField::spectral_offset)

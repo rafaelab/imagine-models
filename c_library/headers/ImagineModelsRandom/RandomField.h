@@ -24,11 +24,14 @@ protected:
   bool created_fftw_plans = false;
   bool has_fftw_wisdom = false;
 
-  bool apply_spectrum = true;
-
 public:
   // Constructors
   using Field<POSTYPE, GRIDTYPE> :: Field;
+
+  // Fields
+
+  bool apply_spectrum = true;
+
 
   // methods
   POSTYPE at_position(const double &x, const double &y, const double &z) const {
@@ -52,14 +55,17 @@ public:
   void remove_padding(double* val, const std::array<int, 3> &shp, const int pad);
 
   double simple_spectrum(const double &abs_k, const double &dk, const double &k0, const double &s) const {
-      const double P = dk / std::pow(abs_k + k0, s);
-      double norm = 1. / ((s - 1.) * std::pow(k0, (s - 1)) ); // normalize to unity
-      return P / norm;
+      double pi = 3.141592653589793;
+      const double unit = 1. / (4 * pi * abs_k * abs_k); 
+      const double dP = unit / std::pow(abs_k + k0, s);
+      //double norm = 1. / ((s - 1.) * std::pow(k0, (s - 1))); // normalize to unity
+      return dP; // / norm;
       }
 
   // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
   // original author: https://github.com/gioacchinowang
   double hammurabi_spectrum(const double &abs_k, const double &rms, const double &k0, const double &k1, const double &a0, const double &a1) const {
+      
       const double p0 = rms*rms;
       double pi = 3.141592653589793;
       const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
@@ -168,7 +174,6 @@ public:
   double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
-    std::cout << "header,  shape[2]:  " << shp[2] << std::endl;
     double* grid_eval = allocate_memory(shp);
     _on_grid(grid_eval, shp, rpt, inc, seed);
     return grid_eval;
@@ -183,8 +188,6 @@ public:
     _on_grid(grid_eval, internal_shape, internal_ref_point, internal_increment, seed);
     return grid_eval;
   }
-
-
 };
 
 
@@ -277,6 +280,8 @@ public:
 
   // fields
   const int ndim = 3;
+
+  bool clean_divergence = true;  
   // methods
   vector at_position(const double &x, const double &y, const double &z) const {
     throw NotImplementedException();
@@ -289,7 +294,6 @@ public:
   std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
     if (initialized_with_grid) 
       throw GridException();
-    std::cout<<"on_grid external call" << std::endl; 
     std::array<double*, 3> grid_eval = allocate_memory(shp);
     _on_grid(grid_eval, shp, rpt, inc, seed);
     return grid_eval;

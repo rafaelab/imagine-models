@@ -17,14 +17,13 @@ void GaussianScalarField::_on_grid(double* val, const std::array<int, 3> &shp, c
 
       int gs_padded = grid_size(padded_shp);
       int sqrt_gs = std::sqrt(grid_size(shp)); //dft normalization
-      //double fvol = inc[0]*inc[1]*inc[2]; // fourier volume
       for (int s = 0; s < gs_padded; ++s) {
-        val[s] = val[s]/sqrt_gs + mean;  
+        val[s] = val[s]/sqrt_gs*rms + mean;  
       }
 }
 
 
 double GaussianScalarField::calculate_fourier_sigma(const double &abs_k, const double &dk) const {
   double var = simple_spectrum(abs_k, dk, spectral_offset, spectral_slope);
-  return std::sqrt(var)*rms;
+  return std::sqrt(var);
 }

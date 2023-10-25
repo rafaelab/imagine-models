@@ -56,12 +56,14 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* v
           continue;
         }
         
+        double sigma;
+
         if (apply_spectrum) {
           const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
-          double sigma = calculate_fourier_sigma(ks, 1./(lx*ly*lz));
+          sigma = calculate_fourier_sigma(ks, 1./(lx*ly*lz));
         }
         else {
-          double sigma = 1.;
+          sigma = 1.;
         }
         std::normal_distribution<double> nd{0, sigma};
 

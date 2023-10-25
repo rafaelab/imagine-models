@@ -15,7 +15,7 @@ class GaussianScalarField : public RandomScalarField {
     double mean = 0;
     double rms = 1;
 
-    bool apply_spectrum = true;
+    //bool apply_spectrum = true;
     double spectral_offset = .001;
     double spectral_slope = 2.;
 

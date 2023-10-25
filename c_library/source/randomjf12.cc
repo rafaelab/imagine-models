@@ -95,30 +95,39 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       return b_rand_val;
     };
 
-  std::cout << "before apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
+  //std::cout << "before apply " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
   std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
   int padded_size = padded_shp[0]*padded_shp[1]*padded_shp[2];
-  apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shp, rpt, inc, apply_profile);
-  std::cout << "after apply " << (val[0])[0] << " " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
-  //std::cout << "grid_size " << grid_size << std::endl;
-  for (int i =0; i<3; ++i) {
-      for (int s = 0; s < padded_size; ++s)  {
-      (val[i])[s] /= grid_size;  
-    }
-    fftw_execute(r2c[i]);
-  }
-  
-  divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], padded_shp, inc);
   int pad =  padded_shp[2] - shp[2];
-  for (int i =0; i<3; ++i) {
-    fftw_execute(c2r[i]);
-    for (int s = 0; s < padded_size; ++s)  {
-      //if (std::isnan((val[i])[s])) {
-      //  std::cout << "found nan" << std::endl;
-      //}
-      (val[i])[s] /= grid_size;  
+  apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shp, rpt, inc, apply_profile);
+  //std::cout << "after apply " << (val[0])[0] << " " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
+  //std::cout << "grid_size " << grid_size << std::endl;
+  
+  if (clean_divergence) {
+  
+    for (int i =0; i<3; ++i) {
+      fftw_execute(r2c[i]);
     }
-    remove_padding(val[i], shp, pad);
+    divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], padded_shp, inc);
+    
+    for (int i =0; i<3; ++i) {
+      fftw_execute(c2r[i]);
+      double sqrt_gs = std::sqrt(grid_size);
+      for (int s = 0; s < padded_size; ++s)  {
+        (val[i])[s] /= (grid_size*sqrt_gs);  
+      }
+      remove_padding(val[i], shp, pad);
+    }
   }
-  std::cout << "afterdivergence " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
+  else {
+    for (int i =0; i<3; ++i) {
+      double sqrt_gs = std::sqrt(grid_size);
+      for (int s = 0; s < padded_size; ++s)  {
+        (val[i])[s] /= sqrt_gs;  
+      }
+      remove_padding(val[i], shp, pad);
+    }
+  }
+
+  //std::cout << "afterdivergence " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
 }
