@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "Field.h"
-#include "RandomField.h"
+#include "RandomScalarField.h"
 
 class LogNormalScalarField : public RandomScalarField {
   protected:

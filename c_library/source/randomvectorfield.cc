@@ -34,8 +34,6 @@ RandomVectorField::~RandomVectorField() {
   #endif
 };
 
-
-
 std::array<double*, 3> RandomVectorField::allocate_memory(std::array<int, 3> shp) {
     std::array<double*, 3> grid_eval;
     int newshp2;
@@ -94,7 +92,7 @@ std::array<double*, 3> RandomVectorField::on_grid(const std::array<int, 3> &shp,
     return grid_eval;
   }
 
-std::array<fftw_complex*, 3> RandomVectorField::draw_random_numbers(std::array<double*, 3> val, const std::array<int, 3> &shp, const int seed) const {
+std::array<fftw_complex*, 3> RandomVectorField::draw_random_numbers(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed) {
   std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
   int grid_size = shp[0]*shp[1]*shp[2];
   auto gen_int = std::mt19937(seed);
@@ -111,54 +109,52 @@ std::array<fftw_complex*, 3> RandomVectorField::draw_random_numbers(std::array<d
 void RandomVectorField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 
   // Step 1: draw random numbers with variance 1, possibly correlated
-  std::array<fftw_complex*, 3> val_comp = draw_random_numbers(val, shp, seed);
+  std::array<fftw_complex*, 3> val_comp = draw_random_numbers(val, shp, inc, seed);
   
   
   // Step 2: apply spatial amplitude, possibly introduce anisotropy depending on regular field.
-  auto apply_profile = [&](std::array<double, 3> &b_rand_val, const double xx, const double yy, const double zz) {
-      
-    double sp = spatial_profile(xx, yy, zz);
-    // apply profile
-    b_rand_val[0] *= sp;
-    b_rand_val[1] *= sp;
-    b_rand_val[2] *= sp;
-
-
-    if (apply_anisotropy) {
-      vector b_reg_val = anisotropy_direction(xx, yy, zz);
-      double b_reg_x = static_cast<double>(b_reg_val[0]); 
-      double b_reg_y = static_cast<double>(b_reg_val[1]);
-      double b_reg_z = static_cast<double>(b_reg_val[2]);
-
-      double b_reg_length = std::sqrt(std::pow(b_reg_x, 2) + std::pow(b_reg_y, 2) + std::pow(b_reg_z, 2));
-
-      if (b_reg_length > 1e-10) { // non zero regular field, -> prefered anisotropy
-        
-        b_reg_x /= b_reg_length;
-        b_reg_y /= b_reg_length;
-        b_reg_z /= b_reg_length;
-        const double rho2 = anisotropy_rho * anisotropy_rho;
-        const double rhonorm = 1. / std::sqrt(0.33333333 * rho2 + 0.66666667 / rho2);
-        double reg_dot_rand  = b_reg_x*b_rand_val[0] + b_reg_y*b_rand_val[1] + b_reg_z*b_rand_val[2];
-
-        for (int ii=0; ii==3; ++ii) {
-          double b_rand_par = b_rand_val[ii] / reg_dot_rand;
-          double b_rand_perp = b_rand_val[ii]  - b_rand_par;
-          b_rand_val[ii] = (b_rand_par * anisotropy_rho + b_rand_perp / anisotropy_rho) * rhonorm;
-        } 
-      }
-    }
-    return b_rand_val;
-  };
-
   std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
+  if (!no_profile) {
+    auto apply_profile = [&](std::array<double, 3> &b_rand_val, const double xx, const double yy, const double zz) {
+        
+      double sp = spatial_profile(xx, yy, zz);
+      // apply profile
+      b_rand_val[0] *= sp;
+      b_rand_val[1] *= sp;
+      b_rand_val[2] *= sp;
+
+
+      if (apply_anisotropy) {
+        vector b_reg_val = anisotropy_direction(xx, yy, zz);
+        double b_reg_x = static_cast<double>(b_reg_val[0]); 
+        double b_reg_y = static_cast<double>(b_reg_val[1]);
+        double b_reg_z = static_cast<double>(b_reg_val[2]);
+
+        double b_reg_length = std::sqrt(std::pow(b_reg_x, 2) + std::pow(b_reg_y, 2) + std::pow(b_reg_z, 2));
+
+        if (b_reg_length > 1e-10) { // non zero regular field, -> prefered anisotropy
+          
+          b_reg_x /= b_reg_length;
+          b_reg_y /= b_reg_length;
+          b_reg_z /= b_reg_length;
+          const double rho2 = anisotropy_rho * anisotropy_rho;
+          const double rhonorm = 1. / std::sqrt(0.33333333 * rho2 + 0.66666667 / rho2);
+          double reg_dot_rand  = b_reg_x*b_rand_val[0] + b_reg_y*b_rand_val[1] + b_reg_z*b_rand_val[2];
+
+          for (int ii=0; ii==3; ++ii) {
+            double b_rand_par = b_rand_val[ii] / reg_dot_rand;
+            double b_rand_perp = b_rand_val[ii]  - b_rand_par;
+            b_rand_val[ii] = (b_rand_par * anisotropy_rho + b_rand_perp / anisotropy_rho) * rhonorm;
+          } 
+        }
+      }
+      return b_rand_val;
+    };
+    apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shp, rpt, inc, apply_profile);
+  }
+  int grid_size = shp[0]*shp[1]*shp[2];    
   int padded_size = padded_shp[0]*padded_shp[1]*padded_shp[2];
   int pad =  padded_shp[2] - shp[2];
-
-
-  apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shp, rpt, inc, apply_profile);
-  
-
   // Step 3 (optional): divergence cleaning using Gram Schmidt process
   if (clean_divergence) {
   

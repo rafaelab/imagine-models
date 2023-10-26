@@ -4,6 +4,8 @@
 #include "hamunits.h"
 #include "GaussianScalar.h"
 
+
+/*
 void GaussianScalarField::_on_grid(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 
       fftw_complex* val_comp = construct_plans(val, shp);
@@ -21,7 +23,7 @@ void GaussianScalarField::_on_grid(double* val, const std::array<int, 3> &shp, c
         val[s] = val[s]/sqrt_gs*rms + mean;  
       }
 }
-
+*/
 
 double GaussianScalarField::calculate_fourier_sigma(const double &abs_k, const double &dk) const {
   double var = simple_spectrum(abs_k, dk, spectral_offset, spectral_slope);

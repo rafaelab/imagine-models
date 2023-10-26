@@ -49,6 +49,8 @@ public:
   bool clean_divergence = true;  
   bool apply_anisotropy = true;  
 
+  double anisotropy_rho = 1.;
+
   // METHODS
   
   // implemented/hidden in child classes, rms amplitude and anisotropy direction
@@ -70,7 +72,7 @@ void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const s
   // divergence cleaner
   void divergence_cleaner(fftw_complex* bx, fftw_complex* by, fftw_complex* bz,  const std::array<int, 3> &shp, const std::array<double, 3> &inc) const;
 
-  std::array<fftw_complex*, 3> draw_random_numbers(std::array<double*, 3> val, const std::array<int, 3> &shp, const int seed) const;
+  std::array<fftw_complex*, 3> draw_random_numbers(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed);
 
   std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed);
 

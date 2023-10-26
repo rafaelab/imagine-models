@@ -3,12 +3,12 @@
 #include <cassert>
 #include <iostream>
 
-#include "Field.h"
-#include "RandomField.h"
+#include "RandomScalarField.h"
 
 class GaussianScalarField : public RandomScalarField {
   protected:
     bool DEBUG = false;
+    bool no_profile = true;
   public:
     using RandomScalarField :: RandomScalarField;
 
@@ -19,7 +19,7 @@ class GaussianScalarField : public RandomScalarField {
     double spectral_offset = .001;
     double spectral_slope = 2.;
 
-    void _on_grid(double* val, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override;
+    //void _on_grid(double* val, const std::array<int, 3> &grid_shape, const std::array<double, 3> &grid_zeropoint, const std::array<double, 3> &grid_increment, const int seed) override;
 
     double calculate_fourier_sigma(const double &abs_k, const double &dk) const override;
 

@@ -35,6 +35,8 @@ set(IM_SRC_FILES
 if(FFTW_FOUND)
     set(IM_SRC_FILES
         ${IM_SRC_FILES}
+        ${IM_SOURCE_DIR}/randomscalarfield.cc
+        ${IM_SOURCE_DIR}/randomvectorfield.cc
         ${IM_SOURCE_DIR}/gaussianscalar.cc
         ${IM_SOURCE_DIR}/lognormal.cc
         ${IM_SOURCE_DIR}/randomjf12.cc
