@@ -70,7 +70,8 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
       b_rand_val[1] *= sp;
       b_rand_val[2] *= sp;
       
-      vector b_reg_val = regular_base.at_position(xx, yy, zz); //FIXME this must change if jf12 regular shall be inferrable as well
+      vector b_reg_val = regular_base.at_position(xx, yy, zz); 
+      
       double b_reg_x = static_cast<double>(b_reg_val[0]); 
       double b_reg_y = static_cast<double>(b_reg_val[1]);
       double b_reg_z = static_cast<double>(b_reg_val[2]);
@@ -108,7 +109,7 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
     for (int i =0; i<3; ++i) {
       fftw_execute(r2c[i]);
     }
-    divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], padded_shp, inc);
+    divergence_cleaner(val_comp[0], val_comp[1], val_comp[2], shp, inc);
     
     for (int i =0; i<3; ++i) {
       fftw_execute(c2r[i]);

@@ -313,26 +313,30 @@ public:
   
 // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
 // original author: https://github.com/gioacchinowang
-  void divergence_cleaner(fftw_complex* bx, fftw_complex* by, fftw_complex* bz,  const std::array<int, 3> &shape, const std::array<double, 3> &increment) const {
+  void divergence_cleaner(fftw_complex* bx, fftw_complex* by, fftw_complex* bz,  const std::array<int, 3> &shp, const std::array<double, 3> &inc) const {
+    double lx = shp[0]*inc[0];
+    double ly = shp[1]*inc[1];
+    double lz = shp[2]*inc[2];
+  
     #ifdef _OPENMP
       #pragma omp parallel for schedule(static)
     #endif
-      for (int i = 0; i < shape[0]; ++i) {
-        double kx = i / increment[0];
-        if (i >= (shape[0] + 1) / 2)
-          kx -= 1. /  increment[0];
+      for (int i = 0; i < shp[0]; ++i) {
+        double kx = i / lx;
+        if (i >= (shp[0] + 1) / 2)
+          kx -= 1. /  inc[0];
           // it's faster to calculate indices manually
-        const int idx_lv1 = i * shape[1] * shape[2];
-        for (int j = 0; j < shape[1]; ++j) {
-          double ky = j /  increment[1];
-          if (j >= (shape[1] + 1) / 2)
-            ky -= 1. /  increment[1];
-          const int idx_lv2 = idx_lv1 + j * shape[2];
-          for (int l = 0; l < shape[2]/2 + 1; ++l) {
+        const int idx_lv1 = i * shp[1] * shp[2];
+        for (int j = 0; j < shp[1]; ++j) {
+          double ky = j /  ly;
+          if (j >= (shp[1] + 1) / 2)
+            ky -= 1. /  inc[1];
+          const int idx_lv2 = idx_lv1 + j * shp[2];
+          for (int l = 0; l < (int)shp[2]/2 + 1; ++l) {
             // 0th term is fixed to zero in allocation
             if (i == 0 and j == 0 and l == 0)
               continue;
-            double kz = 1. /  increment[2];
+            double kz = l /  lz;
             const int idx = idx_lv2 + l;
             double k_length = 0;
             double b_length = 0;
@@ -341,12 +345,12 @@ public:
             std::array<double, 3> b{(*bx)[idx], (*by)[idx], (*bz)[idx]};
             b_length = static_cast<double>(b[0]*b[0] + b[1]*b[1] + b[2]*b[2]);
             k_length = static_cast<double>(k[0]*k[0] + k[1]*k[1] + k[2]*k[2]);
-            b_dot_k = (b[0]*k[0] + b[1]*k[1] + b[2]*k[2]);
 
             if (k_length == 0 or b_length == 0) {
               continue;
               }
             k_length = std::sqrt(k_length);
+            b_dot_k = (b[0]*k[0] + b[1]*k[1] + b[2]*k[2]);
 
             const double bk_over_k = b_dot_k / k_length;
             // multiply \sqrt(3) for preserving spectral power statistically
