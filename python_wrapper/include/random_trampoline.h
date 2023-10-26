@@ -5,6 +5,8 @@
 #include "Field.h"
 
 #include "RandomField.h"
+#include "RandomVectorField.h"
+#include "RandomScalarField.h"
 
 
 #include <iostream>
