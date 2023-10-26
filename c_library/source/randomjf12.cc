@@ -10,6 +10,10 @@ double JF12RandomField::calculate_fourier_sigma(const double &abs_k, const doubl
   return std::sqrt(var);
 }
 
+vector JF12RandomField::anisotropy_direction(const double &x, const double &y, const double &z) const {
+  return regular_base.at_position(x, y, z); 
+}
+
 double JF12RandomField::spatial_profile(const double &x, const double &y, const double &z) const {
 
       const double r{sqrt(x * x + y * y)};
@@ -46,10 +50,11 @@ double JF12RandomField::spatial_profile(const double &x, const double &y, const 
       scaling_disk = scaling_disk * exp(-0.5 * z * z / (z0_spiral * z0_spiral));
       scaling_halo = b0_halo * exp(-r / r0_halo) * exp(-0.5 * z * z / (z0_halo * z0_halo));
 
-      return (scaling_disk * scaling_disk + scaling_halo * scaling_halo);
+      return std::sqrt(scaling_disk * scaling_disk + scaling_halo * scaling_halo);
 
 }
 
+/*
 void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 
   std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
@@ -131,4 +136,4 @@ void JF12RandomField::_on_grid(std::array<double*, 3> val, const std::array<int,
   }
 
   //std::cout << "afterdivergence " << (val[0])[0] <<" " << (val[0])[5] << " "  << (val[0])[10] << std::endl;
-}
+}*/

@@ -16,7 +16,7 @@ double ESRandomField::spatial_profile(const double &x, const double &y, const do
   return std::exp(-r_cyl / r0) * std::exp(-zz / z0);
 }
 
-
+/*
 void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &zpt, const std::array<double, 3> &inc, const int seed) {
 
       int gs = grid_size(shp);
@@ -57,3 +57,4 @@ void ESRandomField::_on_grid(std::array<double*, 3> val, const std::array<int, 3
       }
 
 }
+*/
