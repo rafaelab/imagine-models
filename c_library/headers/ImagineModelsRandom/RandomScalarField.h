@@ -51,6 +51,8 @@ public:
   double* on_grid(const int seed);
 
   void _on_grid(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed);
+  
+  double* profile_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rfp, const std::array<double, 3> &inc);
 };
 
 #endif /* RANDOMSCALARFIELD_H */

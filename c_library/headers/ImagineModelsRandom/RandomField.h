@@ -53,6 +53,8 @@ public:
     throw NotImplementedException();
   }
 
+  virtual double* profile_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rfp, const std::array<double, 3> &inc) = 0;
+
   void remove_padding(double* val, const std::array<int, 3> &shp, const int pad);
 
   double simple_spectrum(const double &abs_k, const double &dk, const double &k0, const double &s) const;

@@ -82,15 +82,25 @@ std::array<double*, 3> RandomVectorField::on_grid(const std::array<int, 3> &shp,
     return grid_eval;
   }
 
-  std::array<double*, 3> RandomVectorField::on_grid(const int seed) {
-    if (not initialized_with_grid) 
-      throw GridException();
-    std::array<double*, 3> grid_eval = allocate_memory(internal_shape);
-    const char *filename = "ImagineModelsRandomVectorField";
-    int fftw_import_wisdom_from_filename(*filename);
-    _on_grid(grid_eval, internal_shape, internal_ref_point, internal_increment, seed);
-    return grid_eval;
-  }
+std::array<double*, 3> RandomVectorField::on_grid(const int seed) {
+  if (not initialized_with_grid) 
+    throw GridException();
+  std::array<double*, 3> grid_eval = allocate_memory(internal_shape);
+  const char *filename = "ImagineModelsRandomVectorField";
+  int fftw_import_wisdom_from_filename(*filename);
+  _on_grid(grid_eval, internal_shape, internal_ref_point, internal_increment, seed);
+  return grid_eval;
+}
+
+double* RandomVectorField::profile_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rfp, const std::array<double, 3> &inc) {
+  double* grid_eval;
+  size_t arr_sz = shp[0]*shp[1]*shp[2];
+  grid_eval = new double[arr_sz];
+  evaluate_function_on_grid<number, double*>(grid_eval, shp, rfp, inc,
+                                    [this](double xx, double yy, double zz)
+                                    { return spatial_profile(xx, yy, zz); });
+  return grid_eval;
+} 
 
 std::array<fftw_complex*, 3> RandomVectorField::draw_random_numbers(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed) {
   std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 

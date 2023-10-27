@@ -67,7 +67,7 @@ public:
   }
 
   // internal on_grid function, combining seeding of random numbers, applying the spatial profile and divergence cleaning
-void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed); 
+  void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed); 
 
   // divergence cleaner
   void divergence_cleaner(fftw_complex* bx, fftw_complex* by, fftw_complex* bz,  const std::array<int, 3> &shp, const std::array<double, 3> &inc) const;
@@ -78,7 +78,8 @@ void _on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const s
 
   std::array<double*, 3> on_grid(const int seed);
 
-  };
+  double* profile_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rfp, const std::array<double, 3> &inc);
+};
 
 
 #endif /* RANDOMVECTORFIELD_H */

@@ -30,6 +30,9 @@ public:
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomField, spatial_profile, x, y, z); }
 
+    double* profile_on_grid(const std::array<int, 3> &shape, const std::array<double, 3> &reference_point, const std::array<double, 3> &increment)
+    override {PYBIND11_OVERRIDE_PURE(double*, RandomField, profile_on_grid, shape, reference_point, increment); }
+
     double calculate_fourier_sigma(const double &abs_k, const double &dk) const override{PYBIND11_OVERRIDE_PURE(double, RandomField, calculate_fourier_sigma, abs_k, dk); }
 
     double* allocate_memory(std::array<int, 3> shp) override {PYBIND11_OVERRIDE_PURE(double*, RandomField, allocate_memory, shp); }
@@ -51,6 +54,9 @@ public:
     std::array<double*, 3> on_grid(const std::array<int, 3>& shape, const std::array<double, 3>& reference_point, const std::array<double, 3>& increment, int seed) override {PYBIND11_OVERRIDE_PURE(Array3PointerType, RandomField, on_grid, shape, reference_point, increment, seed); }
 
     double spatial_profile(const double &x, const double &y, const double &z) const override{PYBIND11_OVERRIDE_PURE(double, RandomField, spatial_profile, x, y, z); }
+
+    double* profile_on_grid(const std::array<int, 3> &shape, const std::array<double, 3> &reference_point, const std::array<double, 3> &increment)
+    override {PYBIND11_OVERRIDE_PURE(double*, RandomField, profile_on_grid, shape, reference_point, increment); }
 
     double calculate_fourier_sigma(const double &abs_k, const double &dk) const override{PYBIND11_OVERRIDE_PURE(double, RandomField, calculate_fourier_sigma, abs_k, dk); }
 

@@ -89,6 +89,16 @@ double* RandomScalarField::on_grid(const int seed) {
   return grid_eval;
 }
 
+double* RandomScalarField::profile_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rfp, const std::array<double, 3> &inc) {
+  double* grid_eval;
+  size_t arr_sz = shp[0]*shp[1]*shp[2];
+  grid_eval = new double[arr_sz];
+  evaluate_function_on_grid<number, double*>(grid_eval, shp, rfp, inc,
+                                    [this](double xx, double yy, double zz)
+                                    { return spatial_profile(xx, yy, zz); });
+  return grid_eval;
+} 
+
 void RandomScalarField::_on_grid(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 
   // Step 1: draw random numbers with variance 1, possibly correlated

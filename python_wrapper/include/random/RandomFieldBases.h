@@ -36,7 +36,18 @@ void RandomFieldBases(py::module_ &m) {
 
           return arr;}, 
           "seed"_a, 
-          py::return_value_policy::take_ownership);
+          py::return_value_policy::take_ownership)
+
+        .def("profile_on_grid", [](RandomVectorField &self, std::array<int, 3> &shape,  std::array<double, 3>  &reference_point, std::array<double, 3>  &increment) {
+        double* f = self.profile_on_grid(shape, reference_point, increment); 
+        size_t sx = shape[0];
+        size_t sy = shape[1];
+        size_t sz = shape[2];
+
+        auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
+        return arr;},
+        py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), 
+        py::return_value_policy::take_ownership);
 
 // Random Scalar Base Class
     py::class_<RandomScalarField, RandomField<number, double*>, PyRandomScalarField>(m, "RandomScalarField")
@@ -66,7 +77,18 @@ void RandomFieldBases(py::module_ &m) {
           //py::array_t<double> arr = py::array(f.size(), f.data());  // produces a copy!
           return arr;}, 
           "seed"_a, 
-          py::return_value_policy::take_ownership);
+          py::return_value_policy::take_ownership)
+
+      .def("profile_on_grid", [](RandomScalarField &self, std::array<int, 3> &shape,  std::array<double, 3>  &reference_point, std::array<double, 3>  &increment) {
+        double* f = self.profile_on_grid(shape, reference_point, increment); 
+        size_t sx = shape[0];
+        size_t sy = shape[1];
+        size_t sz = shape[2];
+
+        auto arr = from_pointer_to_pyarray(std::move(f), sx, sy, sz);
+        return arr;},
+        py::kw_only(), py::arg("shape").noconvert(), py::arg("reference_point"), py::arg("increment"), 
+        py::return_value_policy::take_ownership);
       
 }
 
