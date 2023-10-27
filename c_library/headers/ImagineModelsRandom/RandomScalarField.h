@@ -44,7 +44,7 @@ public:
   // implemented/hidden in child classes, rms amplitude and anisotropy direction
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
 
-  fftw_complex* draw_random_numbers(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed); 
+  double* random_numbers_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed);
 
   double* on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed);
 

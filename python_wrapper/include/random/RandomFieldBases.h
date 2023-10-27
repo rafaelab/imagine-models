@@ -90,6 +90,16 @@ void RandomFieldBases(py::module_ &m) {
           "seed"_a, 
           py::return_value_policy::take_ownership)
 
+      .def("random_numbers_on_grid", [](RandomScalarField &self, std::array<int, 3> &shape, std::array<double, 3>  &increment, const int seed) {
+        double* val = self.random_numbers_on_grid(shape, increment, seed); 
+        size_t sx = shape[0];
+        size_t sy = shape[1];
+        size_t sz = shape[2];
+        auto arr = from_pointer_to_pyarray(std::move(val), sx, sy, sz);
+        return arr;},
+      py::kw_only(), py::arg("shape").noconvert(), py::arg("increment"), "seed"_a,
+      py::return_value_policy::take_ownership)
+
       .def("profile_on_grid", [](RandomScalarField &self, std::array<int, 3> &shape,  std::array<double, 3>  &reference_point, std::array<double, 3>  &increment) {
         double* f = self.profile_on_grid(shape, reference_point, increment); 
         size_t sx = shape[0];

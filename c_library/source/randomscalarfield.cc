@@ -65,14 +65,6 @@ void RandomScalarField::destroy_plans() {
   }
 }
 
-fftw_complex* RandomScalarField::draw_random_numbers(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed) {
-  fftw_complex* val_comp = construct_plans(val, shp); 
-  int grid_size = shp[0]*shp[1]*shp[2];
-  seed_complex_random_numbers(val_comp, shp, inc, seed);
-  fftw_execute(c2r);
-  return val_comp;
-}
-
 double* RandomScalarField::on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
   double* grid_eval = allocate_memory(shp);
   _on_grid(grid_eval, shp, rpt, inc, seed);
@@ -99,12 +91,39 @@ double* RandomScalarField::profile_on_grid(const std::array<int, 3> &shp, const 
   return grid_eval;
 } 
 
+double* RandomScalarField::random_numbers_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed) {
+    double* val = allocate_memory(shp);
+    fftw_complex* val_comp = construct_plans(val, shp); 
+    int gs = grid_size(shp);
+    double sqrt_gs = std::sqrt(gs);
+    std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
+    int padded_size = grid_size(padded_shp);
+    int pad =  padded_shp[2] - shp[2];
+
+    seed_complex_random_numbers(val_comp, shp, inc, seed);
+    fftw_execute(c2r);
+    for (int s = 0; s < padded_size; ++s)  {
+        (val)[s] /= sqrt_gs;  
+    }
+    remove_padding(val, shp, pad);
+    
+    return val;
+}
+
 void RandomScalarField::_on_grid(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 
-  // Step 1: draw random numbers with variance 1, possibly correlated
-  fftw_complex* val_comp = draw_random_numbers(val, shp, inc, seed);
-  
+  fftw_complex* val_comp = construct_plans(val, shp); 
   std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
+  int gs = grid_size(shp);
+  double sqrt_gs = std::sqrt(gs);
+  int padded_size = grid_size(padded_shp);
+  int pad =  padded_shp[2] - shp[2];
+  // Step 1: draw random numbers with variance 1, possibly correlated
+
+  seed_complex_random_numbers(val_comp, shp, inc, seed);
+  fftw_execute(c2r);
+  
+  
   // Step 2: apply spatial amplitude, possibly introduce anisotropy depending on regular field.
   if (!no_profile) {
     auto apply_profile = [&](double &rand_val, const double xx, const double yy, const double zz) {
@@ -117,12 +136,7 @@ void RandomScalarField::_on_grid(double* val, const std::array<int, 3> &shp, con
   
     apply_function_to_field<double*, double>(val, padded_shp, rpt, inc, apply_profile);
   }
-  
-  int grid_size = shp[0]*shp[1]*shp[2];
-  int padded_size = padded_shp[0]*padded_shp[1]*padded_shp[2];
-  int pad =  padded_shp[2] - shp[2];
 
-  double sqrt_gs = std::sqrt(grid_size);
   for (int s = 0; s < padded_size; ++s)  {
     (val)[s] /= sqrt_gs;  
   }
