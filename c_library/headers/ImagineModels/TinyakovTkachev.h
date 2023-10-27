@@ -17,7 +17,7 @@ protected:
     Eigen::MatrixXd _jac(const double &x, const double &y, const double &z, TTMagneticField &p) const;
 #endif
 public:
-    using RegularVectorField ::RegularVectorField;
+    using RegularVectorField::RegularVectorField;
 
     double b_r_max = 20.; // kpc
     double b_r_min = 4.;  // kpc

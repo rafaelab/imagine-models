@@ -93,73 +93,98 @@ public:
   }
 
 
-  // Evaluate scalar valued functions on regular grids
-  template <typename FRTYPE> 
-  void evaluate_function_on_grid(double *fval, const std::array<int, 3> &size, const std::array<double, 3> &rpt,  const std::array<double, 3> &inc, std::function<FRTYPE(double, double, double)> eval) {
+  void initialize_field_value(double* fval, number eval, const int idx) {
+    fval[idx] = static_cast<double>(eval);
+  }
+
+  void initialize_field_value(std::array<double*, 3> fval, number eval,  const int idx) {
+    fval[0][idx] = static_cast<double>(eval);
+    fval[1][idx] = static_cast<double>(eval);
+    fval[2][idx] = static_cast<double>(eval);
+  }
+
+  void initialize_field_value(std::array<double*, 3> fval, vector eval, const int idx) {
+    fval[0][idx] = static_cast<double>(eval[0]);
+    fval[1][idx] = static_cast<double>(eval[1]);
+    fval[2][idx] = static_cast<double>(eval[2]);
+  }
+
+  // The update_field_value functions are not yet usable with autodiff, as they are only used for random fields
+  void update_field_value(double* fval, std::function<double(double &, const double, const double, const double)> func, const int idx, const double xx, const double yy, const double zz) {
+    double fval_at_inx = fval[idx];
+    double eval = func(fval_at_inx, xx, yy, zz);
+    fval[idx] = static_cast<double>(eval);
+  }
+
+  void update_field_value(std::array<double *, 3> fval, std::function<std::array<double, 3>(std::array<double, 3> &, double, double, double)> func, const int idx, const double xx, const double yy, const double zz) {
+    std::array<double, 3> val = {fval[0][idx], fval[1][idx], fval[2][idx]};
+    std::array<double, 3> eval = func(val, xx, yy, zz); 
+    fval[0][idx] = static_cast<double>(eval[0]);
+    fval[1][idx] = static_cast<double>(eval[1]);
+    fval[2][idx] = static_cast<double>(eval[2]);
+  }
+
+  // Initialize functions on regular grids
+  template <typename FRTYPE, typename GTYPE> 
+  void evaluate_function_on_grid(GTYPE fval, const std::array<int, 3> &size, const std::array<double, 3> &rpt,  const std::array<double, 3> &inc, std::function<FRTYPE(double, double, double)> func) {
     for (int i=0; i < size[0]; i++) {
       int m = i*size[1]*size[2];
       for (int j=0; j < size[1]; j++) {
         int n = j*size[2];
         for (int k=0; k < size[2]; k++) {
-          FRTYPE v = eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
-                    fval[m + n + k] = static_cast<double>(v);
+          FRTYPE v = func(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
+          initialize_field_value(fval, v, m + n + k);
         }   
       }   
     }
   } 
 
-// Evaluate scalar valued functions on irregular grids
-  template <typename FRTYPE> 
-  void evaluate_function_on_grid(double *fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<FRTYPE(double, double, double)> eval) {
+// Initialze functions on irregular grids
+  template <typename FRTYPE, typename GTYPE> 
+  void evaluate_function_on_grid(GTYPE fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<FRTYPE(double, double, double)> func) {
     std::vector<int> size{(int)ggx.size(), (int)ggy.size(), (int)ggz.size()};
     for (int i=0; i < size[0]; i++) {
       int m = i*size[1]*size[2];
       for (int j=0; j < size[1]; j++) {
         int n = j*size[2];
         for (int k=0; k < size[2]; k++) {
-          FRTYPE v = eval(ggx.at(i), ggy.at(j), ggz.at(k));
-          fval[m + n + k] = static_cast<double>(v);
+          FRTYPE v = func(ggx.at(i), ggy.at(j), ggz.at(k));
+          initialize_field_value(fval, v, m + n + k);
         }   
       }   
     }
   }
 
 
-  // Evaluate vector valued functions on irregular grids (replace with template for ndim?)
-  template <typename FRTYPE> 
-  void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<FRTYPE(double, double, double)> eval) {
+
+  // Apply functions on regular grids
+  template <typename GTYPE, typename FRTYPE> 
+  void apply_function_to_field(GTYPE fval, const std::array<int, 3> &size, const std::array<double, 3> &rpt,  const std::array<double, 3> &inc, std::function<FRTYPE(FRTYPE &, double, double, double)> func) {
+    for (int i=0; i < size[0]; i++) {
+      int m = i*size[1]*size[2];
+      for (int j=0; j < size[1]; j++) {
+        int n = j*size[2];
+        for (int k=0; k < size[2]; k++) {
+          update_field_value(fval, func, m + n + k, rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
+        }   
+      }   
+    }
+  } 
+
+// Apply functions on irregular grids
+  template <typename FRTYPE, typename GTYPE> 
+  void apply_function_to_field(GTYPE fval, const std::vector<double> &ggx, const std::vector<double> &ggy, const std::vector<double> &ggz, std::function<FRTYPE(FRTYPE &, double, double, double)> func) {
     std::vector<int> size{(int)ggx.size(), (int)ggy.size(), (int)ggz.size()};
     for (int i=0; i < size[0]; i++) {
       int m = i*size[1]*size[2];
       for (int j=0; j < size[1]; j++) {
         int n = j*size[2];
         for (int k=0; k < size[2]; k++) {
-          FRTYPE v = eval(ggx.at(i), ggy.at(j), ggz.at(k));
-          fval[0][m + n + k] = static_cast<double>(v[0]);
-          fval[1][m + n + k] = static_cast<double>(v[1]);
-          fval[2][m + n + k] = static_cast<double>(v[2]);
-        }      
-      }   
-    }   
-  }
-
-  // Evaluate vector valued functions on regular grids
-  template <typename FRTYPE> 
-  void evaluate_function_on_grid(std::array<double*, 3>  fval, const std::array<int, 3> &size, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, std::function<FRTYPE(double, double, double)> eval) {
-    for (int i=0; i < size[0]; i++) {
-      int m = i*size[1]*size[2];
-      for (int j=0; j < size[1]; j++) {
-        int n = j*size[2];
-        for (int k=0; k < size[2]; k++) {
-          FRTYPE v = eval(rpt[0] + i*inc[0], rpt[1] + j*inc[1], rpt[2] + k*inc[2]);
-          fval[0][m + n + k] = static_cast<double>(v[0]);
-          fval[1][m + n + k] = static_cast<double>(v[1]);
-          fval[2][m + n + k] = static_cast<double>(v[2]);        
+          update_field_value(fval, func, m + n + k, ggx.at(i), ggy.at(j), ggz.at(k));
         }   
-      }  
+      }   
     }
   }
-
 };
 
 #endif

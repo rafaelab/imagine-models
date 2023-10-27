@@ -1,3 +1,31 @@
+
+
+template<typename POSTYPE, typename GRIDTYPE>
+double RandomField<POSTYPE, GRIDTYPE>::hammurabi_spectrum(const double &abs_k, const double &rms, const double &k0, const double &k1, const double &a0, const double &a1) const {
+  // this function is adapted from https://github.com/hammurabi-dev/hammurabiX/blob/master/source/field/b/brnd_jf12.cc
+  // original author: https://github.com/gioacchinowang
+  const double p0 = rms*rms;
+  double pi = 3.141592653589793;
+  const double unit = 1. / (4 * pi * abs_k * abs_k);   // units fixing, wave vector in 1/kpc units
+  // power laws
+  const double band1 = double(abs_k < k1);
+  const double band2 = double(abs_k > k1) * double(abs_k < k0);
+  const double band3 = double(abs_k > k0);
+  const double P = band1 * std::pow(k0 / k1, a1) * std::pow(abs_k / k1, 6.0) +
+                  band2 / std::pow(abs_k / k0, a1) +
+                  band3 / std::pow(abs_k / k0, a0);
+  return P * p0 * unit;
+  }
+
+template<typename POSTYPE, typename GRIDTYPE>
+double RandomField<POSTYPE, GRIDTYPE>::simple_spectrum(const double &abs_k, const double &dk, const double &k0, const double &s) const {
+  double pi = 3.141592653589793;
+  const double unit = 1. / (4 * pi * abs_k * abs_k); 
+  const double dP = unit / std::pow(abs_k + k0, s);
+  //double norm = 1. / ((s - 1.) * std::pow(k0, (s - 1))); // normalize to unity
+  return dP; // / norm;
+}
+
 template<typename POSTYPE, typename GRIDTYPE>
 void RandomField<POSTYPE, GRIDTYPE>::remove_padding(double* val, const std::array<int, 3> &shp, const int pad) {
   int start = 0;
@@ -8,8 +36,9 @@ void RandomField<POSTYPE, GRIDTYPE>::remove_padding(double* val, const std::arra
   }
 }
 
+
 template<typename POSTYPE, typename GRIDTYPE>
-void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed)  {
+void RandomField<POSTYPE, GRIDTYPE>::seed_complex_random_numbers(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed)  {
 
   bool debug_random = false;
   auto gen = std::mt19937(seed);
@@ -56,10 +85,15 @@ void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* v
           continue;
         }
         
-        
-        //const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
-        //double sigma = calculate_fourier_sigma(ks);
-        double sigma = 1.;
+        double sigma;
+
+        if (apply_spectrum) {
+          const double ks = std::sqrt(kx * kx + ky * ky + kz * kz);
+          sigma = calculate_fourier_sigma(ks, 1./(lx*ly*lz));
+        }
+        else {
+          sigma = 1.;
+        }
         std::normal_distribution<double> nd{0, sigma};
 
         bool l_is_zero_or_nyquist = (l == 0 or l == nyquist_z);

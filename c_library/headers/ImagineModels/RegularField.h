@@ -59,12 +59,12 @@ public:
     double *grid_eval = allocate_memory(internal_shape);
     if (regular_grid)
     {
-      evaluate_function_on_grid<number>(grid_eval, internal_shape, internal_ref_point, internal_increment, [this](double xx, double yy, double zz)
+      evaluate_function_on_grid<number, double*>(grid_eval, internal_shape, internal_ref_point, internal_increment, [this](double xx, double yy, double zz)
                                         { return at_position(xx, yy, zz); });
     }
     else
     {
-      evaluate_function_on_grid<number>(grid_eval, internal_grid_x, internal_grid_y, internal_grid_z, [this](double xx, double yy, double zz)
+      evaluate_function_on_grid<number, double*>(grid_eval, internal_grid_x, internal_grid_y, internal_grid_z, [this](double xx, double yy, double zz)
                                         { return at_position(xx, yy, zz); });
     }
     return grid_eval;
@@ -74,7 +74,7 @@ public:
   {
     std::array<int, 3> shp = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
     double *grid_eval = allocate_memory(shp);
-    evaluate_function_on_grid<number>(grid_eval, grid_x, grid_y, grid_z,
+    evaluate_function_on_grid<number, double*>(grid_eval, grid_x, grid_y, grid_z,
                                       [this](double xx, double yy, double zz)
                                       { return at_position(xx, yy, zz); });
     return grid_eval;
@@ -83,7 +83,7 @@ public:
   double *on_grid(const std::array<int, 3> &shape, const std::array<double, 3> &reference_point, const std::array<double, 3> &increment, int seed = 0)
   {
     double *grid_eval = allocate_memory(shape);
-    evaluate_function_on_grid<number>(grid_eval, shape, reference_point, increment,
+    evaluate_function_on_grid<number, double*>(grid_eval, shape, reference_point, increment,
                                       [this](double xx, double yy, double zz)
                                       { return at_position(xx, yy, zz); });
     return grid_eval;
@@ -166,12 +166,12 @@ public:
     ;
     if (regular_grid)
     {
-      evaluate_function_on_grid<vector>(grid_eval, internal_shape, internal_ref_point, internal_increment, [this](double xx, double yy, double zz)
+      evaluate_function_on_grid<vector, std::array<double *, 3>>(grid_eval, internal_shape, internal_ref_point, internal_increment, [this](double xx, double yy, double zz)
                                         { return at_position(xx, yy, zz); });
     }
     else
     {
-      evaluate_function_on_grid<vector>(grid_eval, internal_grid_x, internal_grid_y, internal_grid_z, [this](double xx, double yy, double zz)
+      evaluate_function_on_grid<vector, std::array<double *, 3>>(grid_eval, internal_grid_x, internal_grid_y, internal_grid_z, [this](double xx, double yy, double zz)
                                         { return at_position(xx, yy, zz); });
     }
     return grid_eval;
@@ -181,7 +181,7 @@ public:
   {
     std::array<int, 3> shp = {(int)grid_x.size(), (int)grid_y.size(), (int)grid_z.size()};
     std::array<double *, 3> grid_eval = allocate_memory(shp);
-    evaluate_function_on_grid<vector>(grid_eval, grid_x, grid_y, grid_z,
+    evaluate_function_on_grid<vector, std::array<double *, 3>>(grid_eval, grid_x, grid_y, grid_z,
                                       [this](double xx, double yy, double zz)
                                       { return at_position(xx, yy, zz); });
     return grid_eval;
@@ -190,7 +190,7 @@ public:
   std::array<double *, 3> on_grid(const std::array<int, 3> &shape, const std::array<double, 3> &reference_point, const std::array<double, 3> &increment, int seed = 0)
   {
     std::array<double *, 3> grid_eval = allocate_memory(shape);
-    evaluate_function_on_grid<vector>(grid_eval, shape, reference_point, increment,
+    evaluate_function_on_grid<vector, std::array<double *, 3>>(grid_eval, shape, reference_point, increment,
                                       [this](double xx, double yy, double zz)
                                       { return at_position(xx, yy, zz); });
     return grid_eval;
