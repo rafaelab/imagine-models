@@ -101,29 +101,53 @@ double* RandomVectorField::profile_on_grid(const std::array<int, 3> &shp, const 
                                     { return spatial_profile(xx, yy, zz); });
   return grid_eval;
 } 
+std::array<double*, 3> RandomVectorField::random_numbers_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed) {
+    std::array<double*, 3> val = allocate_memory(shp);
+    std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
+    int gs = grid_size(shp);
+    double sqrt_gs = std::sqrt(gs);
+    auto gen_int = std::mt19937(seed);
+    std::uniform_int_distribution<int> uni(0, 1215752192);
+    std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
+    int padded_size = grid_size(padded_shp);
+    int pad =  padded_shp[2] - shp[2];
 
-std::array<fftw_complex*, 3> RandomVectorField::draw_random_numbers(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed) {
-  std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
-  int grid_size = shp[0]*shp[1]*shp[2];
-  auto gen_int = std::mt19937(seed);
-  std::uniform_int_distribution<int> uni(0, 1215752192);
-
-  for (int i =0; i<3; ++i) {
-    int sub_seed = uni(gen_int); 
-    draw_random_numbers_complex(val_comp[i], shp, inc, sub_seed);
-    fftw_execute(c2r[i]);
-  }
-  return val_comp;
+    for (int i =0; i<3; ++i) {
+      int sub_seed = uni(gen_int); 
+      seed_complex_random_numbers(val_comp[i], shp, inc, sub_seed);
+      fftw_execute(c2r[i]);
+      for (int s = 0; s < padded_size; ++s)  {
+        (val[i])[s] /= sqrt_gs;  
+      }
+      remove_padding(val[i], shp, pad);
+    }
+    return val;
 }
 
 void RandomVectorField::_on_grid(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) {
 
+  std::array<fftw_complex*, 3> val_comp = construct_plans(val, shp); 
+  std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
+  int gs = grid_size(shp);   
+  int padded_size = grid_size(padded_shp);
+  int pad =  padded_shp[2] - shp[2];
+  auto gen_int = std::mt19937(seed);
+  std::uniform_int_distribution<int> uni(0, 1215752192);
+  double sqrt_gs = std::sqrt(gs);
+
   // Step 1: draw random numbers with variance 1, possibly correlated
-  std::array<fftw_complex*, 3> val_comp = draw_random_numbers(val, shp, inc, seed);
-  
+
+  for (int i =0; i<3; ++i) {
+    int sub_seed = uni(gen_int); 
+    seed_complex_random_numbers(val_comp[i], shp, inc, sub_seed);
+    fftw_execute(c2r[i]);
+    //for (int s = 0; s < padded_size; ++s)  {
+    //    (val[i])[s] /= sqrt_gs;  
+    //  }
+    //remove_padding(val[i], shp, pad);
+  }
   
   // Step 2: apply spatial amplitude, possibly introduce anisotropy depending on regular field.
-  std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 
   if (!no_profile) {
     auto apply_profile = [&](std::array<double, 3> &b_rand_val, const double xx, const double yy, const double zz) {
         
@@ -162,9 +186,6 @@ void RandomVectorField::_on_grid(std::array<double*, 3> val, const std::array<in
     };
     apply_function_to_field<std::array<double*, 3>, std::array<double, 3>>(val, padded_shp, rpt, inc, apply_profile);
   }
-  int grid_size = shp[0]*shp[1]*shp[2];    
-  int padded_size = padded_shp[0]*padded_shp[1]*padded_shp[2];
-  int pad =  padded_shp[2] - shp[2];
   // Step 3 (optional): divergence cleaning using Gram Schmidt process
   if (clean_divergence) {
   
@@ -175,16 +196,15 @@ void RandomVectorField::_on_grid(std::array<double*, 3> val, const std::array<in
     
     for (int i =0; i<3; ++i) {
       fftw_execute(c2r[i]);
-      double sqrt_gs = std::sqrt(grid_size);
       for (int s = 0; s < padded_size; ++s)  {
-        (val[i])[s] /= (grid_size*sqrt_gs);  
+        (val[i])[s] /= (gs*sqrt_gs);  
       }
       remove_padding(val[i], shp, pad);
     }
   }
   else {
     for (int i =0; i<3; ++i) {
-      double sqrt_gs = std::sqrt(grid_size);
+      double sqrt_gs = std::sqrt(gs);
       for (int s = 0; s < padded_size; ++s)  {
         (val[i])[s] /= sqrt_gs;  
       }

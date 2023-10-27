@@ -8,7 +8,7 @@ void LogNormalScalarField::_on_grid(double* val, const std::array<int, 3> &shp, 
 
       fftw_complex* val_comp = construct_plans(val, shp);;
         
-      draw_random_numbers_complex(val_comp, shp, grid_increment, seed);
+      seed_complex_random_numbers(val_comp, shp, grid_increment, seed);
       
       fftw_execute(c2r);
       std::array<int, 3> padded_shp = {shp[0],  shp[1],  2*(shp[2]/2 + 1)}; 

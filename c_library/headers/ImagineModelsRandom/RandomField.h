@@ -47,7 +47,7 @@ public:
     // This function is the place where the global routine should be implemented, i.e. how the spatial profile modifies the random field, and if divergence cleaning needs to be performed. 
   virtual void _on_grid(GRIDTYPE val, const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed) = 0;
 
-  void draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed); 
+  void seed_complex_random_numbers(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed); 
 
   GRIDTYPE on_grid(const std::vector<double>  &grid_x, const std::vector<double>  &grid_y, const std::vector<double>  &grid_z, const int seed) {
     throw NotImplementedException();

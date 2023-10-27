@@ -38,7 +38,7 @@ void RandomField<POSTYPE, GRIDTYPE>::remove_padding(double* val, const std::arra
 
 
 template<typename POSTYPE, typename GRIDTYPE>
-void RandomField<POSTYPE, GRIDTYPE>::draw_random_numbers_complex(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed)  {
+void RandomField<POSTYPE, GRIDTYPE>::seed_complex_random_numbers(fftw_complex* vec,  const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed)  {
 
   bool debug_random = false;
   auto gen = std::mt19937(seed);

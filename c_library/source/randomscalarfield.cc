@@ -68,7 +68,7 @@ void RandomScalarField::destroy_plans() {
 fftw_complex* RandomScalarField::draw_random_numbers(double* val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed) {
   fftw_complex* val_comp = construct_plans(val, shp); 
   int grid_size = shp[0]*shp[1]*shp[2];
-  draw_random_numbers_complex(val_comp, shp, inc, seed);
+  seed_complex_random_numbers(val_comp, shp, inc, seed);
   fftw_execute(c2r);
   return val_comp;
 }

@@ -26,10 +26,6 @@ protected:
 
   // protected member functions 
 
-  // memory (de-)allocation
-  std::array<double*, 3> allocate_memory(std::array<int, 3> shp);
-  void free_memory(std::array<double*, 3> grid_eval);
-
   // fftw plan (con/de)struction
   std::array<fftw_complex*, 3> construct_plans(std::array<double*, 3> grid_eval, std::array<int, 3> shp);
   void destroy_plans();
@@ -52,6 +48,10 @@ public:
   double anisotropy_rho = 1.;
 
   // METHODS
+
+  // memory (de-)allocation
+  std::array<double*, 3> allocate_memory(std::array<int, 3> shp);
+  void free_memory(std::array<double*, 3> grid_eval);
   
   // implemented/hidden in child classes, rms amplitude and anisotropy direction
   virtual double spatial_profile(const double &x, const double &y, const double &z) const = 0;
@@ -72,7 +72,7 @@ public:
   // divergence cleaner
   void divergence_cleaner(fftw_complex* bx, fftw_complex* by, fftw_complex* bz,  const std::array<int, 3> &shp, const std::array<double, 3> &inc) const;
 
-  std::array<fftw_complex*, 3> draw_random_numbers(std::array<double*, 3> val, const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed);
+  std::array<double*, 3> random_numbers_on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &inc, const int seed);
 
   std::array<double*, 3> on_grid(const std::array<int, 3> &shp, const std::array<double, 3> &rpt, const std::array<double, 3> &inc, const int seed);
 
