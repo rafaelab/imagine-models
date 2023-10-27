@@ -10,10 +10,10 @@ except ImportError:
 
 plt.ion()
 
-def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar=True, show_labels=True,
+def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar=True, show_labels=True, label=None,
                save_fig=False, field_name=None, quiver=False, amplitude=False, cut_index =None,  plot_earth=True, cmap=None):
     """
-    produces a plot showing a slice through a IMAGINE model output. The slice goes throgh the middle of array in the respective dimension slice_dim
+    produces a plot showing a slice through a IMAGINE model output. The slice goes throgh the middle of array in the respective dimension slice_dim. All distances are kpc.
 
     :param array: vector or scalar field in grid form e.g. from on_grid()
     :param slice_dim: dimension on which to slice, e.g. 0 will give a slice through the y-z plane
@@ -24,11 +24,12 @@ def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar
     :param vmax: maximum value on color bar (magnetic field in muG or density in 1/cm^3)
     :param vec_dim: which dimension of vec(B) to display, can be 0, 1, 2. Necessary to plot vector field components, no effect for scalar field or if amplitude=True
     :param show_cbar: show color bar
-    :param show_labels: show labels on plotted axes
-    :param save_fig: saves figure automatically
-    :param field_name: if not None: displays name of field in plot
-    :param quiver: adds field vectors displayed as arrows to plot, has no effect for scalar fields
-    :param plot_earth: adds a marker on Earth's position
+    :param show_labels: show labels on plotted axes, default=True
+    :param label: label to plot, if None, default labels are used, default=None
+    :param save_fig: saves figure automatically, default=False
+    :param field_name: if not None: displays name of field in plot, default=None
+    :param quiver: adds field vectors displayed as arrows to plot, has no effect for scalar fields, default=False
+    :param plot_earth: adds a marker on Earth's position, default=False
     :param cmap: string to select a matplotlib colormap, the default
     """
    #
@@ -134,13 +135,15 @@ def plot_slice(array, slice_dim, shp, rfp, inc, vmin, vmax, vec_dim=0, show_cbar
     if show_cbar:
         cbar = fig.colorbar(ax.images[0], orientation="horizontal", shrink=0.5, aspect=30)
         if show_labels:
-            if is_vector:
-                if amplitude:
-                    cbar.set_label(r'$|B|$ sign($B_\phi$) / $\mu$G')
-                else:
-                    cbar.set_label(r'$B_%s$ / $\mu$G' % comp_label[0])
-            else: 
-                cbar.set_label(r'$n_\mathrm{th}$ / $\mathrm{cm}^-3$')
+            if label is None:
+                if is_vector:
+                    if amplitude:
+                        label = r'$|B|$ sign($B_\phi$) / $\mu$G'
+                    else:
+                        label = r'$B_%s$ / $\mu$G' % comp_label[0]
+                else: 
+                    label = r'$n_\mathrm{th}$ / $\mathrm{cm}^-3$'                 
+            cbar.set_label(label)
     plt.tight_layout()
     if save_fig:
         name = comp_label + "_" + dims_label[0] + "_" + dims_label[1] + "_plane"
