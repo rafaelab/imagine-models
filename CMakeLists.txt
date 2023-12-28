@@ -10,6 +10,31 @@ include(CTest)
 include(FetchContent)
 include(GNUInstallDirs)
 
+
+# The follwing line of code are form 
+# https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
+
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# the RPATH to be used when installing, but only if it's not a system directory
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+if("${isSystemDir}" STREQUAL "-1")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+endif("${isSystemDir}" STREQUAL "-1")
+
+## end RPATH code
+
 set(USE_AUTODIFF ON CACHE BOOL OFF)
 set(USE_FFTW ON CACHE BOOL OFF)
 
@@ -97,6 +122,7 @@ if(Python3_FOUND)
         target_include_directories(_ImagineModels PUBLIC /usr/include/eigen3)
     endif()
 
+    message("LIBRARIES: "  ${LIBRARIES})
     target_link_libraries(_ImagineModels PUBLIC ImagineModels ${LIBRARIES})
     if (autodiff_FOUND)
         target_link_libraries(_ImagineModels PUBLIC ImagineModels autodiff::autodiff)
