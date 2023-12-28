@@ -33,6 +33,7 @@ class CMakeBuild(build_ext):
         # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
         extdir = ext_fullpath.parent.resolve()
+        print("extdir: ", extdir )
         # required for auto-detection & inclusion of auxiliary "native" libs
 #        if not extdir.endswith(os.path.sep):
 #            extdir += os.path.sep
@@ -108,6 +109,7 @@ class CMakeBuild(build_ext):
                 cmake_args += [
                     f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
                 ]
+                print("DCMAKE_LIBRARY_OUTPUT_DIRECTORY_ ", f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}")
                 build_args += ["--config", cfg]
 
         if sys.platform.startswith("darwin"):
