@@ -117,9 +117,9 @@ if(Python3_FOUND)
     endif()
 
     message("LIBRARIES: "  ${LIBRARIES})
-    target_link_libraries(_ImagineModels PUBLIC ImagineModels ${LIBRARIES})
+    target_link_libraries(_ImagineModels PUBLIC tImagineModels ${LIBRARIES})
     if (autodiff_FOUND)
-        target_link_libraries(_ImagineModels PUBLIC ImagineModels autodiff::autodiff)
+        target_link_libraries(_ImagineModels PUBLIC tImagineModels autodiff::autodiff)
     endif()
     # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
     # define (VERSION_INFO) here.

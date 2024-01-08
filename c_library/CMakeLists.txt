@@ -67,7 +67,7 @@ if ("${is_system}" STREQUAL "-1")
     set_target_properties(tImagineModels PROPERTIES
         INSTALL_RPATH_USE_LINK_PATH TRUE
         INSTALL_RPATH "${lib_path}")
-    # The following is necessary for installation in a virtual
+#    # The following is necessary for installation in a virtual
     # environment `python -m pip venv env`
     #s#et_target_properties(ImagineModels PROPERTIES
      #   INSTALL_RPATH_USE_LINK_PATH TRUE
