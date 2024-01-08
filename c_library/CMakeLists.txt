@@ -1,4 +1,4 @@
-project(ImagineModels VERSION 0.2 DESCRIPTION "A library for Galactic models.")
+project(tImagineModels VERSION 0.2 DESCRIPTION "A library for Galactic models.")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,37 +44,52 @@ if(FFTW_FOUND)
     )
 endif()
 
-add_library(ImagineModels SHARED ${IM_SRC_FILES})
-target_include_directories(ImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModels)
+add_library(tImagineModels SHARED ${IM_SRC_FILES})
+target_include_directories(tImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModels)
 
 if (FFTW_FOUND)
-    target_include_directories(ImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModelsRandom)
+    target_include_directories(tImagineModels PUBLIC ${IM_INCLUDE_DIR}/ImagineModelsRandom)
 endif()
-target_link_libraries(ImagineModels PUBLIC ${LIBRARIES})
+target_link_libraries(tImagineModels PUBLIC ${LIBRARIES})
 if (autodiff_FOUND) 
-    target_include_directories(ImagineModels PUBLIC /usr/local/include/autodiff)
-    target_include_directories(ImagineModels PUBLIC /usr/include/eigen3)
-    target_link_libraries(ImagineModels PUBLIC autodiff::autodiff)
+    target_include_directories(tImagineModels PUBLIC /usr/local/include/autodiff)
+    target_include_directories(tImagineModels PUBLIC /usr/include/eigen3)
+    target_link_libraries(tImagineModels PUBLIC autodiff::autodiff)
 endif()
 
-set_target_properties(ImagineModels PROPERTIES
+set_target_properties(tImagineModels PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION}
 )
+
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
+if ("${is_system}" STREQUAL "-1")
+    set_target_properties(tImagineModels PROPERTIES
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+        INSTALL_RPATH "${lib_path}")
+    # The following is necessary for installation in a virtual
+    # environment `python -m pip venv env`
+    #s#et_target_properties(ImagineModels PROPERTIES
+     #   INSTALL_RPATH_USE_LINK_PATH TRUE
+     #   INSTALL_RPATH "${lib_path}")
+        message("Hi internal: ")
+endif()
 
 enable_testing()
 set(TESTSOURCES grid parameter_update positions)
 foreach(test ${TESTSOURCES})
     set(test_name ${test}_ctest)
     add_executable(${test_name} "${PROJECT_SOURCE_DIR}/test/regular/test_${test}.cc")
-    target_link_libraries(${test_name} ImagineModels ${LIBRARIES})
+    target_link_libraries(${test_name} tImagineModels ${LIBRARIES})
     add_test(${test_name} ${test_name})
 endforeach()
 
 configure_file(${PROJECT_SOURCE_DIR}/ImagineModels.pc.in ${CMAKE_BINARY_DIR}/ImagineModels.pc @ONLY)
 
+
+message("CMAKE_INSTALL_INCLUDEDIR: "  ${CMAKE_INSTALL_INCLUDEDIR})
 message("CMAKE_INSTALL_LIBDIR: "  ${CMAKE_INSTALL_LIBDIR})
 message("CMAKE_INSTALL_RPATH: "  ${CMAKE_INSTALL_RPATH})
 message("CMAKE_INSTALL_DATAROOTDIR: "  ${CMAKE_INSTALL_DATAROOTDIR})
-install(TARGETS ImagineModels LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS tImagineModels LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${CMAKE_BINARY_DIR}/ImagineModels.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)

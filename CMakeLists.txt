@@ -27,12 +27,6 @@ message("CMAKE_INSTALL_RPATH: "  ${CMAKE_INSTALL_RPATH})
 # which point to directories outside the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# the RPATH to be used when installing, but only if it's not a system directory
-#list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif("${isSystemDir}" STREQUAL "-1")
-
 ## end RPATH code
 
 set(USE_AUTODIFF ON CACHE BOOL OFF)
@@ -130,15 +124,26 @@ if(Python3_FOUND)
     # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
     # define (VERSION_INFO) here.
     target_compile_definitions(_ImagineModels PRIVATE VERSION_INFO=${PROJECT_VERSION})
+    set(ppath "${Python3_EXECUTABLE}")
+    string(REPLACE "python3" "" pypath ppath)
+    message("Python exec ${Python3_EXECUTABLE}")
+    set(lib_path "${Python3_EXECUTABLE}/${CMAKE_INSTALL_LIBDIR}")
+    message( "Python3_pypath: ${pppath}")
+    message( "Python3_STDARCH: ${Python3_STDARCH}")
+    message( "Python3_LIBRARIES: ${Python3_LIBRARIES}")
+    message( "Python3_LIBRARY_DIRS: ${Python3_LIBRARY_DIRS}")
+    message( "Python3_RUNTIME_LIBRARY_DIRS: ${Python3_RUNTIME_LIBRARY_DIRS}")
+    
 else()
     message("-- Could not find the Python Interpreter! Please provide provide a hint to CMake, using '-D CMAKE_PYTHON_EXECUTABLE'.")
+    set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 #if (SKBUILD)
 #    find_package(PythonExtensions REQUIRED)
 #    set(lib_path "${PYTHON_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 #else()
-set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+# set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 #endif()
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
 if ("${is_system}" STREQUAL "-1")
@@ -150,6 +155,8 @@ if ("${is_system}" STREQUAL "-1")
     set_target_properties(_ImagineModels PROPERTIES
         INSTALL_RPATH_USE_LINK_PATH TRUE
         INSTALL_RPATH "${lib_path}")
+        message("Hi: ")
 endif()
 
 message("lib_path: "  ${lib_path})
+message("is_system: "  ${is_system})
