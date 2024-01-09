@@ -68,6 +68,10 @@ class CMakeBuild(build_ext):
         # (needed e.g. to build for ARM OSx on conda-forge)
         if "CMAKE_ARGS" in os.environ:
             cmake_args += [item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
+            
+    
+        if "CMAKE_PREFIX_PATH" in os.environ:
+            cmake_args += [f"-DCMAKE_PREFIX_PATH={os.environ['CMAKE_PREFIX_PATH']}"]
 
         # In this example, we pass in the version to C++. You might not need to.
         # cmake_args += [f"-DEXAMPLE_VERSION_INFO={self.distribution.get_version()}"]

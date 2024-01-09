@@ -116,11 +116,29 @@ if(Python3_FOUND)
         target_include_directories(_ImagineModels PUBLIC /usr/include/eigen3)
     endif()
 
+    set_target_properties(_ImagineModels PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
+
+    # target_link_libraries(_ImagineModels PRIVATE supporting_library)
+    
+    set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+
     message("LIBRARIES: "  ${LIBRARIES})
     target_link_libraries(_ImagineModels PUBLIC tImagineModels ${LIBRARIES})
     if (autodiff_FOUND)
-        target_link_libraries(_ImagineModels PUBLIC tImagineModels autodiff::autodiff)
+        target_link_libraries(_ImagineModels PUBLIC autodiff::autodiff)
     endif()
+
+    
+    if(UNIX AND NOT APPLE)
+        message("unix: ${Python3_SITEARCH}")
+        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH "${Python3_SITEARCH}")
+    elseif(APPLE)
+        message("apple: @loader_path/site_packages")
+        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH "@loader_path/site_packages")
+    else() 
+        message("No unix and no apple")
+    endif()
+    
     # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
     # define (VERSION_INFO) here.
     target_compile_definitions(_ImagineModels PRIVATE VERSION_INFO=${PROJECT_VERSION})
@@ -137,7 +155,7 @@ if(Python3_FOUND)
     message( "Python3_RUNTIME_LIBRARY_DIRS: ${Python3_RUNTIME_LIBRARY_DIRS}")
     
 else()
-    message("-- Could not find the Python Interpreter! Please provide provide a hint to CMake, using '-D CMAKE_PYTHON_EXECUTABLE'.")
+    message("-- Could not find the Python Interpreter! If you want to build the python package, please provide provide a hint to CMake, using '-D CMAKE_PYTHON_EXECUTABLE'.")
 endif()
 
 #if (SKBUILD)

@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 
+# set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
+
 set(IM_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/headers/)
 INCLUDE_DIRECTORIES ( "/usr/local/include/eigen3 " )
 set(IM_SOURCE_DIR ${PROJECT_SOURCE_DIR}/source)
@@ -57,11 +59,11 @@ if (autodiff_FOUND)
     target_link_libraries(tImagineModels PUBLIC autodiff::autodiff)
 endif()
 
-set_target_properties(tImagineModels PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_VERSION}
-)
-get_target_property(HI tImagineModels INSTALL_NAME_DIR)
+set_target_properties(tImagineModels PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION} 
+                      # INSTALL_NAME_DIR "${Python3_SITEARCH}"
+                      # INSTALL_RPATH "${Python3_SITEARCH}"
+                      )
+# get_target_property(HI tImagineModels INSTALL_NAME_DIR)
 
 #list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${install_path}" is_system)
 #if ("${is_system}" STREQUAL "-1")
@@ -101,6 +103,12 @@ message("CMAKE_INSTALL_DATAROOTDIR: "  ${CMAKE_INSTALL_DATAROOTDIR})
 #    install(TARGETS tImagineModels LIBRARY DESTINATION ${install_path})
 #    install(FILES ${CMAKE_BINARY_DIR}/ImagineModels.pc DESTINATION ${install_path}/pkgconfig)
 #else()
-install(TARGETS tImagineModels LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS tImagineModels LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}) # "${Python3_SITEARCH}") 
+
+get_target_property(HI1 tImagineModels INSTALL_NAME_DIR)
+get_target_property(HI2 tImagineModels DESTINATION)
+message("HI2: "  ${HI1})
+message("HI1: "  ${HI2})
+
 install(FILES ${CMAKE_BINARY_DIR}/ImagineModels.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 #endif()
