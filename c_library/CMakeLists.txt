@@ -61,19 +61,20 @@ set_target_properties(tImagineModels PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION}
 )
+get_target_property(HI tImagineModels INSTALL_NAME_DIR)
 
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
-if ("${is_system}" STREQUAL "-1")
-    set_target_properties(tImagineModels PROPERTIES
-        INSTALL_RPATH_USE_LINK_PATH TRUE
-        INSTALL_RPATH "${lib_path}")
+#list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${install_path}" is_system)
+#if ("${is_system}" STREQUAL "-1")
+#    set_target_properties(tImagineModels PROPERTIES
+  #      INSTALL_RPATH_USE_LINK_PATH TRUE)
+        # INSTALL_RPATH "${install_path}")
 #    # The following is necessary for installation in a virtual
     # environment `python -m pip venv env`
     #s#et_target_properties(ImagineModels PROPERTIES
      #   INSTALL_RPATH_USE_LINK_PATH TRUE
      #   INSTALL_RPATH "${lib_path}")
-        message("Hi internal: ")
-endif()
+#        message("Hi internal: ")
+#endif()
 
 enable_testing()
 set(TESTSOURCES grid parameter_update positions)
@@ -87,9 +88,19 @@ endforeach()
 configure_file(${PROJECT_SOURCE_DIR}/ImagineModels.pc.in ${CMAKE_BINARY_DIR}/ImagineModels.pc @ONLY)
 
 
+message("HI: "  ${HI})
+message("rpath: "  "@rpath")
+message("INSTALL_NAME_DIR: "  ${INSTALL_NAME_DIR})
 message("CMAKE_INSTALL_INCLUDEDIR: "  ${CMAKE_INSTALL_INCLUDEDIR})
+message("CMAKE_BINARY_DIR: "  ${CMAKE_BINARY_INCLUDEDIR})
 message("CMAKE_INSTALL_LIBDIR: "  ${CMAKE_INSTALL_LIBDIR})
 message("CMAKE_INSTALL_RPATH: "  ${CMAKE_INSTALL_RPATH})
 message("CMAKE_INSTALL_DATAROOTDIR: "  ${CMAKE_INSTALL_DATAROOTDIR})
+
+#if(Python3_FOUND) 
+#    install(TARGETS tImagineModels LIBRARY DESTINATION ${install_path})
+#    install(FILES ${CMAKE_BINARY_DIR}/ImagineModels.pc DESTINATION ${install_path}/pkgconfig)
+#else()
 install(TARGETS tImagineModels LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${CMAKE_BINARY_DIR}/ImagineModels.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+#endif()

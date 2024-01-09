@@ -15,17 +15,17 @@ include(GNUInstallDirs)
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 
 # use, i.e. don't skip the full RPATH for the build tree
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
+#set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
 # when building, don't use the install RPATH already
 # (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+#set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-message("CMAKE_INSTALL_RPATH: "  ${CMAKE_INSTALL_RPATH})
+#set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+#message("CMAKE_INSTALL_RPATH: "  ${CMAKE_INSTALL_RPATH})
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+#set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ## end RPATH code
 
@@ -124,19 +124,20 @@ if(Python3_FOUND)
     # EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
     # define (VERSION_INFO) here.
     target_compile_definitions(_ImagineModels PRIVATE VERSION_INFO=${PROJECT_VERSION})
-    set(ppath "${Python3_EXECUTABLE}")
-    string(REPLACE "python3" "" pypath ppath)
+    set(install_path "${Python3_SITEARCH}")
+    # string(REPLACE "python3" "" pypath ppath)
     message("Python exec ${Python3_EXECUTABLE}")
-    set(lib_path "${Python3_EXECUTABLE}/${CMAKE_INSTALL_LIBDIR}")
-    message( "Python3_pypath: ${pppath}")
+    # set(lib_path "${Python3_EXECUTABLE}/${CMAKE_INSTALL_LIBDIR}")
+    # message( "Python3_pypath: ${ppath}")
     message( "Python3_STDARCH: ${Python3_STDARCH}")
+    message( "Python3_SITEARCH: ${Python3_SITEARCH}")
+    message( "Python3_BINARCH: ${Python3_BINARCH}")
     message( "Python3_LIBRARIES: ${Python3_LIBRARIES}")
     message( "Python3_LIBRARY_DIRS: ${Python3_LIBRARY_DIRS}")
     message( "Python3_RUNTIME_LIBRARY_DIRS: ${Python3_RUNTIME_LIBRARY_DIRS}")
     
 else()
     message("-- Could not find the Python Interpreter! Please provide provide a hint to CMake, using '-D CMAKE_PYTHON_EXECUTABLE'.")
-    set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 #if (SKBUILD)
@@ -145,18 +146,18 @@ endif()
 #else()
 # set(lib_path "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 #endif()
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
-if ("${is_system}" STREQUAL "-1")
-    set_target_properties(_ImagineModels PROPERTIES
-        INSTALL_RPATH_USE_LINK_PATH TRUE
-        INSTALL_RPATH "${lib_path}")
-    # The following is necessary for installation in a virtual
-    # environment `python -m pip venv env`
-    set_target_properties(_ImagineModels PROPERTIES
-        INSTALL_RPATH_USE_LINK_PATH TRUE
-        INSTALL_RPATH "${lib_path}")
-        message("Hi: ")
-endif()
+#list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${install_path}" is_system)
+#if ("${is_system}" STREQUAL "-1")
+#    set_target_properties(_ImagineModels PROPERTIES
+#        INSTALL_RPATH_USE_LINK_PATH TRUE
+#        INSTALL_RPATH "${install_path}")
+#    # The following is necessary for installation in a virtual
+#    # environment `python -m pip venv env`
+#    set_target_properties(_ImagineModels PROPERTIES
+#        INSTALL_RPATH_USE_LINK_PATH TRUE
+#        INSTALL_RPATH "${install_path}")
+#        message("Hi: ")
+#endif()
 
-message("lib_path: "  ${lib_path})
-message("is_system: "  ${is_system})
+#message("install_path: "  ${install_path})
+#message("is_system: "  ${is_system})
