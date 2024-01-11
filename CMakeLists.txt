@@ -129,12 +129,13 @@ if(Python3_FOUND)
     endif()
 
     
+   
     if(UNIX AND NOT APPLE)
-        message("unix: ${Python3_SITEARCH}")
+        message("unix: ${Python3_SITEARCH}") 
         set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH "${Python3_SITEARCH}")
     elseif(APPLE)
-        message("apple: @loader_path/site_packages")
-        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH "@loader_path/site_packages")
+        message("apple: @rpath/site_packages")
+        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH "@rpath/site_packages")
     else() 
         message("No unix and no apple")
     endif()
