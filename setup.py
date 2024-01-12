@@ -50,10 +50,11 @@ class CMakeBuild(build_ext):
         # from Python.
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
-            f"-DPYTHON_EXECUTABLE={sys.executable}",
+        #     f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
         ]
         
+        cmake_args.append("-DBUILD_PYTHON_PACKAGE=ON")
         
         use_autodiff = os.environ.get("USE_AUTODIFF", "")
         if len(use_autodiff) > 1:
@@ -113,7 +114,6 @@ class CMakeBuild(build_ext):
                 cmake_args += [
                     f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}"
                 ]
-                print("DCMAKE_LIBRARY_OUTPUT_DIRECTORY_ ", f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{cfg.upper()}={extdir}")
                 build_args += ["--config", cfg]
 
         if sys.platform.startswith("darwin"):
@@ -135,9 +135,8 @@ class CMakeBuild(build_ext):
         if not build_temp.exists():
             build_temp.mkdir(parents=True)
 
-        print('cmake: ', cmake_args)
-        print(ext.sourcedir)
-        print('build: ', build_args)
+        print('setup.py: cmake args: ', cmake_args)
+        print('setup.py: build: ', build_args)
         subprocess.run(
             ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
         )
