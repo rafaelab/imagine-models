@@ -16,7 +16,7 @@ A full list of implemented models can be found [here](#list-of-models).
 Requires:
 
 - [Python 3](https://www.python.org/) (>=3.6)
-- [C++](https://www.python.org/) (>=11)
+- [C++](https://www.python.org/) (>=17)
 
 Python Libraries:
 
@@ -40,18 +40,6 @@ This may change in the future.
 The installation procedures are preliminary only 
 
 
-### Installation (C++)
-
-To install the C++ library (tested only under Debian until now):
- 
-```
-mkdir build
-cd build 
-cmake ..
-sudo make install 
-```
-
-
 ### Installation (Python)
 
 Easiest via
@@ -64,18 +52,39 @@ If you want to specify a branch, you can do so by adding @branch-name to the abo
 
 Alternatively, (e.g. if you want to add your own model) you need to clone the repository via
 
-    git clone -b branch_name --recursive https://github.com/IMAGINE-Consortium/imagine-models.git
+    git clone --recursive https://github.com/IMAGINE-Consortium/imagine-models.git
 
 The `--recursive` flag makes sure that also the pybind module is cloned (to the `/extern` folder).
 
 The package can then be installed with
 
-    python3 -m pip install folder/where/setup/py/is/
+    python3 -m pip install -e folder/where/setup/py/is/
+
+where `-e` flag makes it possible to edit the source files directly, which is convenient for developing. 
+
+The installer will automatically figure out which of the optional dependencies you have installed. 
+If you want to disable those, you can do so by defining the `USE_AUTODIFF=OFF` and `USE_FFTW=OFF` environment variables BEFORE you run pip. 
+
+
+### Installation (C++)
+
+First, one needs download the source files, e.g. via cloning the repository with
+
+    git clone --recursive https://github.com/IMAGINE-Consortium/imagine-models.git
+
+The `--recursive` flag makes sure that also the pybind11 module is cloned (to the `/extern` folder), in case you also want to build the Python package. 
+One can then install the C++ library via:
+ 
+```
+mkdir build
+cd build 
+cmake ..
+sudo make install 
+```
 
 The installer will automatically figure out which of the optional dependencies you have installed. 
 
-If you want to disable those, you can do so by defining the `USE_AUTODIFF=OFF` and `USE_FFTW=OFF` environment variables BEFORE you run pip. 
-
+If you want to disable those, you can do so by defining the `USE_AUTODIFF=OFF` and `USE_FFTW=OFF` environment variables BEFORE you run cmake. 
 
 
 ## Examples
