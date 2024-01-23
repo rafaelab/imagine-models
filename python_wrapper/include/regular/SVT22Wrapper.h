@@ -1,13 +1,13 @@
-#ifndef REGULARJF12WRAPPER_H
-#define REGULARJF12WRAPPER_H
+#ifndef SVT22WRAPPER_H
+#define SVT22WRAPPER_H
 
 #include <pybind11/pybind11.h>
 
-#include "RegularJF12.h"
+#include "SVT22.h"
 
-void RegularJF12(py::module_ &m)
+void SVT22(py::module_ &m)
 {
-    py::class_<JF12MagneticField, RegularVectorField>(m, "SVT22")
+    py::class_<SVT22MagneticField, RegularVectorField>(m, "SVT22")
         .def(py::init<>())
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
