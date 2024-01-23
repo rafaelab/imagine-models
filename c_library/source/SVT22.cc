@@ -2,7 +2,7 @@
 #include <cassert>
 #include <iostream>
 #include "hamunits.h"
-#include "RegularJF12.h"
+#include "SVT22.h"
 
 vector SVT22MagneticField::_at_position(const double &x, const double &y, const double &z, const SVT22MagneticField &p) const
 {
@@ -53,7 +53,7 @@ vector SVT22MagneticField::_at_position(const double &x, const double &y, const 
 Eigen::MatrixXd SVT22MagneticField::_jac(const double &x, const double &y, const double &z, SVT22MagneticField &p) const
 {
   vector out;
-  Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, JF12MagneticField &_p)
+  Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, SVT22MagneticField &_p)
                                         { return _p._at_position(_x, _y, _z, _p); },
                                         ad::wrt(p.B_val, p.r_cut, p.z_cut, p.b_arm_4,
                                         ad::at(x, y, z, p), out);
