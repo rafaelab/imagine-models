@@ -54,8 +54,8 @@ Eigen::MatrixXd SVT22MagneticField::_jac(const double &x, const double &y, const
   vector out;
   Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, SVT22MagneticField &_p)
                                         { return _p._at_position(_x, _y, _z, _p); },
-                                        ad::wrt(p.B_val, p.r_cut, p.z_cut,
-                                        ad::at(x, y, z, p), out));
+                                        ad::wrt(p.B_val, p.r_cut, p.z_cut),
+                                        ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
 }
 
