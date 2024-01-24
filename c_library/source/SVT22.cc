@@ -20,7 +20,7 @@ vector SVT22MagneticField::_at_position(const double &x, const double &y, const 
   if (do_halo) {
     number b1, rh;
     number B_h = 0.;
-
+    number z_min = 0.1;
     if (z >= 0)
     { // North
       b1 = p.B_val;
@@ -30,7 +30,7 @@ vector SVT22MagneticField::_at_position(const double &x, const double &y, const 
       b1 = -p.B_val;
     }
 
-    B_h = b1 * (exp(-p.z_min/std::abs(z)) * exp(-std::abs(r) / p.r_cut) * exp(-(std::abs(z)) / (p.z_cut)); // vertical exponential fall-off
+    B_h = b1 * (exp(-z_min/std::abs(z)) * exp(-std::abs(r) / p.r_cut) * exp(-(std::abs(z)) / (p.z_cut)); // vertical exponential fall-off
     const number B_cyl_h[3] = {0., B_h * 1, 0.};
     // add fields together
     B_cyl[0] += B_cyl_h[0];
