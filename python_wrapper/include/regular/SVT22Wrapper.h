@@ -12,9 +12,9 @@ void SVT22(py::module_ &m)
         .def(py::init<std::vector<double> &, std::vector<double> &, std::vector<double> &>())
         .def(py::init<std::array<int, 3> &, std::array<double, 3> &, std::array<double, 3> &>())
 
-        .def_readwrite("B_val", &SVT22MagneticField::b_arm_1)
-        .def_readwrite("r_cut", &SVT22MagneticField::b_arm_2)
-        .def_readwrite("z_cut", &SVT22MagneticField::b_arm_3)
+        .def_readwrite("B_val", &SVT22MagneticField::B_val)
+        .def_readwrite("r_cut", &SVT22MagneticField::r_cut)
+        .def_readwrite("z_cut", &SVT22MagneticField::z_cut)
 
 #if autodiff_FOUND
         .def_readwrite("active_diff", &SVT22MagneticField::active_diff)
