@@ -23,15 +23,14 @@ vector SVT22MagneticField::_at_position(const double &x, const double &y, const 
 
     if (z >= 0)
     { // North
-      b1 = p.B_val*;
+      b1 = p.B_val;
     }
     else
     { // South
       b1 = -p.B_val;
     }
 
-    B_h = b1 * (exp(-p.z_min/std::abs(z)) * exp(-std::abs(r) / p.r_cut) *
-          exp(-(std::abs(z)) / (p.z_cut)); // vertical exponential fall-off
+    B_h = b1 * (exp(-p.z_min/std::abs(z)) * exp(-std::abs(r) / p.r_cut) * exp(-(std::abs(z)) / (p.z_cut)); // vertical exponential fall-off
     const number B_cyl_h[3] = {0., B_h * 1, 0.};
     // add fields together
     B_cyl[0] += B_cyl_h[0];
@@ -55,7 +54,7 @@ Eigen::MatrixXd SVT22MagneticField::_jac(const double &x, const double &y, const
   vector out;
   Eigen::MatrixXd _deriv = ad::jacobian([&](double _x, double _y, double _z, SVT22MagneticField &_p)
                                         { return _p._at_position(_x, _y, _z, _p); },
-                                        ad::wrt(p.B_val, p.r_cut, p.z_cut, p.b_arm_4,
+                                        ad::wrt(p.B_val, p.r_cut, p.z_cut,
                                         ad::at(x, y, z, p), out);
   return _filter_diff(_deriv);
 }
