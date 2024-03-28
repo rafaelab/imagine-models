@@ -30,7 +30,7 @@ set(IM_SRC_FILES
     ${IM_SOURCE_DIR}/fauvet.cc
     ${IM_SOURCE_DIR}/tinyakovtkachev.cc
     ${IM_SOURCE_DIR}/hararimollerachroulet.cc  
-    ${IM_SOURCE_DIR}/SVT22.cc   
+    ${IM_SOURCE_DIR}/svt22.cc   
 )
 
 if(FFTW_FOUND)

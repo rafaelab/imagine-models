@@ -1,5 +1,5 @@
-#ifndef REGULARJF12_H
-#define REGULARJF12_H
+#ifndef SVT22_H
+#define SVT22_H
 
 #include <functional>
 #include <cmath>
