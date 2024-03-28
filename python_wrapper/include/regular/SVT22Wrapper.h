@@ -16,6 +16,7 @@ void SVT22(py::module_ &m)
         .def_readwrite("r_cut", &SVT22MagneticField::r_cut)
         .def_readwrite("z_cut", &SVT22MagneticField::z_cut)
 
+
 #if autodiff_FOUND
         .def_readwrite("active_diff", &SVT22MagneticField::active_diff)
         .def_readonly("all_diff", &SVT22MagneticField::all_diff)

@@ -31,7 +31,6 @@ set(IM_SRC_FILES
     ${IM_SOURCE_DIR}/tinyakovtkachev.cc
     ${IM_SOURCE_DIR}/hararimollerachroulet.cc  
     ${IM_SOURCE_DIR}/SVT22.cc   
-
 )
 
 if(FFTW_FOUND)
@@ -77,3 +76,4 @@ configure_file(${PROJECT_SOURCE_DIR}/ImagineModels.pc.in ${CMAKE_BINARY_DIR}/Ima
 
 install(TARGETS ImagineModels LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(FILES ${CMAKE_BINARY_DIR}/ImagineModels.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+
