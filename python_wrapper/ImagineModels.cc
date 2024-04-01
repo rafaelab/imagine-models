@@ -34,6 +34,8 @@ using namespace pybind11::literals;
 #include "include/regular/HarariMollerachRouletWrapper.h"
 #include "include/regular/TinyakovTkachevWrapper.h"
 #include "include/regular/RegularJF12Wrapper.h"
+#include "include/regular/SVT22Wrapper.h"
+
 
 #if FFTW_FOUND
 #include "include/random/RandomFieldBases.h"
@@ -60,8 +62,8 @@ void TinyakovTkachev(py::module_ &);
 void HarariMollerachRoulet(py::module_ &);
 void WMAP(py::module_ &);
 void Fauvet(py::module_ &);
-
 void YMW(py::module_ &);
+void SVT22(py::module_ &);
 
 #if FFTW_FOUND
 void RandomFieldBases(py::module_ &);
@@ -70,6 +72,8 @@ void RandomJF12(py::module_ &);
 void EnsslinSteininger(py::module_ &);
 void GaussianScalar(py::module_ &);
 void LogNormal(py::module_ &);
+void SVT22(py::module_ &);
+
 #endif
 
 PYBIND11_MODULE(_ImagineModels, m)
@@ -93,7 +97,7 @@ PYBIND11_MODULE(_ImagineModels, m)
   YMW(m);
   WMAP(m);
   Fauvet(m);
-
+  SVT22(m);
 #if FFTW_FOUND
   RandomFieldBases(m);
   RandomJF12(m);
