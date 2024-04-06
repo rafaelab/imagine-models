@@ -124,8 +124,8 @@ if(BUILD_PYTHON_PACKAGE)
             target_include_directories(_ImagineModels PUBLIC ${FFTW_INCLUDE_DIRS})
         endif()
 
-        set_target_properties(_ImagineModels PROPERTIES BUILD_WITH_INSTALL_RPATH ${CMAKE_BUILD_WITH_INSTALL_RPATH})
-        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH_USE_LINK_PATH ${INSTALL_RPATH_USE_LINK_PATH})
+        set_target_properties(_ImagineModels PROPERTIES BUILD_WITH_INSTALL_RPATH "${CMAKE_BUILD_WITH_INSTALL_RPATH}")
+        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH_USE_LINK_PATH "${INSTALL_RPATH_USE_LINK_PATH}")
 
         target_link_libraries(_ImagineModels PUBLIC ImagineModels ${LIBRARIES})
         if (autodiff_FOUND)
