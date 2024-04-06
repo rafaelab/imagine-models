@@ -70,7 +70,23 @@ endif()
 
 add_compile_definitions(FFTW_FOUND=${FFTW_FOUND})
 
-### INSTALLATION 
+
+
+
+## INSTALLATION 
+
+# Installation paths
+
+# fix paths to enable installation in custom directories
+option(USE_ABSOLUTE_RPATH "Use absolute rpath" On)
+if(APPLE OR USE_ABSOLUTE_RPATH)
+  set(CMAKE_SKIP_BUILD_RPATH  False)
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH False)
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH True)
+  set(ABSOLUTE_RPATH "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}")
+endif(APPLE OR USE_ABSOLUTE_RPATH)
+message(STATUS "Installation directory: ${CMAKE_INSTALL_PREFIX}")
+
 
 ## C++
 
@@ -108,9 +124,8 @@ if(BUILD_PYTHON_PACKAGE)
             target_include_directories(_ImagineModels PUBLIC ${FFTW_INCLUDE_DIRS})
         endif()
 
-        set_target_properties(_ImagineModels PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
-        
-        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
+        set_target_properties(_ImagineModels PROPERTIES BUILD_WITH_INSTALL_RPATH ${CMAKE_BUILD_WITH_INSTALL_RPATH})
+        set_target_properties(_ImagineModels PROPERTIES INSTALL_RPATH_USE_LINK_PATH ${INSTALL_RPATH_USE_LINK_PATH})
 
         target_link_libraries(_ImagineModels PUBLIC ImagineModels ${LIBRARIES})
         if (autodiff_FOUND)

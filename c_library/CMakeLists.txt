@@ -5,12 +5,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".so")
 
 set(IM_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/headers/)
-INCLUDE_DIRECTORIES ( "/usr/local/include/eigen3 " )
+INCLUDE_DIRECTORIES (${EIGEN3_INCLUDE_DIR})
 set(IM_SOURCE_DIR ${PROJECT_SOURCE_DIR}/source)
 
 
-set(INCLUDE_INSTALL_DIR
-"${CMAKE_INSTALL_INCLUDEDIR}/ImagineModels")
+set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/ImagineModels")
 # CACHE PATH "The directory relative to CMAKE_INSTALL_PREFIX where ImagineModel header files are installed"
 
 
@@ -53,8 +52,8 @@ if (FFTW_FOUND)
 endif()
 target_link_libraries(ImagineModels PUBLIC ${LIBRARIES})
 if (autodiff_FOUND) 
-    target_include_directories(ImagineModels PUBLIC /usr/local/include/autodiff)
-    target_include_directories(ImagineModels PUBLIC /usr/include/eigen3)
+    target_include_directories(ImagineModels PUBLIC ${autodiff_INCLUDE_DIRS})
+    target_include_directories(ImagineModels PUBLIC ${EIGEN3_INCLUDE_DIR})
     target_link_libraries(ImagineModels PUBLIC autodiff::autodiff)
 endif()
 
