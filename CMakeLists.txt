@@ -93,11 +93,13 @@ message(STATUS "Installation directory: ${CMAKE_INSTALL_PREFIX}")
 # now we add the c_library, the CMakeLists in there will install the ImagineModels library 
 add_subdirectory(${PROJECT_SOURCE_DIR}/c_library)
 
+set(IM_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/c_library/headers)
+message(STATUS "Include directory: ${IM_INCLUDE_DIR}")
+
+
 ## Python, if requested
 
 if(BUILD_PYTHON_PACKAGE)
-
-    set(IM_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/c_library/headers)
 
     # Checking for Python 3
     set(INTERNAL_PYBIND11_DIR "${PROJECT_SOURCE_DIR}/extern/pybind11")
