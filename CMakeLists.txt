@@ -24,14 +24,14 @@ if (USE_AUTODIFF)
     find_package(autodiff)
     if (autodiff_FOUND)         
         message("-- autodiff library found: attempting to find Eigen3.")
-        set(autodiff_INCLUDE_DIRS /usr/include/eigen3)
-    
         find_package(Eigen3 REQUIRED NO_MODULE)
-
+        set(autodiff_INCLUDE_DIRS  ${EIGEN3_INCLUDE_DIR})
+    
         if(NOT Eigen3_FOUND)
             message("-- Could not find the Eigen3 library! Autodifferention disabled.")
         else()
             message("-- Eigen3 library found: Autodifferention enabled.")
+            include_directories(${EIGEN3_INCLUDE_DIR})
     endif()
     else()
         message("-- Could not find the autodiff library! Autodifferention disabled.")
